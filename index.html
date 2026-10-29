@@ -3,208 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Untuk Carelina</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <title>Surprise untuk Carelina</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #09090b;
-            --surface: #18181b;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --border: rgba(255, 255, 255, 0.1);
+            --bg: #1a1a1a;
+            --gold: #d4af37;
+            --off-white: #e5e5e5;
+            --glass: rgba(255, 255, 255, 0.05);
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: var(--bg);
-            color: var(--text-primary);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .ambient-glow {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(212, 212, 216, 0.05) 0%, rgba(9, 9, 11, 0) 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 600px;
-            padding: 40px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: var(--off-white);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
             height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .canvas {
+            width: 90%;
+            max-width: 500px;
+            padding: 60px 40px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: linear-gradient(135deg, #222 0%, #111 100%);
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            position: relative;
         }
 
         .page {
             position: absolute;
-            width: 85%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
             opacity: 0;
-            visibility: hidden;
-            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: translateY(15px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            transition: opacity 1.5s ease;
+            pointer-events: none;
         }
 
-        .page.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        /* Photo Frame Style */
-        .photo-frame {
-            width: 220px;
-            height: 280px;
-            margin: 0 auto 24px auto;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            border-radius: 4px;
-        }
-
-        .photo-frame span {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
+        .page.active { opacity: 1; pointer-events: auto; }
 
         h1 {
-            font-size: 2.75rem;
-            font-weight: 300;
-            letter-spacing: -0.03em;
-            margin-bottom: 8px;
-            color: #ffffff;
-        }
-
-        .date {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 25px;
+            letter-spacing: 3px;
         }
 
         p {
-            font-size: 1.15rem;
-            line-height: 1.7;
-            color: var(--text-secondary);
-            font-weight: 300;
-            margin-bottom: 16px;
+            font-size: 1.3rem;
+            line-height: 2;
+            font-weight: 200;
+            color: #d1d1d1;
         }
 
-        .highlight-box {
-            margin-top: 16px;
-            padding: 24px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        .decor {
+            width: 60px;
+            height: 2px;
+            background: var(--gold);
+            margin: 30px auto;
         }
 
-        .highlight-box p {
-            color: var(--text-primary);
-            margin: 0;
-            font-style: italic;
+        .frame {
+            border: 1px solid var(--gold);
+            padding: 10px;
+            width: 180px;
+            margin: 0 auto 30px;
+            background: rgba(212, 175, 55, 0.05);
         }
 
-        .hint {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            opacity: 0.5;
-            z-index: 10;
-            pointer-events: none;
-        }
+        .frame::after { content: 'TEMPAT FOTO'; font-size: 0.6rem; letter-spacing: 4px; color: var(--gold); }
     </style>
 </head>
 <body>
 
-    <div class="ambient-glow"></div>
-    <div class="hint">Sentuh di mana saja untuk melanjutkan</div>
-
-    <div class="container">
-        <!-- Intro -->
-        <div id="page0" class="page active">
-            <h1 style="font-weight: 400; font-size: 2.2rem; margin-bottom: 12px;">Untuk Carelina</h1>
-            <p style="font-size: 1rem; color: var(--text-secondary);">Sebuah ruang kecil, khusus untuk hari ini.</p>
+    <div class="canvas">
+        <div id="p1" class="page active">
+            <h1>Carelina</h1>
+            <div class="decor"></div>
+            <p>30 Oktober, sebuah hari di mana semesta berterima kasih atas hadirmu.</p>
         </div>
 
-        <!-- Page 1 -->
-        <div id="page1" class="page">
-            <div class="photo-frame">
-                <span>Ruang Kenangan</span>
-            </div>
-            <h1>30 Oktober</h1>
-            <div class="date">Hari yang baik untuk dunia</div>
+        <div id="p2" class="page">
+            <div class="frame"></div>
+            <p>Seberapa sering kau menelan lelahmu sendiri, hanya agar orang lain merasa aman?</p>
         </div>
 
-        <!-- Page 2 -->
-        <div id="page2" class="page">
-            <p>Seberapa keras kau memikul beban orang lain,</p>
-            <p>seberapa sering kau melupakan dirimu sendiri.</p>
+        <div id="p3" class="page">
+            <h1>Validasi Jiwa</h1>
+            <p>Di balik bahu yang kuat itu, kau berhak untuk beristirahat. Kau tidak pernah benar-benar sendiri.</p>
         </div>
 
-        <!-- Page 3 -->
-        <div id="page3" class="page">
-            <div class="highlight-box">
-                <p>Kau tidak pernah sendiri.<br>Aku di sini, menjadi rumah untukmu pulang.</p>
-            </div>
-            <p style="margin-top: 24px; font-size: 1.25rem; color: #ffffff;">Selamat Ulang Tahun, Semestaku. 🤍</p>
+        <div id="p4" class="page">
+            <h1>Selamat Ulang Tahun</h1>
+            <p>Tetaplah bersinar, Carelina. Aku di sini untukmu.</p>
         </div>
     </div>
 
     <script>
-        let currentStep = 0;
-        const totalPages = 4;
-        
+        let s = 0;
+        const pages = document.querySelectorAll('.page');
         document.body.addEventListener('click', () => {
-            const curr = document.getElementById('page' + currentStep);
-            if (curr) curr.classList.remove('active');
-            
-            currentStep++;
-            if (currentStep >= totalPages) {
-                currentStep = totalPages - 1; // Stay on last page
-            }
-            
-            const next = document.getElementById('page' + currentStep);
-            if (next) next.classList.add('active');
-
-            if (currentStep === totalPages - 1) {
-                document.querySelector('.hint').style.display = 'none';
-            }
+            pages[s].classList.remove('active');
+            s = (s + 1) % pages.length;
+            pages[s].classList.add('active');
         });
     </script>
 </body>
