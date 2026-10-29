@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk Carelina</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F4EFEA;
+            --ink: #3E3632;
+        }
+        body { 
+            background-color: var(--bg); 
+            color: var(--ink); 
+            font-family: 'Cormorant Garamond', serif; 
+            margin: 0; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+        .bg-photo {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px) brightness(0.7);
+            opacity: 0;
+            transition: opacity 3s ease;
+            z-index: -1;
+        }
+        .bg-photo.show { opacity: 0.35; }
+        #intro { font-size: 1.5rem; letter-spacing: 2px; text-align: center; }
+        .page { 
+            position: absolute; 
+            opacity: 0; 
+            transition: opacity 2s ease; 
+            max-width: 80%;
+            text-align: center;
+            pointer-events: none;
+        }
+        .active { opacity: 1; pointer-events: auto; }
+        h1 { font-size: 3rem; margin-bottom: 20px; }
+        p { font-size: 1.5rem; line-height: 1.8; }
+        .highlight { font-style: italic; display: block; margin-top: 20px; border-top: 1px solid var(--ink); padding-top: 20px; }
+        .secret-box {
+            margin-top: 30px;
+            padding: 15px 25px;
+            border: 1px dashed var(--ink);
+            display: inline-block;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            background: rgba(244, 239, 234, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-photo" id="bgPhoto"></div>
+    <div id="intro" class="active">Sentuh untuk membuka surat...</div>
+    <div id="page1" class="page">
+        <h1>Carelina.</h1>
+        <p>30 Oktober.</p>
+        <p>Dunia berputar, tapi hari ini adalah porosnya bagiku.</p>
+    </div>
+    <div id="page2" class="page">
+        <p>Aku memperhatikanmu.</p>
+        <p>Seberapa keras kau memikul beban orang lain, seberapa sering kau melupakan dirimu sendiri hanya agar orang di sekitarmu tersenyum.</p>
+    </div>
+    <div id="page3" class="page">
+        <p>Tapi ingatlah, Carelina.</p>
+        <p>Di balik bahu yang kuat itu, ada jiwa yang butuh dipeluk.</p>
+        <p class="highlight">Kau tidak pernah sendiri.<br>Aku di sini, menjadi rumah untukmu pulang.</p>
+        <div class="secret-box">Selamat Ulang Tahun, Semestaku. 🤍</div>
+    </div>
+    <script>
+        let stage = 0;
+        const pages = [document.getElementById('intro'), document.getElementById('page1'), document.getElementById('page2'), document.getElementById('page3')];
+        const bgPhoto = document.getElementById('bgPhoto');
+        document.body.addEventListener('click', () => {
+            if (stage < pages.length - 1) {
+                pages[stage].classList.remove('active');
+                stage++;
+                pages[stage].classList.add('active');
+                if (stage === 1) bgPhoto.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
