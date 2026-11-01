@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Judul Video</title>
+<style>
+  html, body { margin: 0; background: #0b0b10; }
+  body { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+  svg { height: 100vh; width: auto; aspect-ratio: 9 / 16; display: block; font-family: Inter, system-ui, sans-serif; }
+  body.render { display: block; min-height: 0; }
+  body.render svg { width: 720px; height: 1280px; }
+</style>
+</head>
+<body>
+<svg id="v" viewBox="0 0 720 1280" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+/* ===== TEMPLATE 2D (SVG) =====
+   Kontrak renderer: window.DURATION, window.renderAt(t), window.AUDIO_EVENTS, window.MUSIC.
+   Ubah bagian PALET, SCENES, CAPS. Semua gambar dihitung dari t (detik) -> deterministik. */
+
+/* ---------- PALET (ganti per brand / per video) ---------- */
+const C = { bg0: '#16123a', bg1: '#2c2563', ink: '#1d1b26', line: '#fdf6e9', accent: '#ffd84d', red: '#ff5a4e', green: '#2fd08f', blue: '#6fb6ff' };
+
+/* ---------- helper ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));       // 0..1 antara a dan b
+const eout = k => 1 - Math.pow(1 - k, 3);                  // ease out
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const back = k => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); }; // overshoot
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };              // acak deterministik
+const f = n => (+n).toFixed(1);
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const txt = (x, y, s, o = {}) => `<text x="${f(x)}" y="${f(y)}" text-anchor="${o.anchor || 'middle'}" font-size="${o.size || 32}" font-weight="${o.weight || 800}" fill="${o.fill || C.line}" letter-spacing="${o.ls || 0}" opacity="${o.op ?? 1}"${o.filter ? ' filter="url(#sh)"' : ''}>${esc(s)}</text>`;
+// grup dengan animasi masuk: pop (skala) + naik
+const popIn = (t, a, x, y, inner, dur = .45) => { const k = prog(t, a, a + dur); if (k <= 0) return ''; return `<g opacity="${f(Math.min(1, k * 3))}" transform="translate(${f(x)} ${f(y + (1 - eout(k)) * 30)}) scale(${(.6 + .4 * back(k)).toFixed(3)})">${inner}</g>`; };
+
+const DEFS = `<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.bg1}"/><stop offset="1" stop-color="${C.bg0}"/></linearGradient>
+  <radialGradient id="vig" cx=".5" cy=".45" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+  <filter id="sh" x="-20%" y="-40%" width="140%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity=".6"/></filter>
+</defs>`;
+
+function backdrop(t) {
+  let s = `<rect width="720" height="1280" fill="url(#bg)"/>`;
+  for (let i = 0; i < 24; i++) {   // partikel melayang
+    const x = rnd(i) * 720 + Math.sin(t * .5 + i) * 14, y = 1280 - ((rnd(i + 40) * 1280 + t * (12 + rnd(i + 9) * 20)) % 1280);
+    s += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(1.5 + rnd(i + 20) * 2.5)}" fill="#fff" opacity="${f(.06 + rnd(i + 60) * .12)}"/>`;
+  }
+  return s;
+}
+
+/* ---------- ADEGAN ----------
+   a/b = detik mulai/selesai. draw(l, t) -> string SVG; l = waktu lokal adegan.
+   sfx: efek suara di awal adegan (lihat references/audio.md). */
+const SCENES = [
+  { a: 0, b: 3.2, sfx: 'boom', draw(l) {
+    return popIn(l, .1, 360, 560, txt(0, 0, 'JUDUL SERI', { size: 22, ls: 6, fill: C.accent }))
+      + popIn(l, .4, 360, 660, txt(0, 0, 'Judul Besar', { size: 92, filter: 1 }));
+  } },
+  { a: 3.2, b: 8.5, sfx: 'whoosh', draw(l, t) {
+    // contoh: tiga batang tumbuh berurutan
+    let s = `<line x1="90" y1="1000" x2="630" y2="1000" stroke="${C.line}" stroke-width="5" stroke-linecap="round"/>`;
+    [[180, 260, C.green, 'A'], [360, 420, C.red, 'B'], [540, 120, C.blue, 'C']].forEach(([x, h, col, lab], i) => {
+      const k = back(prog(l, .3 + i * .4, 1.0 + i * .4)), hh = h * k;
+      s += `<rect x="${x - 60}" y="${f(1000 - hh)}" width="120" height="${f(hh)}" rx="12" fill="${col}"/>`;
+      s += txt(x, 1045, lab, { size: 24, ls: 2 });
+    });
+    return s;
+  } },
+  { a: 8.5, b: 12, sfx: 'boom', draw(l) {
+    return popIn(l, .2, 360, 640, `<rect x="-280" y="-120" width="560" height="240" rx="30" fill="${C.line}"/>` + txt(0, 20, 'Pesan penutup', { size: 54, fill: C.ink }));
+  } },
+];
+
+/* ---------- CAPTION ----------  [mulai, selesai, teks, opsi]
+   '|' = ganti baris. *kata* = merah, _kata_ = hijau, ^kata^ = kuning. Kata muncul satu per satu. */
+const CAPS = [
+  [3.4, 5.8, 'Contoh caption|dengan kata *penting*'],
+  [5.8, 8.3, 'baris kedua yang|_positif_ dan ^menonjol^.'],
+];
+const MARK = { '*': C.red, '_': C.green, '^': C.accent };
+
+function captions(t) {
+  let s = '';
+  for (const [t0, t1, text, o = {}] of CAPS) {
+    if (t < t0 || t > t1) continue;
+    const size = o.size || 46, y0 = o.y || 330, lh = size * 1.22, lines = text.split('|');
+    const cy = y0 + (lines.length - 1) * lh / 2, pop = back(prog(t, t0, t0 + .28));
+    s += `<g opacity="${f(1 - prog(t, t1 - .22, t1))}" transform="translate(360 ${f(cy)}) scale(${(.85 + .15 * pop).toFixed(3)}) translate(-360 ${f(-cy)})" filter="url(#sh)">`;
+    let wi = 0;
+    lines.forEach((line, li) => {
+      s += `<text x="360" y="${f(y0 + li * lh)}" text-anchor="middle" font-size="${size}" font-weight="800" fill="#fff">`;
+      line.split(' ').forEach((w, j) => {
+        const on = f(prog(t, t0 + wi * .13, t0 + wi * .13 + .12)); wi++;
+        const m = w.match(/^([*_^])(.+?)\1(.*)$/), sp = j ? ' ' : '';
+        s += m ? `<tspan opacity="${on}">${sp}</tspan><tspan fill="${MARK[m[1]]}" opacity="${on}">${esc(m[2])}</tspan><tspan opacity="${on}">${esc(m[3])}</tspan>`
+               : `<tspan opacity="${on}">${sp}${esc(w)}</tspan>`;
+      });
+      s += '</text>';
+    });
+    s += '</g>';
+  }
+  return s;
+}
+
+/* ---------- timeline, audio ---------- */
+const DURATION = SCENES[SCENES.length - 1].b;
+window.DURATION = DURATION;
+window.AUDIO_EVENTS = [
+  ...SCENES.filter(s => s.sfx).map(s => ({ t: s.a, type: s.sfx })),
+  ...CAPS.map(([t0], i) => ({ t: t0, type: 'pluck', note: [76, 72, 69, 74][i % 4] })),
+  { t: DURATION - 3, type: 'end' },
+];
+window.MUSIC = { style: 'lofi', drumsFrom: 3.2, drumsTo: DURATION };
+
+const svg = document.getElementById('v');
+function renderAt(t) {
+  const sc = SCENES.find(s => t >= s.a && t < s.b) || SCENES[SCENES.length - 1];
+  const l = t - sc.a;
+  const fade = Math.min(sc.a === 0 ? 1 : prog(l, 0, .3), sc.b >= DURATION ? 1 : 1 - prog(t, sc.b - .25, sc.b));
+  const black = Math.max(1 - prog(t, 0, .35), prog(t, DURATION - .7, DURATION));
+  svg.innerHTML = DEFS + backdrop(t) + `<g opacity="${f(fade)}">${sc.draw(l, t)}</g>` + captions(t)
+    + `<rect width="720" height="1280" fill="url(#vig)"/><rect width="720" height="1280" fill="#000" opacity="${f(black)}"/>`;
+}
+window.renderAt = renderAt;
+
+if (new URLSearchParams(location.search).has('render')) document.body.classList.add('render');
+else { const st = performance.now(); const loop = () => { renderAt(((performance.now() - st) / 1000) % DURATION); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+</script>
+</body>
+</html>

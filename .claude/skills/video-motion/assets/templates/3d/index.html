@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Judul Video 3D</title>
+<style>
+  html, body { margin: 0; background: #0b0b10; }
+  body { display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; font-family: Inter, system-ui, sans-serif; }
+  #stage { width: 720px; height: 1280px; position: relative; overflow: hidden; transform-origin: top left; }
+  body:not(.render) #stage { transform: scale(calc(100vh / 1280px)); }
+  body.render { display: block; min-height: 0; }
+  canvas { position: absolute; inset: 0; width: 720px !important; height: 1280px !important; }
+  #ui { position: absolute; inset: 0; pointer-events: none; }
+  .cap { position: absolute; left: 40px; right: 40px; text-align: center; color: #fff; font-weight: 800; letter-spacing: -1px; text-shadow: 0 4px 18px rgba(0,0,0,.55); }
+  .cap b { color: var(--hl, #ffd84d); }
+  .tag { position: absolute; left: 0; right: 0; text-align: center; font-size: 20px; letter-spacing: 6px; font-weight: 800; color: #ffd84d; }
+  #fade { position: absolute; inset: 0; background: #000; }
+</style>
+<script type="importmap">{ "imports": { "three": "/lib/three.module.min.js", "three/addons/": "/lib/addons/" } }</script>
+</head>
+<body>
+<div id="stage"><div id="ui"></div><div id="fade"></div></div>
+<script type="module">
+/* ===== TEMPLATE 3D (Three.js) =====
+   Kontrak renderer sama: window.DURATION, window.renderAt(t), AUDIO_EVENTS, MUSIC.
+   Jalankan lewat scripts/render.cjs (menyajikan /lib/ = Three.js lokal; tanpa internet).
+   Prinsip: JANGAN pakai clock/requestAnimationFrame untuk animasi — semua posisi dihitung dari t,
+   supaya tiap frame bisa dirender ulang persis sama. Teks/caption pakai HTML di #ui (lebih tajam). */
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ---------- PALET ---------- */
+const C = { bg: '#2b2560', floor: '#3a3278', gold: '#ffc94d', red: '#ff5a4e', green: '#2fd08f', cream: '#fdf6e9', violet: '#7d70ff', ink: '#1d1b26' };
+
+/* ---------- helper waktu ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eout = k => 1 - Math.pow(1 - k, 3);
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const back = k => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+const bounce = k => { const n = 7.5625, d = 2.75; if (k < 1 / d) return n * k * k; if (k < 2 / d) return n * (k -= 1.5 / d) * k + .75; if (k < 2.5 / d) return n * (k -= 2.25 / d) * k + .9375; return n * (k -= 2.625 / d) * k + .984375; };
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+/* ---------- renderer, kamera, cahaya ---------- */
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(+(new URLSearchParams(location.search).get('pr') || 1));
+renderer.setSize(720, 1280, false);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(C.bg);
+scene.fog = new THREE.Fog(C.bg, 14, 30);
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture; // pantulan lembut
+const camera = new THREE.PerspectiveCamera(42, 720 / 1280, .1, 100);
+
+scene.add(new THREE.HemisphereLight('#ffffff', '#40306a', .8));
+const key = new THREE.DirectionalLight('#fff3e0', 2.4);
+key.position.set(4, 8, 5); key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024); key.shadow.radius = 6;
+Object.assign(key.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6 });
+scene.add(key);
+const rim = new THREE.DirectionalLight('#9fb4ff', 1.2); rim.position.set(-5, 3, -4); scene.add(rim);
+
+const floor = new THREE.Mesh(new THREE.CircleGeometry(12, 64), new THREE.MeshStandardMaterial({ color: C.floor, roughness: .9 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+/* ---------- helper objek ---------- */
+const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: .45, metalness: 0, ...o });
+function mesh(geo, material, parent = scene) { const m = new THREE.Mesh(geo, material); m.castShadow = m.receiveShadow = true; parent.add(m); return m; }
+// tekstur teks dari canvas (label di permukaan 3D, mis. "Rp" di koin)
+function textTexture(text, { size = 256, w = size, h = size, bg = null, color = C.ink, font = '800 120px Inter' } = {}) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const g = cv.getContext('2d');
+  if (bg) { g.fillStyle = bg; g.fillRect(0, 0, w, h); }
+  g.fillStyle = color; g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, w / 2, h / 2 + 6);
+  const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 8; return tx;
+}
+
+/* koin emas dengan tulisan Rp */
+const coinGeo = new THREE.CylinderGeometry(.42, .42, .1, 48);
+const coinFace = mat(C.gold, { metalness: .25, roughness: .35, emissive: '#5a3a00', emissiveIntensity: .25, map: textTexture('Rp', { bg: C.gold, color: '#b07d12' }) });
+const coinSide = mat('#f0b53a', { metalness: .25, roughness: .4, emissive: '#5a3a00', emissiveIntensity: .25 });
+function coin() { return mesh(coinGeo, [coinSide, coinFace, coinFace]); }
+
+/* ---------- OBJEK ADEGAN (ganti sesuai cerita) ---------- */
+// 1) toples tabungan + koin jatuh
+const jar = new THREE.Group(); scene.add(jar);
+mesh(new THREE.CylinderGeometry(1.1, 1.0, 2.2, 48, 1, true), new THREE.MeshStandardMaterial({ color: '#cfe8ff', roughness: .1, transparent: true, opacity: .3, side: THREE.DoubleSide, depthWrite: false }), jar).position.y = 1.1;
+mesh(new THREE.CylinderGeometry(1.15, 1.15, .25, 48), mat(C.red), jar).position.y = 2.3;
+const COINS = Array.from({ length: 14 }, (_, i) => { const c = coin(); c.userData.i = i; return c; });
+
+// 2) HP dengan layar menyala
+const phone = new THREE.Group(); scene.add(phone);
+mesh(new RoundedBoxGeometry(1.6, 3.1, .22, 6, .18), mat(C.ink, { roughness: .3 }), phone);
+const screen = mesh(new THREE.PlaneGeometry(1.4, 2.8), new THREE.MeshBasicMaterial({ map: textTexture('-Rp', { w: 256, h: 512, bg: '#9fe4ff', color: C.red, font: '800 90px Inter' }) }), phone);
+screen.position.z = .115;
+
+// 3) grafik batang
+const BARS = [[C.green, 2.6], [C.red, 2.4], [C.cream, .2]].map(([col, h], i) => { const b = mesh(new RoundedBoxGeometry(.9, 1, .9, 4, .08), mat(col)); b.userData = { h, x: (i - 1) * 1.3 }; return b; });
+
+/* ---------- TIMELINE ----------
+   Tiap adegan: a..b (detik). Fungsi update(l, t) mengatur posisi objek & kamera.
+   Objek yang tidak dipakai adegan disembunyikan otomatis lewat `show`. */
+const SCENES = [
+  { a: 0, b: 5, show: [jar, ...COINS], sfx: 'boom', update(l) {
+    camera.position.set(Math.sin(l * .25) * 1.5, 3.6, 10.5); camera.lookAt(0, 2.2, 0);
+    COINS.forEach(c => {
+      const i = c.userData.i, t0 = .4 + i * .22, k = prog(l, t0, t0 + .7);
+      const restY = .12 + i * .1;
+      c.position.set((rnd(i) - .5) * .5 * (1 - k), lerp(6, restY, bounce(k)), (rnd(i + 5) - .5) * .5 * (1 - k));
+      c.rotation.set(lerp(rnd(i) * 6, 0, eout(k)), rnd(i + 2) * 6, 0);
+      c.visible = l > t0 - .05;
+    });
+  } },
+  { a: 5, b: 9.5, show: [phone, ...COINS], sfx: 'whoosh', update(l) {
+    const k = eio(prog(l, 0, 1.2));
+    camera.position.set(lerp(-3, 0, k), 2.6, lerp(9, 10.5, k)); camera.lookAt(0, 2.5, 0);
+    phone.position.set(0, 1.8 + Math.sin(l * 2) * .08, 0); phone.rotation.set(-.1, Math.sin(l * .8) * .3, 0);
+    COINS.forEach(c => {   // koin terbang keluar dari HP
+      const i = c.userData.i, t0 = .8 + i * .18, k2 = prog(l, t0, t0 + 1.2);
+      c.visible = k2 > 0 && k2 < 1;
+      const a = rnd(i) * Math.PI * 2;
+      c.position.set(Math.cos(a) * 3.2 * eout(k2), 1.8 + Math.sin(k2 * Math.PI) * 2 - k2 * 1.5, .3 + Math.sin(a) * 1.5 * eout(k2));
+      c.rotation.set(k2 * 10, k2 * 6, 0);
+    });
+  } },
+  { a: 9.5, b: 14, show: BARS, sfx: 'boom', update(l) {
+    camera.position.set(Math.sin(l * .3) * 2, 3.4, 11); camera.lookAt(0, 2.2, 0);
+    BARS.forEach((b, i) => { const h = b.userData.h * back(prog(l, .3 + i * .35, 1.1 + i * .35)); b.scale.set(1, Math.max(.01, h), 1); b.position.set(b.userData.x, h / 2, 0); });
+  } },
+];
+
+/* ---------- CAPTION HTML ----------  [mulai, selesai, html, {y, size}]  <b>kata</b> = sorotan */
+const CAPS = [
+  [0.4, 4.6, '<div class="tag">JUDUL SERI · EPS. 01</div>', { y: 180 }],
+  [1.0, 4.6, 'Nabung itu kayak <b>ngisi toples</b>', { y: 230, size: 50 }],
+  [5.3, 9.2, 'tapi tiap notif belanja…<br><b style="color:#ff5a4e">koinnya terbang</b>', { y: 230, size: 48 }],
+  [9.8, 13.6, 'Gaji vs pengeluaran vs <b>tabungan</b>', { y: 230, size: 46 }],
+];
+const ui = document.getElementById('ui');
+const capEls = CAPS.map(([, , html, o = {}]) => { const d = document.createElement('div'); d.className = 'cap'; d.innerHTML = html; d.style.top = (o.y ?? 230) + 'px'; d.style.fontSize = (o.size ?? 48) + 'px'; ui.appendChild(d); return d; });
+
+const DURATION = SCENES[SCENES.length - 1].b;
+window.DURATION = DURATION;
+window.AUDIO_EVENTS = [
+  ...SCENES.filter(s => s.sfx).map(s => ({ t: s.a, type: s.sfx })),
+  ...COINS.map((_, i) => ({ t: .4 + i * .22 + .55, type: 'coin', gain: .5 })),
+  { t: DURATION - 3, type: 'end' },
+];
+window.MUSIC = { style: 'upbeat', drumsFrom: 0, drumsTo: DURATION };
+
+const all = new Set(SCENES.flatMap(s => s.show));
+window.renderAt = t => {
+  const sc = SCENES.find(s => t >= s.a && t < s.b) || SCENES[SCENES.length - 1];
+  all.forEach(o => { o.visible = sc.show.includes(o); });
+  sc.update(t - sc.a, t);
+  renderer.render(scene, camera);
+  CAPS.forEach(([a, b], i) => {
+    const k = back(prog(t, a, a + .35)), o = Math.min(prog(t, a, a + .2), 1 - prog(t, b - .25, b));
+    capEls[i].style.opacity = o.toFixed(3);
+    capEls[i].style.transform = `translateY(${((1 - k) * 30).toFixed(1)}px) scale(${(.85 + .15 * k).toFixed(3)})`;
+  });
+  // fade hitam di awal/akhir + kedip singkat di pergantian adegan
+  const cut = SCENES.some(s => s.a > 0 && t >= s.a - .12 && t < s.a + .12) ? .6 : 0;
+  document.getElementById('fade').style.opacity = Math.max(1 - prog(t, 0, .4), prog(t, DURATION - .7, DURATION), cut).toFixed(3);
+};
+
+if (new URLSearchParams(location.search).has('render')) document.body.classList.add('render');
+else { const st = performance.now(); const loop = () => { window.renderAt(((performance.now() - st) / 1000) % DURATION); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+</script>
+</body>
+</html>

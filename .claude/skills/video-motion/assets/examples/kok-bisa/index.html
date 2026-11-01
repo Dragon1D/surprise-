@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kok Bisa?</title>
+<link rel="stylesheet" href="chat.css">
+<style>
+  html, body { margin: 0; background: #111; }
+  body { display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; font-family: Inter, system-ui, sans-serif; }
+  #stage { width: 720px; height: 1280px; position: relative; overflow: hidden; background: #2a2550; transform-origin: top left; }
+  body:not(.render) #stage { transform: scale(calc(100vh / 1280px)); }
+  body.render { display: block; min-height: 0; }
+  #scene, #fx { position: absolute; inset: 0; width: 720px; height: 1280px; }
+  #chatA, #chatB { left: 0; top: 0; width: 720px; height: 800px; }
+  #chip { z-index: 10; position: absolute; left: 50%; top: 800px; transform: translate(-50%, -50%); background: #1d1b26; color: #fff; font-weight: 800; font-size: 19px; letter-spacing: 3px; padding: 12px 22px; border-radius: 999px; white-space: nowrap; border: 3px solid #fff; }
+  #cap { z-index: 10; position: absolute; left: 40px; right: 40px; top: 1080px; text-align: center; }
+  #cap span { display: inline; background: #ffd84d; color: #1d1b26; font-weight: 800; font-size: 48px; line-height: 1.5; padding: 4px 16px; border-radius: 10px; letter-spacing: -1px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  #cap div { display: inline-block; transform-origin: 50% 100%; }
+  #end { position: absolute; inset: 0; background: #5b4bff; color: #fff; text-align: center; }
+  #end .txt { position: absolute; left: 0; right: 0; top: 700px; padding: 0 50px; }
+  #end .tag { font-size: 18px; letter-spacing: 5px; font-weight: 800; color: #c9c3ff; }
+  #end h1 { font-size: 86px; line-height: 1.02; letter-spacing: -2.5px; margin: 16px 0; font-weight: 800; }
+  #end h1 em { font-style: normal; color: #ffd84d; }
+  #end p { font-size: 29px; line-height: 1.38; margin: 0 auto; max-width: 600px; color: #ece9ff; }
+  #end .cta { margin-top: 36px; display: inline-block; background: #fff; color: #5b4bff; font-weight: 800; font-size: 25px; padding: 16px 30px; border-radius: 999px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="scene" viewBox="0 0 720 1280" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="chatA"></div>
+  <div id="chatB"></div>
+  <div id="chip"></div>
+  <div id="end"><svg id="endsvg" viewBox="0 0 720 700" width="720" height="700"></svg>
+    <div class="txt"><div class="tag">CURHAT DOMPET · EPS. 01</div><h1>Bayar dirimu<br><em>duluan.</em></h1>
+    <p>Begitu gajian, langsung sisihkan 10–20% ke tabungan. Baru sisanya buat hidup &amp; jajan.</p>
+    <div class="cta">Kirim ke temen yang tanggal 3 udah bokek 👀</div></div></div>
+  <svg id="fx" viewBox="0 0 720 1280" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="cap"></div>
+</div>
+<script src="chat.js"></script>
+<script>
+/* "Kok Bisa?" — tokoh rebahan tengah malam, kaget lihat saldo, lalu flashback lewat chat dengan dompetnya.
+   Semua dihitung dari waktu t (detik) supaya bisa dirender frame-per-frame oleh render.cjs. */
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eout = k => 1 - Math.pow(1 - k, 3);
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const back = k => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const f = n => (+n).toFixed(1);
+const $ = id => document.getElementById(id);
+
+const P = { skin: '#f3c6a2', skinD: '#dfa781', hair: '#2b2233', hood: '#ef6f50', hoodD: '#c95239', ink: '#1d1b26',
+  wall: '#2b2653', wall2: '#3d3576', blanket: '#7a68c9', blanketD: '#6554b5', pillow: '#ece6fb', board: '#55406f' };
+
+/* ---------- naskah chat ---------- */
+const SCRIPT_A = [
+  { date: '25 OKT · HARI GAJIAN', clock: '09.02' },
+  { card: 'Gaji masuk', label: 'TRANSFER MASUK', amt: 8000000, react: 'happy' },
+  { d: 'AKU KENYANG BANGET 🤩', typ: .6, react: 'happy' },
+  { k: 'self reward dikit boleh lah ya', react: 'smug' },
+  { card: '👟 Sepatu lari', label: 'CHECKOUT BERHASIL', amt: -749000, react: 'smug' },
+  { d: 'dikit 🙂', typ: .8, wait: .5, react: 'guilty' },
+  { date: '28 OKT', clock: '00.44' },
+  { card: '🛒 Promo tengah malam · 4 barang', label: 'CHECKOUT BERHASIL', amt: -1230000, react: 'cringe' },
+  { d: 'katanya cuma liat-liat', typ: .6, react: 'guilty' },
+  { k: 'kebablasan dikit 😅', react: 'cringe' },
+  { date: '1 NOV', clock: '08.12' },
+  { card: '🏠 Kos & tagihan', label: 'AUTODEBET', amt: -2500000, fast: true, react: 'cringe' },
+  { card: '⏳ Cicilan paylater', label: 'AUTODEBET', amt: -850000, fast: true, react: 'cringe' },
+  { card: '🛵 Ojol + makan', label: 'PEMBAYARAN', amt: -1234000, fast: true, react: 'shock' },
+  { card: '📺 Langganan ×4', label: 'AUTODEBET', amt: -246000, react: 'shock' },
+  { voice: '(suara dompet ngos-ngosan)', typ: .8, dur: 2.6, react: 'guilty' },
+  { date: '2 NOV', clock: '21.30' },
+  { card: '🍻 Nongkrong + kado nikahan', label: 'PEMBAYARAN', amt: -775000, react: 'cringe' },
+  { rekap: true, typ: 1.2, wait: 2.3, react: 'shock' },
+];
+const SCRIPT_B = [
+  { date: '25 NOV · HARI GAJIAN', clock: '09.01' },
+  { card: 'Gaji masuk', label: 'TRANSFER MASUK', amt: 8000000, react: 'happy' },
+  { k: 'tabungan duluan ah 🐷', react: 'proud' },
+  { card: '🐷 Pindah ke Tabungan', label: 'TABUNGAN DULUAN', amt: -1600000, save: true, react: 'proud' },
+  { d: 'PINTER BANGET 🥹', typ: .6, react: 'happy' },
+  { d: 'sisanya bebas. asal tetap di jalur ya', typ: .6, wait: 1.2, react: 'proud' },
+];
+
+const chatA = createChat($('chatA'), SCRIPT_A, { start: .5 });
+const chatB = createChat($('chatB'), SCRIPT_B, { start: .5 });
+
+/* ---------- timeline ---------- */
+const FB0 = 6.0;                       // mulai flashback
+const FB_END = FB0 + chatA.end + .2;   // keluar dari flashback
+const R2 = FB_END;                     // kamar lagi
+const AF0 = R2 + 5.8;                  // gajian berikutnya
+const AF_END = AF0 + chatB.end + .3;
+const E0 = AF_END;                     // penutup
+const DURATION = E0 + 6.0;
+window.DURATION = DURATION;
+
+const AUDIO = [
+  { t: 1.2, type: 'notif' }, { t: 1.55, type: 'sting' }, { t: 3.4, type: 'pop' }, { t: 4.8, type: 'whoosh' },
+  { t: FB_END - .5, type: 'whoosh' }, { t: R2 + .6, type: 'slap' }, { t: R2 + 2.6, type: 'pop' }, { t: R2 + 3.5, type: 'idea' },
+  { t: AF0 - .4, type: 'swipe' }, { t: E0, type: 'end' },
+];
+chatA.audio.forEach(e => AUDIO.push({ ...e, t: e.t + FB0 }));
+chatB.audio.forEach(e => AUDIO.push({ ...e, t: e.t + AF0 }));
+window.AUDIO_EVENTS = AUDIO.sort((a, b) => a.t - b.t);
+window.MUSIC = { drumsFrom: FB0, drumsTo: DURATION };
+
+function keysFrom(chat, off, first) {
+  const k = [{ t: off, e: first }];
+  for (const it of chat.items) if (it.react) k.push({ t: off + (it.typeFrom ?? it.typFrom ?? it.at), e: it.react, it });
+  return k;
+}
+const KEYS = [
+  { t: 0, e: 'scroll' }, { t: 1.55, e: 'shock' }, { t: 3.2, e: 'think' },
+  ...keysFrom(chatA, FB0, 'scroll'),
+  { t: R2, e: 'shock' }, { t: R2 + .6, e: 'facepalm' }, { t: R2 + 2.4, e: 'think' }, { t: R2 + 3.5, e: 'idea' },
+  ...keysFrom(chatB, AF0, 'scroll'),
+  { t: E0, e: 'proud' },
+];
+function exprAt(t) {
+  let k = KEYS[0];
+  for (const x of KEYS) if (x.t <= t) k = x;
+  return { e: k.e, bounce: 1 - prog(t, k.t, k.t + .4) };
+}
+
+/* ---------- tokoh ---------- */
+const EX = {
+  scroll:   { eyes: 'dot', look: [0, 7], brow: [0, 0], mouth: 'flat', phone: 1 },
+  neutral:  { eyes: 'dot', brow: [0, 0], mouth: 'smile', phone: 1 },
+  happy:    { eyes: 'arc', brow: [-10, -10], mouth: 'grin', blush: 1, phone: 1 },
+  smug:     { eyes: 'lid', brow: [-12, 3], mouth: 'smirk', phone: 1 },
+  cringe:   { eyes: 'squeeze', brow: 'worried', mouth: 'teeth', sweat: .7, phone: 1 },
+  shock:    { eyes: 'big', brow: [-20, -20], mouth: 'O', sweat: 1, pale: 1, phone: 1 },
+  guilty:   { eyes: 'side', brow: 'worried', mouth: 'wobble', sweat: .5, phone: 1 },
+  facepalm: { eyes: 'none', mouth: 'down', hand: 'face' },
+  think:    { eyes: 'up', brow: [-8, 2], mouth: 'pursed', hand: 'chin' },
+  idea:     { eyes: 'sparkle', brow: [-14, -14], mouth: 'grin', hand: 'point', bulb: 1 },
+  proud:    { eyes: 'arc', brow: [-6, -6], mouth: 'smile', blush: 1, phone: 1 },
+};
+
+function arm(x1, y1, x2, y2) {
+  return `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${P.hoodD}" stroke-width="58" stroke-linecap="round"/><path d="M${x1} ${y1} L${x2} ${y2}" stroke="${P.hood}" stroke-width="50" stroke-linecap="round"/>`;
+}
+
+function human(name, t, bounce = 0) {
+  const x = EX[name] || EX.neutral;
+  let s = '';
+  // badan
+  s += `<path d="M-175 330 Q-170 150 -62 118 L62 118 Q170 150 175 330 Z" fill="${P.hood}"/>`;
+  s += `<path d="M-62 118 Q0 180 62 118 Q0 150 -62 118Z" fill="${P.hoodD}"/>`;
+  s += `<path d="M-26 150 v60 M26 150 v60" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".85"/>`;
+  s += `<rect x="-30" y="70" width="60" height="62" rx="20" fill="${P.skinD}"/>`;
+  // kepala (squash kecil saat ganti ekspresi)
+  const sq = Math.sin(bounce * Math.PI) * .07;
+  s += `<g transform="translate(0 ${f(-bounce * 10)}) scale(${(1 + sq).toFixed(3)} ${(1 - sq * .7).toFixed(3)})">`;
+  s += `<circle cx="-92" cy="12" r="22" fill="${P.skinD}"/><circle cx="92" cy="12" r="22" fill="${P.skinD}"/>`;
+  s += `<ellipse cx="0" cy="0" rx="92" ry="102" fill="${P.skin}"/>`;
+  s += `<path d="M-100 14 Q-114 -100 -6 -112 Q96 -116 102 -6 Q98 -42 72 -58 Q44 -30 -4 -50 Q-40 -30 -72 -54 Q-94 -30 -100 14Z" fill="${P.hair}"/>`;
+  if (x.pale) s += `<ellipse cx="0" cy="0" rx="92" ry="102" fill="#7fa7ff" opacity=".2"/>`;
+  if (x.phone) s += `<ellipse cx="10" cy="30" rx="80" ry="70" fill="#9fe4ff" opacity=".13"/>`;
+  // alis
+  const by = -40;
+  if (x.brow === 'worried') s += `<path d="M-58 ${by + 4} L-16 ${by - 8} M58 ${by + 4} L16 ${by - 8}" stroke="${P.hair}" stroke-width="9" stroke-linecap="round"/>`;
+  else if (x.brow) s += `<path d="M-56 ${by + x.brow[0]} L-18 ${by + x.brow[0] - 2} M56 ${by + x.brow[1]} L18 ${by + x.brow[1] - 2}" stroke="${P.hair}" stroke-width="9" stroke-linecap="round"/>`;
+  // mata
+  const blink = (t % 3.7) < .12 && ['dot', 'side', 'up', 'lid'].includes(x.eyes);
+  for (const sx of [-1, 1]) {
+    const ex = sx * 36, ey = 2;
+    if (blink) { s += `<path d="M${ex - 10} ${ey} h20" stroke="${P.ink}" stroke-width="5" stroke-linecap="round"/>`; continue; }
+    switch (x.eyes) {
+      case 'dot': case 'side': case 'up': case 'lid': case 'sparkle': {
+        const lk = x.look || (x.eyes === 'side' ? [-8, 2] : x.eyes === 'up' ? [5, -8] : [0, 0]);
+        s += `<ellipse cx="${ex + lk[0]}" cy="${ey + lk[1]}" rx="9.5" ry="12" fill="${P.ink}"/><circle cx="${ex + lk[0] + 3}" cy="${ey + lk[1] - 4}" r="${x.eyes === 'sparkle' ? 5 : 3}" fill="#fff"/>`;
+        if (x.eyes === 'lid' || x.eyes === 'side') s += `<rect x="${ex - 14}" y="${ey - 18}" width="28" height="14" fill="${P.skin}"/><path d="M${ex - 13} ${ey - 4} h26" stroke="${P.ink}" stroke-width="4" stroke-linecap="round"/>`;
+        break;
+      }
+      case 'arc': s += `<path d="M${ex - 12} ${ey + 4} Q${ex} ${ey - 12} ${ex + 12} ${ey + 4}" stroke="${P.ink}" stroke-width="6" fill="none" stroke-linecap="round"/>`; break;
+      case 'squeeze': s += `<path d="M${ex - sx * 11} ${ey - 9} L${ex + sx * 9} ${ey} L${ex - sx * 11} ${ey + 9}" stroke="${P.ink}" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`; break;
+      case 'big': s += `<circle cx="${ex}" cy="${ey}" r="21" fill="#fff" stroke="${P.ink}" stroke-width="4"/><circle cx="${ex}" cy="${ey + 2}" r="6" fill="${P.ink}"/>`; break;
+    }
+  }
+  if (x.blush) s += `<ellipse cx="-56" cy="34" rx="15" ry="9" fill="#f08a8a" opacity=".6"/><ellipse cx="56" cy="34" rx="15" ry="9" fill="#f08a8a" opacity=".6"/>`;
+  // mulut
+  const M = {
+    smile: `<path d="M-22 48 Q0 64 22 48" stroke="${P.ink}" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+    flat: `<path d="M-14 54 h28" stroke="${P.ink}" stroke-width="6" stroke-linecap="round"/>`,
+    grin: `<path d="M-32 42 Q0 92 32 42 Z" fill="#5a2020"/><ellipse cx="0" cy="66" rx="13" ry="7" fill="#f28b9a"/>`,
+    smirk: `<path d="M-18 56 Q10 60 28 42" stroke="${P.ink}" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+    teeth: `<rect x="-30" y="42" width="60" height="24" rx="9" fill="#fff" stroke="${P.ink}" stroke-width="4"/><path d="M-10 42 v24 M10 42 v24 M-30 54 h60" stroke="${P.ink}" stroke-width="2.5"/>`,
+    O: `<ellipse cx="0" cy="58" rx="15" ry="${f(21 + Math.sin(t * 8) * 2)}" fill="#5a2020"/>`,
+    wobble: `<path d="M-22 56 q6 -7 11 0 t11 0 t11 0 t11 0" stroke="${P.ink}" stroke-width="5" fill="none" stroke-linecap="round"/>`,
+    down: `<path d="M-18 60 Q0 48 18 60" stroke="${P.ink}" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+    pursed: `<ellipse cx="14" cy="54" rx="8" ry="7" fill="#5a2020"/>`,
+  };
+  s += M[x.mouth] || '';
+  if (x.sweat) {
+    for (let i = 0; i < 2; i++) {
+      const k = (t * 1.1 + i * .5) % 1, sx = i ? -100 : 98, sy = -50 + k * 50;
+      s += `<path d="M${sx} ${f(sy)} q-10 17 0 22 q10 -5 0 -22z" fill="#8fd3ff" opacity="${f(x.sweat * (1 - k))}"/>`;
+    }
+  }
+  s += '</g>';
+  // tangan
+  if (x.phone) {
+    s += arm(150, 300, 78, 175);
+    s += `<g transform="rotate(-8 64 120)"><rect x="30" y="64" width="68" height="116" rx="14" fill="${P.ink}"/><rect x="37" y="73" width="54" height="96" rx="6" fill="#9fe4ff"/><rect x="44" y="84" width="40" height="8" rx="4" fill="#fff" opacity=".7"/><rect x="44" y="100" width="30" height="8" rx="4" fill="#fff" opacity=".5"/></g>`;
+    s += `<circle cx="70" cy="170" r="26" fill="${P.skin}"/><ellipse cx="44" cy="${f(132 + (name === 'scroll' ? Math.sin(t * 5) * 10 : 0))}" rx="11" ry="15" fill="${P.skin}"/>`;
+  }
+  if (x.hand === 'face') { s += arm(-150, 300, -46, 92); s += `<ellipse cx="-4" cy="-2" rx="60" ry="44" fill="${P.skin}"/><path d="M-40 -34 v40 M-16 -40 v44 M8 -40 v44 M32 -34 v40" stroke="${P.skinD}" stroke-width="4" stroke-linecap="round"/>`; }
+  if (x.hand === 'chin') { s += arm(-150, 300, -40, 150); s += `<circle cx="-24" cy="112" r="28" fill="${P.skin}"/>`; }
+  if (x.hand === 'point') { s += arm(-150, 300, -132, 100); s += `<circle cx="-132" cy="74" r="26" fill="${P.skin}"/><path d="M-132 60 v-40" stroke="${P.skin}" stroke-width="16" stroke-linecap="round"/>`; }
+  if (x.bulb) {
+    const k = back(clamp(bounce < 1 ? 1 - bounce : 0));
+    s += `<g transform="translate(0 -190) scale(${f(Math.max(.01, k))})">`;
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; s += `<path d="M${f(Math.cos(a) * 56)} ${f(Math.sin(a) * 56)} L${f(Math.cos(a) * 76)} ${f(Math.sin(a) * 76)}" stroke="#ffd84d" stroke-width="8" stroke-linecap="round"/>`; }
+    s += `<circle r="40" fill="#ffd84d"/><rect x="-18" y="34" width="36" height="22" rx="5" fill="#b9b3d6"/><path d="M-12 8 q12 -18 24 0" stroke="#e0a800" stroke-width="5" fill="none"/></g>`;
+  }
+  return s;
+}
+
+/* ---------- kamar ---------- */
+function room(t, ex) {
+  let s = `<defs><linearGradient id="wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.wall}"/><stop offset="1" stop-color="${P.wall2}"/></linearGradient>
+    <radialGradient id="lamp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb35c" stop-opacity=".45"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>
+    <radialGradient id="ph" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#9fe4ff" stop-opacity=".28"/><stop offset="1" stop-color="#9fe4ff" stop-opacity="0"/></radialGradient></defs>`;
+  s += `<rect width="720" height="1280" fill="url(#wl)"/>`;
+  // jendela + bulan
+  s += `<rect x="54" y="150" width="236" height="300" rx="18" fill="#4a4290"/><rect x="68" y="164" width="208" height="272" rx="10" fill="#15123a"/>`;
+  s += `<circle cx="210" cy="230" r="34" fill="#fff4cf"/><circle cx="224" cy="220" r="30" fill="#15123a"/>`;
+  for (let i = 0; i < 9; i++) s += `<circle cx="${f(85 + rnd(i) * 175)}" cy="${f(185 + rnd(i + 9) * 230)}" r="${f(1.5 + rnd(i + 3) * 2)}" fill="#fff" opacity="${f(.4 + .6 * Math.abs(Math.sin(t * 2 + i)))}"/>`;
+  s += `<path d="M68 395 h40 v-60 h30 v60 h20 v-90 h36 v90 h24 v-40 h30 v40 h28 v41 h-208z" fill="#0c0a26"/>`;
+  for (let i = 0; i < 6; i++) s += `<rect x="${118 + i * 24}" y="${355 + (i % 3) * 14}" width="6" height="8" fill="#ffd84d" opacity=".7"/>`;
+  s += `<path d="M40 140 h50 q-10 160 6 330 h-56z" fill="#e2675a"/><path d="M304 140 h-50 q10 160 -6 330 h56z" fill="#e2675a"/>`;
+  // poster
+  s += `<g transform="rotate(3 555 290)"><rect x="470" y="180" width="170" height="220" rx="8" fill="#f4ede1"/>`;
+  s += `<text x="555" y="225" text-anchor="middle" font-size="22" font-weight="800" fill="${P.ink}">GOALS</text><text x="555" y="250" text-anchor="middle" font-size="16" font-weight="700" fill="#e5483b">2026</text>`;
+  ['nabung', 'dana darurat', 'liburan'].forEach((w, i) => { s += `<rect x="490" y="${272 + i * 36}" width="18" height="18" rx="4" fill="none" stroke="${P.ink}" stroke-width="3"/><text x="518" y="${287 + i * 36}" font-size="17" font-weight="600" fill="${P.ink}">${w}</text>`; });
+  s += `</g>`;
+  // lampu tidur + jam
+  s += `<circle cx="640" cy="760" r="260" fill="url(#lamp)"/>`;
+  s += `<path d="M600 700 h80 l-14 -70 h-52z" fill="#ffcf7a"/><rect x="634" y="700" width="12" height="80" fill="#9a8bd0"/>`;
+  s += `<rect x="560" y="780" width="200" height="300" rx="10" fill="#4a3d6e"/><rect x="614" y="806" width="100" height="46" rx="10" fill="#15123a"/>`;
+  s += `<text x="664" y="840" text-anchor="middle" font-size="26" font-weight="800" fill="#ff6b5b" font-family="JetBrains Mono, monospace">${ex.clock || '23.48'}</text>`;
+  // headboard, bantal, tokoh, selimut
+  s += `<rect x="110" y="540" width="500" height="420" rx="46" fill="${P.board}"/>`;
+  s += `<rect x="160" y="610" width="400" height="170" rx="80" fill="${P.pillow}"/>`;
+  const e = exprAt(t);
+  s += `<circle cx="400" cy="760" r="200" fill="url(#ph)" opacity="${EX[e.e] && EX[e.e].phone ? 1 : 0}"/>`;
+  s += `<g transform="translate(360 680) scale(1.25)">${human(e.e, t, e.bounce)}</g>`;
+  s += `<path d="M-20 1020 Q160 960 360 990 T740 970 V1300 H-20Z" fill="${P.blanket}"/>`;
+  for (let i = 0; i < 5; i++) s += `<path d="M${-20 + i * 170} ${1040 + i * 4} q60 -14 120 0" stroke="${P.blanketD}" stroke-width="10" fill="none" stroke-linecap="round"/>`;
+  return s;
+}
+
+function thought(cx, cy, text, k, tailTo) {
+  if (k <= 0) return '';
+  let s = `<g transform="translate(${cx} ${cy}) scale(${f(Math.max(.01, k))}) translate(${-cx} ${-cy})">`;
+  if (tailTo) s += `<circle cx="${tailTo[0]}" cy="${tailTo[1]}" r="12" fill="#fff"/><circle cx="${(tailTo[0] + cx) / 2 - 20}" cy="${(tailTo[1] + cy) / 2 + 30}" r="20" fill="#fff"/>`;
+  [[0, 0, 100], [-80, 20, 72], [80, 20, 72], [-40, -50, 70], [45, -50, 70], [0, 50, 70]].forEach(([dx, dy, r]) => { s += `<circle cx="${cx + dx}" cy="${cy + dy}" r="${r}" fill="#fff"/>`; });
+  s += `<text x="${cx}" y="${cy + 14}" text-anchor="middle" font-size="40" font-weight="800" fill="${P.ink}">${text}</text></g>`;
+  return s;
+}
+
+function notifBanner(y) {
+  return `<g transform="translate(0 ${f(y)})"><rect x="30" y="40" width="660" height="128" rx="30" fill="#fff" opacity=".97"/>
+    <rect x="56" y="66" width="76" height="76" rx="20" fill="#1fa971"/><text x="94" y="116" text-anchor="middle" font-size="28" font-weight="800" fill="#fff">Rp</text>
+    <text x="154" y="92" font-size="19" font-weight="700" fill="#8a8173" letter-spacing="1">M-BANKING · sekarang</text>
+    <text x="154" y="134" font-size="31" font-weight="800" fill="${P.ink}">Saldo kamu: <tspan fill="#e5483b">Rp416.000</tspan></text></g>`;
+}
+
+/* ---------- caption ---------- */
+const CAPS = [
+  [0.4, 2.2, 'Tanggal 3. Jam 23.48.'],
+  [2.2, 4.6, 'Gajian masih 22 hari lagi.'],
+  [R2 + .7, R2 + 2.5, 'Oke… ini salahku.'],
+  [R2 + 2.5, R2 + 5.6, 'Gajian depan, beda cerita.'],
+];
+function caption(t) {
+  for (const [a, b, s] of CAPS) if (t >= a && t < b) {
+    const k = back(prog(t, a, a + .3)), o = 1 - prog(t, b - .2, b);
+    return `<div style="opacity:${f(o)};transform:rotate(-2deg) scale(${(.6 + .4 * k).toFixed(3)})"><span>${s}</span></div>`;
+  }
+  return '';
+}
+
+/* ---------- reaksi di panel bawah ---------- */
+function panel(t, chat, off, clock) {
+  let s = `<defs><clipPath id="pc"><rect x="0" y="800" width="720" height="480"/></clipPath></defs>`;
+  s += `<g clip-path="url(#pc)"><g transform="translate(0 340)">${room(t, { clock })}</g>`;
+  // angka minus melayang dari HP
+  for (const it of chat.items) {
+    if (!it.card || it.amt > 0) continue;
+    const k = prog(t, off + it.at, off + it.at + 1.3);
+    if (k <= 0 || k >= 1) continue;
+    const txt = (it.save ? '🐷 +' : '-') + 'Rp' + (Math.abs(it.amt) >= 1e6 ? (Math.abs(it.amt) / 1e6).toFixed(1).replace(/\.0$/, '').replace('.', ',') + 'jt' : Math.round(Math.abs(it.amt) / 1000) + 'rb');
+    const col = it.save ? '#1fa971' : '#e5483b';
+    s += `<g opacity="${f(Math.min(1, k * 5) * (1 - prog(k, .7, 1)))}" transform="translate(${f(520 + Math.sin(k * 6) * 12)} ${f(1040 - eout(k) * 130)}) scale(${f(.7 + .3 * back(Math.min(1, k * 3)))})"><rect x="-110" y="-40" width="220" height="58" rx="16" fill="#fff" stroke="${col}" stroke-width="4"/><text x="0" y="0" text-anchor="middle" font-size="30" font-weight="800" fill="${col}">${txt}</text></g>`;
+  }
+  s += `</g><rect x="0" y="796" width="720" height="8" fill="${P.ink}"/>`;
+  return s;
+}
+
+/* ---------- render ---------- */
+const scene = $('scene'), fx = $('fx'), cap = $('cap'), chip = $('chip'), endEl = $('end');
+function renderAt(t) {
+  let sc = '', fxs = '';
+  const inA = t >= FB0 && t < FB_END, inB = t >= AF0 - .5 && t < E0 + .8;
+  $('chatA').style.display = inA ? 'flex' : 'none';
+  $('chatB').style.display = inB ? 'flex' : 'none';
+  chip.style.display = 'none';
+  let white = 0;
+
+  if (t < FB0) {
+    // kamar: notifikasi, kaget, bengong, zoom ke gelembung pikiran
+    const z = eio(prog(t, 4.8, 6.0)), k = lerp(1, 8, z);
+    sc += `<g transform="translate(560 330) scale(${f(k)}) translate(-560 -330)">${room(t, {})}`;
+    sc += thought(560, 330, '…kok bisa?', back(prog(t, 3.4, 3.9)), [470, 470]);
+    sc += '</g>';
+    const ny = t < 3.9 ? lerp(-200, 0, back(prog(t, 1.1, 1.5))) : lerp(0, -200, eio(prog(t, 3.9, 4.3)));
+    fxs += notifBanner(ny);
+    white = Math.max(1 - prog(t, 0, .5), prog(t, 5.4, 6.0));
+  } else if (t < FB_END) {
+    chatA.renderAt(t - FB0);
+    sc += panel(t, chatA, FB0);
+    chip.style.display = 'block';
+    chip.textContent = '💭 9 HARI SEBELUMNYA';
+    chip.style.opacity = 1;
+    white = Math.max(1 - prog(t, FB0, FB0 + .45), prog(t, FB_END - .5, FB_END));
+  } else if (t < AF0) {
+    const z = eio(prog(t, R2, R2 + .8)), k = lerp(6, 1, z);
+    sc += `<g transform="translate(560 330) scale(${f(k)}) translate(-560 -330)">${room(t, { clock: '23.59' })}`;
+    sc += thought(560, 330, 'gimana kalau…', back(prog(t, R2 + 2.6, R2 + 3.0)) * (1 - prog(t, R2 + 3.4, R2 + 3.6)), [470, 470]);
+    sc += '</g>';
+    white = 1 - prog(t, R2, R2 + .45);
+  }
+  if (inB && t < E0 + .8) {
+    // gajian berikutnya: panel chat naik dari bawah
+    const up = eout(prog(t, AF0 - .5, AF0));
+    chatB.renderAt(t - AF0);
+    $('chatB').style.transform = `translateY(${f((1 - up) * 1280)}px)`;
+    if (t >= AF0 - .5) {
+      sc = (t < AF0 ? sc : '') + `<g transform="translate(0 ${f((1 - up) * 1280)})">${panel(t, chatB, AF0, '09.04')}</g>`;
+      chip.style.display = up > .9 ? 'block' : 'none';
+      chip.textContent = '📅 GAJIAN BERIKUTNYA';
+    }
+  }
+  scene.innerHTML = sc;
+  fx.innerHTML = fxs + (white > 0 ? `<rect width="720" height="1280" fill="#fff" opacity="${f(white)}"/>` : '');
+  cap.innerHTML = caption(t);
+
+  // penutup
+  const ek = eio(prog(t, E0, E0 + .7));
+  endEl.style.display = ek > 0 ? 'block' : 'none';
+  endEl.style.clipPath = `circle(${f(ek * 1500)}px at 360px 1000px)`;
+  if (ek > 0) {
+    const b = back(prog(t, E0 + .4, E0 + 1.0));
+    $('endsvg').innerHTML = `<defs><clipPath id="av"><circle cx="360" cy="430" r="200"/></clipPath></defs>
+      <g transform="translate(360 430) scale(${f(Math.max(.01, b))}) translate(-360 -430)"><circle cx="360" cy="430" r="208" fill="#fff"/><circle cx="360" cy="430" r="200" fill="#7d70ff"/>
+      <g clip-path="url(#av)"><g transform="translate(360 440) scale(1.05)">${human('proud', t, 0)}</g></g></g>`;
+    const kids = endEl.querySelector('.txt').children;
+    [E0 + .8, E0 + 1.1, E0 + 1.6, E0 + 2.2].forEach((a, i) => {
+      const k = eout(prog(t, a, a + .5));
+      kids[i].style.opacity = k; kids[i].style.transform = `translateY(${f((1 - k) * 24)}px)`;
+    });
+  }
+  $('stage').style.filter = t > DURATION - .6 ? `brightness(${(1 - prog(t, DURATION - .6, DURATION)).toFixed(3)})` : '';
+}
+window.renderAt = renderAt;
+
+if (new URLSearchParams(location.search).has('render')) document.body.classList.add('render');
+else document.fonts.ready.then(() => {
+  const st = performance.now();
+  const loop = () => { renderAt(((performance.now() - st) / 1000) % DURATION); requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+});
+</script>
+</body>
+</html>

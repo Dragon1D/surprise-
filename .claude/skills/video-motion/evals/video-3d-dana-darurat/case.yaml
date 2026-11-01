@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: video-3d-dana-darurat
+expected_outcome: |
+  Sebuah MP4 vertikal 1080x1920 berdurasi sekitar 20 detik dengan audio, dibuat dengan
+  adegan 3D (Three.js), berisi pesan dana darurat 3-6x pengeluaran bulanan, caption terbaca,
+  dan dipratinjau (lembar kontak) sebelum render penuh.

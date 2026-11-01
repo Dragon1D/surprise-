@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curhat Dompet</title>
+<style>
+  :root {
+    --bg: #f4ede1; --ink: #1d1b26; --muted: #8a8173; --me: #5b4bff; --me2: #7d70ff;
+    --red: #e5483b; --green: #1fa971; --card: #fffdf8; --chip: #e7dccb; --brown: #d9782f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #111; }
+  body { display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: Inter, system-ui, sans-serif; }
+  #stage { width: 720px; height: 1280px; position: relative; overflow: hidden; background: var(--me); transform-origin: top left; }
+  body:not(.render) #stage { transform: scale(calc(100vh / 1280px)); }
+  body:not(.render) { align-items: flex-start; }
+  body.render { display: block; min-height: 0; }
+
+  #app { position: absolute; inset: 0; background: var(--bg); transform-origin: 50% 0; display: flex; flex-direction: column; }
+  .statusbar { height: 44px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; font-weight: 700; font-size: 20px; color: var(--ink); background: #fff; }
+  .bat { width: 40px; height: 20px; border: 2.5px solid var(--ink); border-radius: 6px; padding: 2px; position: relative; }
+  .bat::after { content: ''; position: absolute; right: -6px; top: 5px; width: 3px; height: 6px; background: var(--ink); border-radius: 0 2px 2px 0; }
+  .bat i { display: block; height: 100%; background: var(--green); border-radius: 2px; }
+  .header { height: 120px; background: #fff; display: flex; align-items: center; gap: 16px; padding: 0 24px; border-bottom: 2px solid #eadfcd; position: relative; z-index: 2; }
+  .back { font-size: 40px; color: var(--ink); width: 22px; font-weight: 300; }
+  #avatar { width: 78px; height: 78px; border-radius: 50%; background: #fbe7d3; display: grid; place-items: center; overflow: hidden; flex: none; }
+  .who b { display: block; font-size: 30px; color: var(--ink); letter-spacing: -.5px; }
+  .who small { font-size: 19px; color: var(--green); font-weight: 600; }
+  .who small.idle { color: var(--muted); font-weight: 500; }
+  #saldo { margin-left: auto; text-align: right; }
+  #saldo small { display: block; font-size: 14px; letter-spacing: 2px; color: var(--muted); font-weight: 700; }
+  #saldo span { font-size: 26px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .chat { flex: 1; position: relative; overflow: hidden;
+    background-image: radial-gradient(circle at 12px 12px, rgba(160,130,90,.10) 3px, transparent 3.5px);
+    background-size: 46px 46px; }
+  #list { position: absolute; left: 0; right: 0; top: 0; padding: 22px 22px 0; }
+  .msg { display: flex; margin-bottom: 12px; }
+  .msg.out { justify-content: flex-end; }
+  .bubble { max-width: 520px; padding: 14px 20px 12px; border-radius: 26px; font-size: 30px; line-height: 1.3; color: var(--ink); background: #fff; box-shadow: 0 2px 0 rgba(90,70,40,.10); }
+  .in .bubble { border-bottom-left-radius: 8px; }
+  .out .bubble { background: var(--me); color: #fff; border-bottom-right-radius: 8px; }
+  .meta { display: inline-block; font-size: 15px; margin-left: 12px; opacity: .55; transform: translateY(3px); white-space: nowrap; }
+  .bubble.deleted { background: #e9e3f8; color: #7c74a8; font-style: italic; }
+  .date { text-align: center; margin: 10px 0 18px; }
+  .date span { display: inline-block; background: var(--chip); color: #6d6253; font-size: 17px; font-weight: 800; letter-spacing: 2px; padding: 8px 18px; border-radius: 999px; }
+  .card { width: 470px; background: var(--card); border-radius: 22px; padding: 16px 20px; border-left: 8px solid var(--red); box-shadow: 0 2px 0 rgba(90,70,40,.12); }
+  .card.plus { border-left-color: var(--green); }
+  .card .lbl { font-size: 15px; letter-spacing: 2px; font-weight: 800; color: var(--muted); }
+  .card .ct { font-size: 27px; font-weight: 600; color: var(--ink); margin: 4px 0 2px; }
+  .card .amt { font-size: 34px; font-weight: 800; color: var(--red); font-variant-numeric: tabular-nums; }
+  .card.plus .amt { color: var(--green); }
+  .voice { display: flex; align-items: center; gap: 14px; width: 440px; }
+  .voice .play { width: 50px; height: 50px; border-radius: 50%; background: var(--brown); display: grid; place-items: center; flex: none; }
+  .voice .play::after { content: ''; border-left: 16px solid #fff; border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 5px; }
+  .voice .wave { display: flex; align-items: center; gap: 4px; height: 44px; flex: 1; }
+  .voice .wave i { width: 5px; border-radius: 3px; background: #cbbfae; }
+  .voice .wave i.on { background: var(--brown); }
+  .voice .dur { font-size: 17px; color: var(--muted); font-weight: 600; }
+  .vcap { font-size: 19px; color: var(--muted); font-style: italic; margin-top: 6px; }
+  .rekap { width: 500px; background: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 2px 0 rgba(90,70,40,.12); }
+  .rekap .rh { background: var(--ink); color: #fff; font-weight: 800; letter-spacing: 3px; font-size: 18px; padding: 14px 20px; }
+  .rekap .row { display: flex; justify-content: space-between; padding: 14px 20px; font-size: 24px; border-bottom: 2px dashed #eee3d2; color: var(--ink); }
+  .rekap .row b { font-variant-numeric: tabular-nums; }
+  .rekap .row.zero b { color: var(--red); }
+  .rekap .bar { height: 14px; display: flex; margin: 16px 20px 18px; border-radius: 7px; overflow: hidden; background: #eee; }
+
+  #typing { position: absolute; left: 22px; }
+  #typing .bubble { display: flex; gap: 8px; padding: 20px 22px; }
+  #typing i { width: 12px; height: 12px; border-radius: 50%; background: #b8ad9c; display: block; }
+
+  .inputbar { height: 110px; background: #fff; display: flex; align-items: center; gap: 16px; padding: 0 22px; border-top: 2px solid #eadfcd; position: relative; z-index: 2; }
+  .field { flex: 1; height: 66px; border-radius: 33px; background: #f3eee6; display: flex; align-items: center; padding: 0 26px; font-size: 26px; color: var(--ink); white-space: nowrap; overflow: hidden; }
+  .field .ph { color: #b2a898; }
+  .field .caret { display: inline-block; width: 3px; height: 30px; background: var(--me); margin-left: 2px; vertical-align: middle; }
+  .send { width: 66px; height: 66px; border-radius: 50%; background: #d9d2c6; display: grid; place-items: center; color: #fff; font-size: 26px; flex: none; }
+  .send.on { background: var(--me); }
+
+  #hook { position: absolute; inset: 0; background: rgba(20,16,40,.82); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; z-index: 5; }
+  #hook .pov { font-size: 40px; font-weight: 800; letter-spacing: 6px; color: #b9b1ff; }
+  #hook .h1 { font-size: 78px; font-weight: 800; line-height: 1.05; letter-spacing: -2px; margin-top: 14px; }
+  #hook .h1 em { font-style: normal; color: #ffc44d; }
+
+  #end { position: absolute; left: 0; right: 0; top: 640px; text-align: center; color: #fff; padding: 0 50px; z-index: 4; }
+  #end .tag { font-size: 18px; letter-spacing: 5px; font-weight: 800; color: #c9c3ff; }
+  #end h1 { font-size: 84px; line-height: 1.02; letter-spacing: -2.5px; margin: 18px 0 18px; font-weight: 800; }
+  #end h1 em { font-style: normal; color: #ffc44d; }
+  #end p { font-size: 29px; line-height: 1.38; margin: 0 auto; max-width: 600px; color: #ece9ff; }
+  #end .cta { margin-top: 40px; display: inline-block; background: #fff; color: var(--me); font-weight: 800; font-size: 25px; padding: 16px 30px; border-radius: 999px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="app">
+    <div class="statusbar"><span id="clock">09.00</span><span class="bat"><i id="batfill"></i></span></div>
+    <div class="header">
+      <div class="back">‹</div>
+      <div id="avatar"></div>
+      <div class="who"><b>Dompet</b><small id="status">online</small></div>
+      <div id="saldo"><small>SALDO</small><span id="saldoval">Rp0</span></div>
+    </div>
+    <div class="chat" id="chat">
+      <div id="list"></div>
+    </div>
+    <div class="inputbar">
+      <div class="field" id="field"></div>
+      <div class="send" id="send">➤</div>
+    </div>
+  </div>
+  <div id="hook"><div class="pov">POV:</div><div class="h1">dompetmu<br>bisa <em>ngechat</em></div></div>
+  <div id="end">
+    <div class="tag">CURHAT DOMPET · EPS. 01</div>
+    <h1>Bayar dirimu<br><em>duluan.</em></h1>
+    <p>Begitu gajian, langsung sisihkan tabungan. Baru sisanya buat hidup &amp; jajan.</p>
+    <div class="cta">Kirim ke temen yang dompetnya udah ngechat 👀</div>
+  </div>
+</div>
+<script>
+/* "Curhat Dompet" — simulasi chat antara Kamu dan Dompet.
+   Semua dihitung dari waktu t (detik), jadi bisa dirender frame-per-frame (render.cjs). */
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eout = k => 1 - Math.pow(1 - k, 3);
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const back = k => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+const rp = n => 'Rp' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+const GAJI = 8000000;
+
+/* ---------- naskah ---------- */
+// d = dompet, k = kamu, date = pemisah tanggal, card = notifikasi transaksi
+const SCRIPT = [
+  { date: '25 OKT · HARI GAJIAN', clock: '09.02' },
+  { card: 'Gaji masuk', label: 'TRANSFER MASUK', amt: +GAJI },
+  { d: 'AKU KENYANG BANGET 🤩', typ: .7 },
+  { d: 'bulan ini kita hemat ya. janji?', typ: .6 },
+  { k: 'janji 🤞' },
+  { k: 'tapi self reward dikit boleh lah' },
+  { card: '👟 Sepatu lari', label: 'CHECKOUT BERHASIL', amt: -749000 },
+  { d: 'dikit 🙂', typ: .9, wait: 1.4 },
+  { date: '26 OKT', clock: '15.40' },
+  { card: '☕ Kopi susu ×3 hari ini', label: 'PEMBAYARAN', amt: -114000 },
+  { d: 'tiga. hari ini. tiga.', typ: .6 },
+  { k: 'ngantuk bestie 🥱' },
+  { date: '28 OKT', clock: '00.47' },
+  { card: '🛵 Ojol + makan, 3 hari', label: 'PEMBAYARAN', amt: -1120000 },
+  { card: '🛒 Promo tengah malam · 4 barang', label: 'CHECKOUT BERHASIL', amt: -1230000 },
+  { d: 'katanya cuma liat-liat', typ: .7 },
+  { k: 'liat-liatnya kebablasan 😅' },
+  { date: '1 NOV', clock: '08.15' },
+  { card: '🏠 Kos & tagihan', label: 'AUTODEBET', amt: -2500000, fast: true },
+  { card: '⏳ Cicilan paylater', label: 'AUTODEBET', amt: -850000, fast: true },
+  { card: '📺 Langganan ×4', label: 'AUTODEBET', amt: -246000 },
+  { voice: '(suara dompet ngos-ngosan)', typ: 1.0, dur: 2.8 },
+  { date: '2 NOV', clock: '21.30' },
+  { card: '🍻 Nongkrong', label: 'PEMBAYARAN', amt: -475000, fast: true },
+  { card: '🎁 Kado nikahan temen', label: 'TRANSFER KELUAR', amt: -300000 },
+  { date: '3 NOV', clock: '07.58' },
+  { d: 'saldo tinggal Rp416.000', typ: .7 },
+  { d: 'gajian masih 22 hari lagi 🫠', typ: .5 },
+  { k: 'kok gajiku cepet banget habisnya??' },
+  { rekap: true, typ: 1.6, wait: 2.6 },
+  { deleted: true, typed: 'iya iya aku boros' },
+  { d: 'aku liat kok 👀', typ: .6 },
+  { d: 'gajian depan, pisahin tabungan DULUAN ya', typ: .9 },
+  { d: 'baru sisanya buat jajan', typ: .5 },
+  { k: 'oke janji. beneran kali ini 🤝' },
+  { d: 'aku screenshot ya. buat bukti 📸', typ: .8, wait: 1.8 },
+];
+
+/* ---------- bangun DOM + timeline ---------- */
+const list = document.getElementById('list');
+const ITEMS = [];
+const AUDIO = [];
+let T = 2.8, saldo = 0, clockH = 9, clockM = 0;
+
+function nextClock() { clockM += 3; if (clockM >= 60) { clockM -= 60; clockH = (clockH + 1) % 24; } return String(clockH).padStart(2, '0') + '.' + String(clockM).padStart(2, '0'); }
+function readTime(s) { return Math.max(.8, .4 + s.length * .03); }
+
+for (const it of SCRIPT) {
+  const el = document.createElement('div');
+  const item = { el, ...it };
+  if (it.date) {
+    [clockH, clockM] = it.clock.split('.').map(Number); clockM -= 3;
+    el.className = 'date'; el.innerHTML = `<span>${esc(it.date)}</span>`;
+    item.at = T; T += .4; AUDIO.push({ t: item.at, type: 'date' });
+  } else if (it.card) {
+    const c = nextClock();
+    el.className = 'msg in';
+    el.innerHTML = `<div class="card ${it.amt > 0 ? 'plus' : ''}"><div class="lbl">${it.label}</div><div class="ct">${esc(it.card)}</div><div class="amt">${it.amt > 0 ? '+' : '-'}${rp(Math.abs(it.amt))}<span class="meta" style="color:var(--muted);opacity:1">${c}</span></div></div>`;
+    item.at = T; item.saldoFrom = saldo; saldo += it.amt; item.saldoTo = saldo; item.clock = c;
+    AUDIO.push({ t: T, type: it.amt > 0 ? 'income' : 'minus' });
+    T += it.fast ? .55 : .95;
+  } else if (it.d || it.voice || it.rekap) {
+    const c = nextClock();
+    item.typFrom = T; T += (it.typ || .6) * .75; item.at = T; item.clock = c;
+    el.className = 'msg in';
+    if (it.d) { el.innerHTML = `<div class="bubble">${esc(it.d)}<span class="meta">${c}</span></div>`; T += readTime(it.d); }
+    if (it.voice) {
+      let bars = ''; for (let i = 0; i < 30; i++) bars += `<i style="height:${8 + Math.abs(Math.sin(i * 1.7) * 30 + Math.sin(i * .6) * 8)}px"></i>`;
+      el.innerHTML = `<div class="bubble"><div class="voice"><div class="play"></div><div class="wave">${bars}</div><div class="dur">0:06</div></div><div class="vcap">${esc(it.voice)}</div></div>`;
+      item.voiceDur = it.dur; T += it.dur + .5;
+      AUDIO.push({ t: item.at + .2, type: 'voice', dur: it.dur });
+    }
+    if (it.rekap) {
+      const butuh = 2500000, mau = GAJI - butuh - 416000;
+      el.innerHTML = `<div class="rekap"><div class="rh">🧾 REKAP 9 HARI</div>
+        <div class="row"><span>Kebutuhan</span><b>${rp(butuh)}</b></div>
+        <div class="row"><span>Keinginan &amp; cicilan</span><b>${rp(mau)}</b></div>
+        <div class="row zero"><span>Tabungan</span><b>Rp0</b></div>
+        <div class="bar"><span style="width:${butuh / GAJI * 100}%;background:#8a8173"></span><span style="width:${mau / GAJI * 100}%;background:var(--red)"></span></div></div>`;
+    }
+    T += it.wait || 0;
+    AUDIO.push({ t: item.at, type: 'in' });
+  } else if (it.k || it.deleted) {
+    const s = it.k || it.typed, c = nextClock();
+    const dur = .3 + s.length * .026;
+    item.typeFrom = T; item.typeText = s; T += dur; item.at = T; item.clock = c;
+    for (let i = 0; i < s.length; i += 2) AUDIO.push({ t: item.typeFrom + (i / s.length) * (dur - .1), type: 'key' });
+    el.className = 'msg out';
+    if (it.k) { el.innerHTML = `<div class="bubble">${esc(it.k)}<span class="meta">${c} ✓✓</span></div>`; T += readTime(it.k) * .7; }
+    else {
+      item.delAt = T + .7;
+      el.innerHTML = `<div class="bubble"><span class="txt">${esc(it.typed)}</span><span class="meta">${c} ✓✓</span></div>`;
+      T += 1.6; AUDIO.push({ t: item.delAt, type: 'delete' });
+    }
+    AUDIO.push({ t: item.at, type: 'out' });
+  }
+  list.appendChild(el);
+  ITEMS.push(item);
+}
+const typingEl = document.createElement('div');
+typingEl.id = 'typing'; typingEl.className = 'msg in';
+typingEl.innerHTML = '<div class="bubble"><i></i><i></i><i></i></div>';
+list.appendChild(typingEl);
+
+const END_AT = T + .3;
+const DURATION = END_AT + 6.2;
+AUDIO.push({ t: END_AT, type: 'end' });
+window.DURATION = DURATION;
+window.AUDIO_EVENTS = AUDIO;
+
+/* ---------- avatar dompet ---------- */
+function wallet(fat, mood, t) {
+  // fat 0..1 = seberapa tebal dompet; mood: happy | ok | sad
+  const w = lerp(58, 92, fat), h = lerp(46, 64, fat), x = 60 - w / 2, y = 64 - h / 2;
+  const bob = Math.sin(t * 3) * 1.5;
+  let s = `<svg viewBox="0 0 120 120" width="100%" height="100%"><g transform="translate(0 ${bob.toFixed(1)})">`;
+  if (fat > .45) s += `<rect x="${60 - w * .3}" y="${y - 12}" width="${w * .55}" height="20" rx="3" fill="#7fc98f" stroke="#1d1b26" stroke-width="3" transform="rotate(-8 60 ${y})"/>`;
+  s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${10 + fat * 8}" fill="#d9782f" stroke="#1d1b26" stroke-width="4"/>`;
+  s += `<path d="M${x + w * .55} ${y + h * .3} h${w * .45} v${h * .4} h-${w * .45} a${h * .2} ${h * .2} 0 0 1 0 -${h * .4}z" fill="#b85e1f" stroke="#1d1b26" stroke-width="3.5"/>`;
+  s += `<circle cx="${x + w * .74}" cy="${y + h * .5}" r="3.5" fill="#ffd27a"/>`;
+  const ex = x + w * .22, ey = y + h * .42;
+  if (mood === 'happy') s += `<path d="M${ex - 7} ${ey + 2} q7 -9 14 0 M${ex + 13} ${ey + 2} q7 -9 14 0" stroke="#1d1b26" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M${ex} ${ey + 13} q10 10 20 0" stroke="#1d1b26" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  else {
+    s += `<circle cx="${ex}" cy="${ey}" r="3.6" fill="#1d1b26"/><circle cx="${ex + 20}" cy="${ey}" r="3.6" fill="#1d1b26"/>`;
+    s += mood === 'sad' ? `<path d="M${ex + 1} ${ey + 17} q9 -8 18 0" stroke="#1d1b26" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M${x + w + 4} ${y + 6} q-6 10 0 13 q6 -3 0 -13z" fill="#8fd3ff" stroke="#1d1b26" stroke-width="2" opacity="${(.5 + .5 * Math.sin(t * 4)).toFixed(2)}"/>`
+      : `<path d="M${ex + 2} ${ey + 14} h16" stroke="#1d1b26" stroke-width="3.5" stroke-linecap="round"/>`;
+  }
+  return s + '</g></svg>';
+}
+
+/* ---------- render ---------- */
+const $ = id => document.getElementById(id);
+const app = $('app'), hook = $('hook'), end = $('end'), field = $('field'), send = $('send');
+let LAYOUT = null;
+
+function measure() {
+  for (const it of ITEMS) it.el.style.visibility = 'visible';
+  LAYOUT = ITEMS.map(it => ({ top: it.el.offsetTop, bottom: it.el.offsetTop + it.el.offsetHeight }));
+  LAYOUT.viewH = $('chat').clientHeight;
+}
+function lastVisible(t) { let i = -1; ITEMS.forEach((it, j) => { if (it.at <= t) i = j; }); return i; }
+function typingAt(t) {
+  for (const it of ITEMS) if (it.typFrom !== undefined && t >= it.typFrom && t < it.at) return it;
+  return null;
+}
+function targetScroll(t) {
+  const i = lastVisible(t);
+  let bottom = i >= 0 ? LAYOUT[i].bottom : 0;
+  if (typingAt(t)) bottom += 84;
+  return Math.max(0, bottom - LAYOUT.viewH + 26);
+}
+function scrollAt(t) {
+  // smoothing eksponensial yang disimulasikan dari 0, supaya deterministik di frame mana pun
+  let s = 0;
+  for (let x = 0; x <= t; x += 1 / 60) s += (targetScroll(x) - s) * .16;
+  return s;
+}
+
+function renderAt(t) {
+  if (!LAYOUT) measure();
+  // pesan
+  ITEMS.forEach((it, i) => {
+    const p = prog(t, it.at, it.at + .38);
+    if (t < it.at) { it.el.style.visibility = 'hidden'; return; }
+    it.el.style.visibility = 'visible';
+    const out = it.el.classList.contains('out');
+    const inner = it.el.firstElementChild;
+    if (it.date) { inner.style.transform = `scale(${(.8 + .2 * eout(p)).toFixed(3)})`; inner.style.opacity = eout(p); return; }
+    inner.style.transformOrigin = out ? '100% 100%' : '0% 100%';
+    inner.style.transform = `scale(${(.55 + .45 * back(p)).toFixed(3)}) translateY(${((1 - eout(p)) * 20).toFixed(1)}px)`;
+    inner.style.opacity = Math.min(1, p * 3).toFixed(3);
+    if (it.deleted) {
+      const del = t >= it.delAt;
+      inner.classList.toggle('deleted', del);
+      inner.querySelector('.txt').textContent = del ? '🚫 Pesan ini telah dihapus' : it.typed;
+      if (del) { const dp = prog(t, it.delAt, it.delAt + .3); inner.style.transform = `scale(${(.92 + .08 * eout(dp)).toFixed(3)})`; }
+    }
+    if (it.voiceDur) {
+      const vp = prog(t, it.at + .2, it.at + .2 + it.voiceDur);
+      inner.querySelectorAll('.wave i').forEach((b, j) => b.classList.toggle('on', j / 30 < vp));
+      inner.querySelector('.dur').textContent = vp > 0 && vp < 1 ? `0:0${Math.floor(vp * 6)}` : '0:06';
+    }
+  });
+  // typing bubble
+  const typ = typingAt(t);
+  const li = lastVisible(t);
+  typingEl.style.display = typ ? 'flex' : 'none';
+  if (typ) {
+    typingEl.style.top = ((li >= 0 ? LAYOUT[li].bottom : 0) + 0) + 'px';
+    typingEl.querySelectorAll('i').forEach((d, j) => { d.style.transform = `translateY(${(-6 * Math.max(0, Math.sin(t * 9 - j * .9))).toFixed(1)}px)`; });
+  }
+  list.style.transform = `translateY(${(-scrollAt(t)).toFixed(1)}px)`;
+
+  // input bar: Kamu sedang mengetik
+  let ftxt = '';
+  for (const it of ITEMS) if (it.typeFrom !== undefined && t >= it.typeFrom && t < it.at) {
+    ftxt = it.typeText.slice(0, Math.ceil(it.typeText.length * prog(t, it.typeFrom, it.at - .12)));
+  }
+  field.innerHTML = ftxt ? `${esc(ftxt)}<span class="caret"></span>` : '<span class="ph">Ketik pesan…</span>';
+  send.classList.toggle('on', !!ftxt);
+
+  // saldo, jam, baterai, avatar
+  let sv = 0, flash = 0, clock = '09.00';
+  for (const it of ITEMS) {
+    if (it.clock && t >= (it.typeFrom ?? it.typFrom ?? it.at)) clock = it.clock;
+    if (it.saldoTo !== undefined && t >= it.at) {
+      const p = eout(prog(t, it.at, it.at + .6));
+      sv = lerp(it.saldoFrom, it.saldoTo, p);
+      flash = (1 - prog(t, it.at, it.at + .8)) * Math.sign(it.saldoTo - it.saldoFrom);
+    }
+  }
+  const sEl = $('saldoval');
+  sEl.textContent = rp(sv);
+  sEl.style.color = flash < 0 ? `rgba(229,72,59,${(.4 + Math.abs(flash) * .6).toFixed(2)})` : flash > 0 ? '#1fa971' : (sv < 1000000 && sv > 0 ? '#e5483b' : '#1d1b26');
+  sEl.style.display = 'inline-block';
+  sEl.style.transform = `scale(${(1 + Math.abs(flash) * .12).toFixed(3)})`;
+  $('clock').textContent = clock;
+  const fat = clamp(sv / GAJI);
+  $('batfill').style.width = (Math.max(.06, fat) * 100).toFixed(1) + '%';
+  $('batfill').style.background = fat < .2 ? '#e5483b' : fat < .5 ? '#f0b23f' : '#1fa971';
+  const lastD = [...ITEMS].reverse().find(it => it.at <= t && (it.d || it.voice));
+  const mood = fat > .6 ? 'happy' : fat > .2 ? 'ok' : 'sad';
+  $('avatar').innerHTML = wallet(fat, (lastD && lastD.d === 'aku screenshot ya. buat bukti 📸') ? 'ok' : mood, t);
+  const st = $('status');
+  if (typ) { st.textContent = typ.voice ? 'merekam suara…' : 'sedang mengetik…'; st.className = ''; }
+  else if (t > END_AT) { st.textContent = 'terakhir dilihat 3 Nov'; st.className = 'idle'; }
+  else { st.textContent = 'online'; st.className = ''; }
+
+  // hook di awal
+  const hp = prog(t, 2.3, 2.9);
+  hook.style.opacity = (1 - hp).toFixed(3);
+  hook.style.display = hp >= 1 ? 'none' : 'flex';
+  const hi = back(prog(t, .1, .6));
+  hook.firstElementChild.style.transform = `scale(${(.6 + .4 * hi).toFixed(3)})`;
+  hook.lastElementChild.style.transform = `scale(${(.6 + .4 * back(prog(t, .35, .9))).toFixed(3)})`;
+  hook.lastElementChild.style.opacity = prog(t, .35, .6);
+
+  // penutup: layar chat mengecil jadi "HP", teks besar di bawah
+  const ep = eio(prog(t, END_AT + .4, END_AT + 1.4));
+  app.style.transform = `translateY(${(ep * 70).toFixed(1)}px) scale(${lerp(1, .42, ep).toFixed(4)})`;
+  app.style.borderRadius = (ep * 60) + 'px';
+  app.style.boxShadow = ep ? `0 0 0 ${(ep * 14).toFixed(1)}px #1d1b26, 0 30px 60px rgba(0,0,0,${(.35 * ep).toFixed(2)})` : 'none';
+  app.style.overflow = 'hidden';
+  const e1 = eout(prog(t, END_AT + 1.2, END_AT + 1.8)), e2 = eout(prog(t, END_AT + 1.6, END_AT + 2.2)), e3 = eout(prog(t, END_AT + 2.1, END_AT + 2.7)), e4 = back(prog(t, END_AT + 2.8, END_AT + 3.3));
+  const kids = end.children;
+  kids[0].style.opacity = e1;
+  kids[1].style.opacity = e2; kids[1].style.transform = `translateY(${((1 - e2) * 30).toFixed(1)}px)`;
+  kids[2].style.opacity = e3;
+  kids[3].style.opacity = Math.min(1, e4 * 2); kids[3].style.transform = `scale(${(.6 + .4 * e4).toFixed(3)})`;
+  end.style.display = e1 > 0 ? 'block' : 'none';
+  const fadeOut = prog(t, DURATION - .6, DURATION);
+  $('stage').style.filter = fadeOut ? `brightness(${(1 - fadeOut).toFixed(3)})` : '';
+}
+window.renderAt = renderAt;
+
+if (new URLSearchParams(location.search).has('render')) {
+  document.body.classList.add('render');
+} else {
+  document.fonts.ready.then(() => {
+    const start = performance.now();
+    const loop = () => { renderAt(((performance.now() - start) / 1000) % DURATION); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  });
+}
+</script>
+</body>
+</html>

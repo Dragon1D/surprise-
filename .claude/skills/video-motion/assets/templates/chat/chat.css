@@ -1,0 +1,61 @@
+.chatapp {
+  --bg: #f4ede1; --ink: #1d1b26; --muted: #8a8173; --me: #5b4bff;
+  --red: #e5483b; --green: #1fa971; --card: #fffdf8; --chip: #e7dccb; --brown: #d9782f;
+  position: absolute; background: var(--bg); display: flex; flex-direction: column; overflow: hidden;
+  font-family: Inter, system-ui, sans-serif;
+}
+.chatapp * { box-sizing: border-box; }
+.chatapp .statusbar { height: 44px; flex: none; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; font-weight: 700; font-size: 20px; color: var(--ink); background: #fff; }
+.chatapp .bat { width: 40px; height: 20px; border: 2.5px solid var(--ink); border-radius: 6px; padding: 2px; position: relative; }
+.chatapp .bat::after { content: ''; position: absolute; right: -6px; top: 5px; width: 3px; height: 6px; background: var(--ink); border-radius: 0 2px 2px 0; }
+.chatapp .bat i { display: block; height: 100%; border-radius: 2px; }
+.chatapp .header { height: 112px; flex: none; background: #fff; display: flex; align-items: center; gap: 16px; padding: 0 24px; border-bottom: 2px solid #eadfcd; position: relative; z-index: 2; }
+.chatapp .back { font-size: 40px; color: var(--ink); width: 22px; font-weight: 300; }
+.chatapp .avatar { width: 76px; height: 76px; border-radius: 50%; background: #fbe7d3; overflow: hidden; flex: none; }
+.chatapp .who b { display: block; font-size: 30px; color: var(--ink); letter-spacing: -.5px; }
+.chatapp .who small { font-size: 19px; color: var(--green); font-weight: 600; }
+.chatapp .saldo { margin-left: auto; text-align: right; }
+.chatapp .saldo small { display: block; font-size: 14px; letter-spacing: 2px; color: var(--muted); font-weight: 700; }
+.chatapp .saldo span { display: inline-block; font-size: 27px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; transform-origin: 100% 50%; }
+.chatapp .chat { flex: 1; position: relative; overflow: hidden;
+  background-image: radial-gradient(circle at 12px 12px, rgba(160,130,90,.10) 3px, transparent 3.5px); background-size: 46px 46px; }
+.chatapp .list { position: absolute; left: 0; right: 0; top: 0; padding: 22px 22px 0; }
+.chatapp .msg { display: flex; margin-bottom: 12px; }
+.chatapp .msg.out { justify-content: flex-end; }
+.chatapp .bubble { max-width: 530px; padding: 14px 20px 12px; border-radius: 26px; font-size: 31px; line-height: 1.28; color: var(--ink); background: #fff; box-shadow: 0 2px 0 rgba(90,70,40,.10); }
+.chatapp .in .bubble { border-bottom-left-radius: 8px; }
+.chatapp .out .bubble { background: var(--me); color: #fff; border-bottom-right-radius: 8px; }
+.chatapp .meta { display: inline-block; font-size: 15px; margin-left: 12px; opacity: .55; transform: translateY(3px); white-space: nowrap; }
+.chatapp .date { text-align: center; margin: 8px 0 16px; }
+.chatapp .date span { display: inline-block; background: var(--chip); color: #6d6253; font-size: 17px; font-weight: 800; letter-spacing: 2px; padding: 8px 18px; border-radius: 999px; }
+.chatapp .card { width: 480px; background: var(--card); border-radius: 22px; padding: 14px 20px; border-left: 8px solid var(--red); box-shadow: 0 2px 0 rgba(90,70,40,.12); }
+.chatapp .card.plus, .chatapp .card.save { border-left-color: var(--green); }
+.chatapp .card .lbl { font-size: 15px; letter-spacing: 2px; font-weight: 800; color: var(--muted); }
+.chatapp .card .ct { font-size: 28px; font-weight: 600; color: var(--ink); margin: 4px 0 2px; }
+.chatapp .card .amt { font-size: 35px; font-weight: 800; color: var(--red); font-variant-numeric: tabular-nums; }
+.chatapp .card .amt .meta { color: var(--muted); opacity: 1; }
+.chatapp .card.plus .amt, .chatapp .card.save .amt { color: var(--green); }
+.chatapp .card.save { background: #eafbf2; }
+.chatapp .voice { display: flex; align-items: center; gap: 14px; width: 440px; }
+.chatapp .voice .play { width: 50px; height: 50px; border-radius: 50%; background: var(--brown); display: grid; place-items: center; flex: none; }
+.chatapp .voice .play::after { content: ''; border-left: 16px solid #fff; border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 5px; }
+.chatapp .voice .wave { display: flex; align-items: center; gap: 4px; height: 44px; flex: 1; }
+.chatapp .voice .wave i { width: 5px; border-radius: 3px; background: #cbbfae; }
+.chatapp .voice .wave i.on { background: var(--brown); }
+.chatapp .voice .dur { font-size: 17px; color: var(--muted); font-weight: 600; }
+.chatapp .vcap { font-size: 20px; color: var(--muted); font-style: italic; margin-top: 6px; }
+.chatapp .rekap { width: 520px; background: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 2px 0 rgba(90,70,40,.12); }
+.chatapp .rekap .rh { background: var(--ink); color: #fff; font-weight: 800; letter-spacing: 3px; font-size: 18px; padding: 14px 20px; }
+.chatapp .rekap .row { display: flex; justify-content: space-between; padding: 12px 20px; font-size: 25px; border-bottom: 2px dashed #eee3d2; color: var(--ink); }
+.chatapp .rekap .row b { font-variant-numeric: tabular-nums; }
+.chatapp .rekap .row.zero b { color: var(--red); }
+.chatapp .rekap .bar { height: 14px; display: flex; margin: 14px 20px 16px; border-radius: 7px; overflow: hidden; background: #eee; }
+.chatapp .typing { position: absolute; left: 22px; }
+.chatapp .typing .bubble { display: flex; gap: 8px; padding: 20px 22px; }
+.chatapp .typing i { width: 12px; height: 12px; border-radius: 50%; background: #b8ad9c; display: block; }
+.chatapp .inputbar { height: 100px; flex: none; background: #fff; display: flex; align-items: center; gap: 16px; padding: 0 22px; border-top: 2px solid #eadfcd; position: relative; z-index: 2; }
+.chatapp .field { flex: 1; height: 62px; border-radius: 31px; background: #f3eee6; display: flex; align-items: center; padding: 0 26px; font-size: 27px; color: var(--ink); white-space: nowrap; overflow: hidden; }
+.chatapp .field .ph { color: #b2a898; }
+.chatapp .field .caret { display: inline-block; width: 3px; height: 30px; background: var(--me); margin-left: 2px; vertical-align: middle; }
+.chatapp .send { width: 62px; height: 62px; border-radius: 50%; background: #d9d2c6; display: grid; place-items: center; color: #fff; font-size: 26px; flex: none; }
+.chatapp .send.on { background: var(--me); }
