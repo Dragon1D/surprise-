@@ -134,6 +134,31 @@ Instagram & TikTok: @bokekanonim
 
 ---
 
+## Facebook (Halaman / Page)
+
+Buat sebagai **Halaman** (bukan akun pribadi), supaya bisa pakai Reels, statistik, dan tidak tercampur akun pribadi.
+
+**Nama Halaman:** `Bokek Anonim`
+**Nama pengguna:** `@bokekanonim` (cadangan sama seperti platform lain: `@bokek.anonim`, `@bokekanonim.id`)
+**Kategori:** Pendidikan (atau "Kreator digital" kalau "Pendidikan" tidak tersedia)
+
+**Bio** (99/101 karakter):
+```
+Halo, gua bokek. Lu juga? 👋 Kelompok dukungan buat gaji yang numpang lewat. Edukasi, bukan jualan.
+```
+
+**Detail Halaman:**
+- Situs web: link halaman link-in-bio (saat sudah ada)
+- Email: email khusus akun
+- Tombol aksi: "Kirim pesan" (buat curhat anonim dan kerja sama)
+
+**Foto profil:** `logo-bokek-anonim/logo-kotak-1080.png`
+**Foto sampul:** `facebook/sampul-facebook-1640x924.png` (teks penting ada di pita tengah, jadi aman di desktop maupun HP)
+
+**Konten:** Reels yang sama dengan Instagram bisa langsung dibagikan ke Facebook (aktifkan "Bagikan ke Facebook" saat upload di Instagram, setelah akun IG dan Halaman FB ditautkan lewat Meta Business Suite).
+
+---
+
 ## Postingan pertama (caption carousel "Sesi Pertama")
 ```
 Selamat datang di Bokek Anonim 🫶
