@@ -65,8 +65,17 @@ File `konten/bank-ide.csv` (kolom: no, pilar, judul_hook, segmen, format, angle_
 - Format satu ide: judul atau hook, segmen utama, format, angle dan isi (1–2 kalimat), CTA, plus tanda ⚠️ cek kalau perlu.
 - Setelah konten tayang, ubah statusnya. Kalau Deny memberi angka performa, catat juga.
 
+## Profil akun (draf, menunggu konfirmasi Deny)
+Detail ada di `konten/profil/profil-instagram.md`, mockup di `konten/profil/contoh-profil.png`.
+- Nama yang direkomendasikan: **@duitkemana** dengan nama tampilan "Duit Kemana? · Edukasi Keuangan". Alternatifnya @curhatdompet, @sisagaji, @tanggaltua.club, dan @melekduit. Ketersediaan handle belum dicek.
+- Foto profil: maskot Dompet senang di lingkaran kuning (`konten/profil/foto-profil-dompet.png`).
+- Palet: ungu `#5b4bff`, kuning `#ffd84d`, krem `#f4ede1`, coral `#ef6f50`, ink `#1d1b26`. Font Inter.
+- Highlight: Mulai Sini, Dana Darurat, Anti Pinjol, Budgeting, Curhat.
+- Cover reels: label seri kecil berhuruf kapital, lalu judul 2–3 baris dengan satu kata disorot. Grid diselang-seling antara video gelap dan carousel terang.
+Selama nama belum dikonfirmasi, jangan tulis handle di video atau carousel.
+
 ## Pertanyaan terbuka (tanyakan ke Deny saat relevan, lalu pindahkan jawabannya ke atas)
-- Nama atau handle akun dan identitas visual final (logo, warna utama).
+- Konfirmasi nama akun (lihat draf di atas) dan hasil cek ketersediaan handle.
 - Frekuensi posting per minggu dan platform prioritas (Instagram, TikTok, atau keduanya).
 - Segmen prioritas kalau harus memilih satu untuk 30 hari pertama.
 - Apakah akan ada wajah atau suara Deny (voice over), atau full animasi.
