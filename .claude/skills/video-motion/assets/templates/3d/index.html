@@ -76,11 +76,15 @@ floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
 const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: .45, metalness: 0, ...o });
 function mesh(geo, material, parent = scene) { const m = new THREE.Mesh(geo, material); m.castShadow = m.receiveShadow = true; parent.add(m); return m; }
 // tekstur teks dari canvas (label di permukaan 3D, mis. "Rp" di koin)
-function textTexture(text, { size = 256, w = size, h = size, bg = null, color = C.ink, font = '800 120px Inter' } = {}) {
+// font: '800 120px Inter' — emoji otomatis lewat Noto Color Emoji; fit=true mengecilkan font sampai muat 90% lebar
+function textTexture(text, { size = 256, w = size, h = size, bg = null, color = C.ink, font = '800 120px Inter', fit = true } = {}) {
   const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
   const g = cv.getContext('2d');
   if (bg) { g.fillStyle = bg; g.fillRect(0, 0, w, h); }
-  g.fillStyle = color; g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, w / 2, h / 2 + 6);
+  let [, weight, px, fam] = font.match(/^(\S+)\s+(\d+)px\s+(.+)$/) || [null, '800', '120', 'Inter'];
+  px = +px; const setF = () => { g.font = `${weight} ${px}px ${fam}, "Noto Color Emoji"`; };
+  setF(); while (fit && px > 8 && g.measureText(text).width > w * .9) { px -= 2; setF(); }
+  g.fillStyle = color; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, w / 2, h / 2 + 6);
   const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 8; return tx;
 }
 
@@ -140,8 +144,8 @@ const SCENES = [
 
 /* ---------- CAPTION HTML ----------  [mulai, selesai, html, {y, size}]  <b>kata</b> = sorotan */
 const CAPS = [
-  [0.4, 4.6, '<div class="tag">JUDUL SERI · EPS. 01</div>', { y: 180 }],
-  [1.0, 4.6, 'Nabung itu kayak <b>ngisi toples</b>', { y: 230, size: 50 }],
+  [-1, 4.6, '<div class="tag">JUDUL SERI · EPS. 01</div>', { y: 180 }],
+  [-1, 4.6, 'Nabung itu kayak <b>ngisi toples</b>', { y: 230, size: 50 }],
   [5.3, 9.2, 'tapi tiap notif belanja…<br><b style="color:#ff5a4e">koinnya terbang</b>', { y: 230, size: 48 }],
   [9.8, 13.6, 'Gaji vs pengeluaran vs <b>tabungan</b>', { y: 230, size: 46 }],
 ];
@@ -170,7 +174,7 @@ window.renderAt = t => {
   });
   // fade hitam di awal/akhir + kedip singkat di pergantian adegan
   const cut = SCENES.some(s => s.a > 0 && t >= s.a - .12 && t < s.a + .12) ? .6 : 0;
-  document.getElementById('fade').style.opacity = Math.max(1 - prog(t, 0, .4), prog(t, DURATION - .7, DURATION), cut).toFixed(3);
+  document.getElementById('fade').style.opacity = Math.max(prog(t, DURATION - .7, DURATION), cut).toFixed(3);
 };
 
 if (new URLSearchParams(location.search).has('render')) document.body.classList.add('render');

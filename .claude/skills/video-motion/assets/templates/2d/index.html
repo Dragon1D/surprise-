@@ -56,8 +56,8 @@ function backdrop(t) {
    sfx: efek suara di awal adegan (lihat references/audio.md). */
 const SCENES = [
   { a: 0, b: 3.2, sfx: 'boom', draw(l) {
-    return popIn(l, .1, 360, 560, txt(0, 0, 'JUDUL SERI', { size: 22, ls: 6, fill: C.accent }))
-      + popIn(l, .4, 360, 660, txt(0, 0, 'Judul Besar', { size: 92, filter: 1 }));
+    return popIn(l, -1, 360, 560, txt(0, 0, 'JUDUL SERI', { size: 22, ls: 6, fill: C.accent }))
+      + popIn(l, -1, 360, 660, txt(0, 0, 'Judul Besar', { size: 92, filter: 1 }));
   } },
   { a: 3.2, b: 8.5, sfx: 'whoosh', draw(l, t) {
     // contoh: tiga batang tumbuh berurutan
@@ -120,7 +120,7 @@ function renderAt(t) {
   const sc = SCENES.find(s => t >= s.a && t < s.b) || SCENES[SCENES.length - 1];
   const l = t - sc.a;
   const fade = Math.min(sc.a === 0 ? 1 : prog(l, 0, .3), sc.b >= DURATION ? 1 : 1 - prog(t, sc.b - .25, sc.b));
-  const black = Math.max(1 - prog(t, 0, .35), prog(t, DURATION - .7, DURATION));
+  const black = prog(t, DURATION - .7, DURATION); // tanpa fade hitam di awal: frame 0 = thumbnail
   svg.innerHTML = DEFS + backdrop(t) + `<g opacity="${f(fade)}">${sc.draw(l, t)}</g>` + captions(t)
     + `<rect width="720" height="1280" fill="url(#vig)"/><rect width="720" height="1280" fill="#000" opacity="${f(black)}"/>`;
 }

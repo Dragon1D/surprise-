@@ -9,7 +9,6 @@
   const back = k => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
   const rp = n => 'Rp' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  const GAJI = 8000000;
 
   function wallet(fat, mood, t) {
     const w = lerp(58, 92, fat), h = lerp(46, 64, fat), x = 60 - w / 2, y = 64 - h / 2;
@@ -30,6 +29,7 @@
   }
 
   window.createChat = function (root, SCRIPT, opts = {}) {
+    const GAJI = opts.gaji ?? 8000000;   // patokan 'dompet penuh' untuk avatar, baterai & rekap
     root.classList.add('chatapp');
     root.innerHTML = `<div class="statusbar"><span class="clock">09.00</span><span class="bat"><i class="batfill"></i></span></div>
       <div class="header"><div class="back">‹</div><div class="avatar"></div><div class="who"><b>Dompet</b><small class="status">online</small></div><div class="saldo"><small>SALDO</small><span class="saldoval">Rp0</span></div></div>
@@ -70,7 +70,7 @@
         }
         if (it.rekap) {
           const butuh = 2500000, mau = GAJI - butuh - saldo;
-          el.innerHTML = `<div class="rekap"><div class="rh">🧾 REKAP 9 HARI</div>
+          el.innerHTML = `<div class="rekap"><div class="rh">🧾 ${esc(it.title || 'REKAP')}</div>
             <div class="row"><span>Kebutuhan</span><b>${rp(butuh)}</b></div>
             <div class="row"><span>Keinginan &amp; cicilan</span><b>${rp(mau)}</b></div>
             <div class="row zero"><span>Tabungan</span><b>Rp0</b></div>
@@ -109,7 +109,14 @@
       if (typingAt(t)) bottom += 84;
       return Math.max(0, bottom - LAYOUT.viewH + 26);
     };
-    const scrollAt = t => { let s = 0; for (let x = 0; x <= t; x += 1 / 60) s += (targetScroll(x) - s) * .16; return s; };
+    // smoothing disimulasikan dari 0 (deterministik); hasil disimpan supaya frame berurutan tidak menghitung ulang dari awal
+    let sc = { x: 0, s: 0 };
+    const scrollAt = t => {
+      if (t < sc.x - 1 / 60) sc = { x: 0, s: 0 };
+      let { x, s } = sc;
+      for (; x <= t; x += 1 / 60) s += (targetScroll(x) - s) * .16;
+      sc = { x, s }; return s;
+    };
 
     function renderAt(t) {
       if (!LAYOUT) measure();

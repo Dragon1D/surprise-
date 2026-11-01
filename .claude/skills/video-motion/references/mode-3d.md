@@ -5,7 +5,7 @@ Template: `assets/templates/3d/index.html` — toples tabungan + koin jatuh (bou
 ## Cara kerja
 - Three.js dan add-on disajikan oleh `render.cjs` di `/lib/` (dari `assets/lib/`) lewat importmap: `import * as THREE from 'three'` dan `three/addons/...`. Tersedia: `geometries/RoundedBoxGeometry.js`, `loaders/GLTFLoader.js`, `utils/BufferGeometryUtils.js`, `environments/RoomEnvironment.js`. Butuh add-on lain → salin dari paket npm `three@0.160.0` (`npm pack three@0.160.0`) ke `assets/lib/addons/` dengan struktur folder yang sama.
 - Halaman 3D **harus dibuka lewat render.cjs** (server http lokal); `file://` memblokir ES module.
-- WebGL jalan di Chromium headless via SwiftShader (CPU). Template ±0,25–0,35 dtk/frame → video 60 dtk ≈ 8–10 menit render; jalankan render penuh di background (`run_in_background`) dan kerjakan hal lain sambil menunggu.
+- WebGL jalan di Chromium headless via SwiftShader (CPU). Template ±0,3–0,6 dtk/frame (tergantung jumlah objek) → video 60 dtk ≈ 10–18 menit render; jalankan render penuh di background (`run_in_background`) dan kerjakan hal lain sambil menunggu.
 - Kecepatan: canvas default dirender 720p (`?pr=1`) lalu di-upscale; `--pr 1.5` untuk tajam penuh (±2x lebih lambat). `MeshPhysicalMaterial` dengan `transmission` sangat mahal (merender adegan dua kali) — untuk kaca pakai `MeshStandardMaterial` transparan (opacity .3, depthWrite false). Bayangan PCFSoft relatif murah. Hindari post-processing.
 
 ## Struktur template
@@ -21,7 +21,7 @@ Template: `assets/templates/3d/index.html` — toples tabungan + koin jatuh (bou
 - Jatuh/mendarat: `lerp(tinggi, posisiAkhir, bounce(k))`. Muncul: `scale = back(k)`. Tumpukan: posisi y = indeks × tebal.
 - Gaya "toy/clay" dari primitif terlihat rapi: RoundedBox, Cylinder, Sphere, Torus, Capsule dengan `roughness .4–.6`, warna jenuh, bayangan lembut.
 - Model .glb dari user: `new GLTFLoader().loadAsync('model.glb')` lalu set `window.READY` = promise itu sebelum render.
-- Teks 3D: pakai `textTexture` pada plane/sprite, atau caption HTML. (TextGeometry butuh file font JSON — tidak dibundel.)
+- Teks 3D: pakai `textTexture` pada plane/sprite, atau caption HTML. `textTexture` otomatis mengecilkan font agar muat (`fit: true`, default) dan mendukung emoji (Noto Color Emoji ada di font stack). (TextGeometry butuh file font JSON — tidak dibundel.)
 
 ## Jebakan umum
 - Koin/objek metalik tampak gelap → turunkan `metalness` (.2–.3) atau tambah `emissive` lembut.

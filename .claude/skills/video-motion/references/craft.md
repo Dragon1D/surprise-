@@ -9,6 +9,11 @@
 | Solusi | ~42–52 dtk | Satu aksi yang jelas dan bisa langsung dilakukan |
 | Penutup / CTA | 4–6 dtk | Kalimat kunci besar + ajakan simpan/kirim ke teman |
 
+## Versi pendek (15–40 detik)
+- 15–25 dtk: hook (0–2) → 2–3 ketukan inti (1 visual + 1 caption per ketukan) → penutup 3 dtk. Satu pesan saja.
+- 30–40 dtk: hook (0–4) → cerita/flashback ±14 dtk (4–6 kejadian) → titik balik ±4 dtk → solusi ±6 dtk → penutup 4 dtk.
+Pangkas jumlah kejadian, jangan mempercepat waktu baca caption.
+
 ## Ritme & keterbacaan
 - Caption: maks ~7 kata per baris, 2 baris. Durasi tampil ≈ 0,4 dtk + 0,03 dtk/huruf (minimal 0,8 dtk). Video tanpa suara harus bisa diikuti dari teks saja.
 - Ganti sesuatu di layar tiap 1,5–3 dtk (objek baru, ekspresi, angka, kamera) — layar diam = scroll.

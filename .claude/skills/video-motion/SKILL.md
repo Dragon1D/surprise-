@@ -18,11 +18,12 @@ Skill ini mengubah ide menjadi video MP4 vertikal yang bisa langsung diupload. A
 4. **Salin template** ke folder proyek baru (mis. `explainer/<slug>/`), lalu sesuaikan isinya:
    `cp -r <skill>/assets/templates/<2d|chat|3d>/. explainer/<slug>/`
    Contoh lengkap yang sudah jadi ada di `assets/examples/` dan berguna sebagai referensi pola, misalnya karakter katak, panci, atau tokoh di kamar.
-5. **Pratinjau sebelum render penuh.** Render penuh makan waktu 1–3 menit, sedangkan pratinjau beberapa detik:
+5. **Pratinjau sebelum render penuh.** Render penuh makan waktu beberapa menit, sedangkan pratinjau hanya beberapa detik:
    `NODE_PATH=$(npm root -g) node <skill>/scripts/render.cjs explainer/<slug> --preview auto`
    Perintah ini menghasilkan 12 frame dan `preview/sheet.jpg`. **Lihat lembar kontaknya** dengan Read, lalu cek teks terpotong, objek bertabrakan, caption menutupi objek penting, frame kosong, dan elemen di luar layar. Untuk detail, crop satu frame dengan ffmpeg dan lihat ukuran penuhnya. Ulangi sampai bersih. Pakai `--preview 3.5,7,12` untuk detik tertentu.
 6. **Render penuh:**
    `NODE_PATH=$(npm root -g) node <skill>/scripts/render.cjs explainer/<slug> [--out nama.mp4]`
+   Perkiraan waktu: 2D/chat ±0,1–0,2 dtk/frame (video 60 dtk ≈ 3–6 menit); 3D ±0,3–0,6 dtk/frame (60 dtk ≈ 10–18 menit). Pakai timeout Bash panjang (600000 ms) atau `run_in_background` untuk video 3D > 30 dtk, dan beri tahu user perkiraan waktunya.
    Audio dibuat otomatis dari `window.AUDIO_EVENTS` dan `window.MUSIC`, lalu dinormalisasi ke -15 LUFS.
 7. **Verifikasi hasil:** `ffprobe` (durasi, 1080x1920, h264 dan aac), lembar kontak dari MP4 final (`ffmpeg -i out.mp4 -vf "fps=1/3,scale=180:-1,tile=9x2" -frames:v 1 cek.jpg`), dan `volumedetect` (mean sekitar -16 sampai -22 dB). Jangan bilang selesai sebelum ini dicek.
 8. **Serahkan:** kirim MP4 ke user dengan SendUserFile kalau tersedia. Masukkan `sound.wav` dan `events.json` ke .gitignore, lalu commit sumber dan MP4 kalau bekerja di repo. Ringkas konsep video dalam beberapa poin, sebutkan keterbatasannya (lihat di bawah), dan tawarkan revisi atau episode lanjutan.
@@ -38,6 +39,8 @@ Halaman `index.html` di folder proyek harus menyediakan:
 | `window.AUDIO_EVENTS` | `[{t, type, ...}]` efek suara (daftar jenis di `references/audio.md`) |
 | `window.MUSIC` | `{style: 'lofi'\|'ambient'\|'upbeat'\|'tense'\|'none', bpm?, drumsFrom?, drumsTo?, volume?}` |
 | `window.READY` | opsional, Promise kalau ada aset yang perlu dimuat dulu (model .glb, gambar) |
+
+Frame pertama dipakai sebagai thumbnail/cover di banyak aplikasi. Jangan mulai dari layar hitam; hook harus sudah terlihat sejak detik 0.
 
 Stage berukuran **720×1280 px CSS** dan diletakkan di pojok kiri atas saat `?render=1` (template sudah mengurusnya). Renderer memotret dengan skala 1,5, jadi hasil akhirnya 1080×1920.
 

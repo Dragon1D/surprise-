@@ -66,12 +66,13 @@ function serve() {
   if (preview) {
     const outDir = path.resolve(opt('dir', path.join(dir, 'preview')));
     fs.mkdirSync(outDir, { recursive: true });
+    for (const old of fs.readdirSync(outDir)) if (/^frame-.*\.png$/.test(old)) fs.unlinkSync(path.join(outDir, old)); // buang frame lama
     const times = preview === 'auto'
       ? Array.from({ length: 12 }, (_, i) => +((i + .5) * duration / 12).toFixed(2))
       : preview.split(',').map(Number);
     const files = [];
     for (const t of times) {
-      const f = path.join(outDir, `frame-${String(t).padStart(6, '0')}.png`);
+      const f = path.join(outDir, `frame-${t.toFixed(2).padStart(6, '0')}.png`);
       await shot(t, { path: f }); files.push(f);
     }
     fail();
