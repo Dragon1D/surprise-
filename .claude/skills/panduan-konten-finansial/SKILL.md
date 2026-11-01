@@ -77,6 +77,25 @@ Detail ada di `konten/profil/profil-instagram.md`, mockup di `konten/profil/cont
 - **Cover reels:** label seri kecil berhuruf kapital, lalu judul 2–3 baris dengan satu kata disorot. Grid diselang-seling antara video gelap dan carousel terang.
 - **Tag penutup video:** `BOKEK ANONIM · <SERI> EPS. NN`. Label lama "DOMPET BOCOR" di video Katak di Panci harus diganti.
 
+## Rencana posting (keputusan Deny, 2026-11-01)
+- **Platform:** Instagram, Facebook, TikTok, YouTube Shorts, dan Threads.
+- **Frekuensi:** 3 postingan per hari selama 30 hari, total 90 konten: 2 video dan 1 carousel per hari.
+- **Satu tema per hari** (diambil dari bank ide), dikemas jadi 3 format:
+  1. **Video cerita** (30–45 dtk): seri *Kok Bisa?* atau sesi curhat.
+  2. **Video tips cepat** (15–25 dtk): gaya **2D teks dan animasi**.
+  3. **Carousel** (6–8 slide) yang layak disimpan.
+- **Distribusi:**
+  - Instagram: 2 video + carousel.
+  - Facebook: 2 video, dibagikan ulang dari Instagram.
+  - TikTok: 2 video + carousel dalam **mode foto**.
+  - YouTube Shorts: 2 video.
+  - Threads: **versi teks** dari tema hari itu.
+- **Narasi (voice over):** Deny akan mencari dubbing sendiri. Setiap video wajib disertai **naskah VO dengan timecode** (`narasi.md` + `narasi.srt`) dengan tempo sekitar 2,3 kata per detik. Caption di layar tetap ada, supaya video bisa dinikmati tanpa suara. Kalau audio dubbing sudah ada, gabungkan dengan ffmpeg (lihat `references/audio.md` di skill video-motion) dan sesuaikan timing kalau perlu.
+- **Produksi per minggu:** buat 7 hari (14 video, 7 carousel, 7 thread), minta Deny mengecek, baru lanjut ke minggu berikutnya.
+- **Kalender:** `konten/kalender-30-hari.csv` dan Google Sheets di folder Drive "Bokek Anonim". Rencana mingguan ada di `konten/minggu-NN/`.
+- **Pengiriman file:** konektor Drive tidak bisa mengunggah video (terlalu besar). Teks dan jadwal disimpan di Drive. Video dan gambar dikirim lewat chat atau halaman unduhan.
+- **Auto-posting:** belum ada. Posting manual lewat Meta Business Suite, TikTok Studio, dan YouTube Studio. Konektor TikTok for Business yang tersambung hanya untuk iklan, bukan posting organik.
+
 ## Pertanyaan terbuka (tanyakan ke Deny saat relevan, lalu pindahkan jawabannya ke atas)
 - Hasil cek ketersediaan handle @bokekanonim di Instagram, TikTok, dan YouTube.
 - Wajah brand cukup maskot Dompet, atau Deny ikut tampil (wajah atau suara)?
