@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Opsi Logo</title>
+<style>
+  body { margin: 0; background: #f4f1fa; font-family: Inter, system-ui, sans-serif; color: #1d1b26; }
+  .sheet { width: 900px; padding: 40px 40px 30px; }
+  h1 { margin: 0 0 4px; font-size: 34px; letter-spacing: -1px; }
+  .sub { color: #7b7486; font-size: 17px; margin-bottom: 26px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  .card { background: #fff; border-radius: 26px; padding: 22px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 2px 0 rgba(40,30,80,.06); }
+  .big { width: 220px; height: 220px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 1px #e6e1f0; }
+  .big svg, .sm svg { width: 100%; height: 100%; display: block; }
+  .row { display: flex; align-items: center; gap: 12px; margin-top: 16px; width: 100%; background: #faf8fd; border-radius: 14px; padding: 10px 12px; }
+  .sm { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex: none; box-shadow: 0 0 0 1px #e6e1f0; }
+  .row b { font-size: 14px; display: block; }
+  .row span { font-size: 12px; color: #7b7486; }
+  .lbl { margin-top: 14px; text-align: center; }
+  .lbl .n { font-weight: 800; font-size: 20px; }
+  .lbl .n i { font-style: normal; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #5b4bff; color: #fff; font-size: 15px; margin-right: 6px; vertical-align: 2px; }
+  .lbl p { margin: 6px 0 0; font-size: 14.5px; color: #5d5768; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <h1>Opsi logo dari hasil riset brand</h1>
+  <div class="sub">Mengisi celah: brand dipimpin karakter. Tanpa koin dan grafik naik, tanpa daun, tanpa hijau atau biru ala bank. Tiap logo ditampilkan besar dan seukuran foto profil di feed.</div>
+  <div class="grid" id="grid"></div>
+</div>
+<script>
+const INK = '#1d1b26', VIO = '#5b4bff', YEL = '#ffd84d', CRE = '#f4ede1', COR = '#ef6f50', GRN = '#1fa971';
+const coin = (cx, cy, r, inner) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${YEL}" stroke="${INK}" stroke-width="4"/><circle cx="${cx}" cy="${cy}" r="${r * .74}" fill="none" stroke="#e0a800" stroke-width="3"/>${inner || ''}`;
+const LOGOS = [
+  { id: 'dompet-ngomong', name: '@dompetngomong · Dompet Bicara', desc: 'Dompetnya sendiri jadi gelembung chat: ekor di bawah, mulut terbuka lagi ngomong. Langsung bilang "ini akun dompet yang curhat". Kandidat utama.',
+    svg: `<rect width="120" height="120" fill="${CRE}"/><g transform="translate(60 64) scale(.82) translate(-62 -62)">
+      <path d="M22 34 h76 a14 14 0 0 1 14 14 v32 a14 14 0 0 1 -14 14 h-50 l-16 14 v-14 h-10 a14 14 0 0 1 -14 -14 v-32 a14 14 0 0 1 14 -14 z" fill="${COR}" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>
+      <path d="M70 50 h42 v24 h-42 a12 12 0 0 1 0 -24z" fill="#c9553b" stroke="${INK}" stroke-width="4"/>
+      <circle cx="84" cy="62" r="4.5" fill="${YEL}" stroke="${INK}" stroke-width="2.5"/>
+      <circle cx="30" cy="56" r="5" fill="${INK}"/><circle cx="50" cy="56" r="5" fill="${INK}"/>
+      <path d="M30 70 q10 14 20 0 z" fill="#5a2020" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M100 24 l6 -8 M108 32 l9 -3 M90 20 l1 -10" stroke="${INK}" stroke-width="4" stroke-linecap="round"/></g>` },
+  { id: 'dompet-ngomong-gelap', name: '@dompetngomong · Versi Gelap', desc: 'Konsep yang sama di latar tinta dengan dompet kuning. Lebih kontras di feed yang ramai, cocok kalau mau kesan lebih "berani".',
+    svg: `<rect width="120" height="120" fill="${INK}"/><g transform="translate(60 64) scale(.82) translate(-62 -62)">
+      <path d="M22 34 h76 a14 14 0 0 1 14 14 v32 a14 14 0 0 1 -14 14 h-50 l-16 14 v-14 h-10 a14 14 0 0 1 -14 -14 v-32 a14 14 0 0 1 14 -14 z" fill="${YEL}" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M70 50 h42 v24 h-42 a12 12 0 0 1 0 -24z" fill="#f0b000" stroke="${INK}" stroke-width="4"/>
+      <circle cx="84" cy="62" r="4.5" fill="${COR}" stroke="${INK}" stroke-width="2.5"/>
+      <circle cx="30" cy="56" r="5" fill="${INK}"/><circle cx="50" cy="56" r="5" fill="${INK}"/>
+      <path d="M30 70 q10 14 20 0 z" fill="#5a2020" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M100 24 l6 -8 M108 32 l9 -3 M90 20 l1 -10" stroke="${YEL}" stroke-width="4" stroke-linecap="round"/></g>` },
+  { id: 'kantong-bolong', name: '@kantongbolong · Kantong Bolong', desc: 'Saku celana dengan lubang dan koin yang lolos jatuh. Idiom sehari-hari yang semua orang ngerti; cocok kalau mau nada "kita senasib".',
+    svg: `<rect width="120" height="120" fill="${COR}"/>
+      <path d="M26 20 h68 v48 q0 20 -34 32 q-34 -12 -34 -32 z" fill="#3c4f8a" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>
+      <path d="M32 28 h56 v38 q0 15 -28 25 q-28 -10 -28 -25 z" fill="none" stroke="${YEL}" stroke-width="2.5" stroke-dasharray="5 4"/>
+      <ellipse cx="60" cy="78" rx="12" ry="7" fill="${INK}"/>
+      <circle cx="60" cy="104" r="9" fill="${YEL}" stroke="${INK}" stroke-width="3.5"/>
+      <path d="M50 92 l-4 -4 M70 92 l4 -4" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>` },
+  { id: 'bokek-anonim', name: '@bokekanonim · Bokek Anonim', desc: 'Parodi "kelompok dukungan": dompet tipis pakai kacamata dan kumis penyamaran. Paling lucu dan berani, tapi nadanya paling "nyindir".',
+    svg: `<rect width="120" height="120" fill="${YEL}"/>
+      <rect x="18" y="40" width="84" height="46" rx="14" fill="${COR}" stroke="${INK}" stroke-width="4.5"/>
+      <path d="M68 52 h34 v22 h-34 a11 11 0 0 1 0 -22z" fill="#c9553b" stroke="${INK}" stroke-width="4"/>
+      <circle cx="31" cy="57" r="10" fill="${INK}"/><circle cx="54" cy="57" r="10" fill="${INK}"/>
+      <path d="M41 56 h3" stroke="${INK}" stroke-width="4"/>
+      <circle cx="28" cy="54" r="3" fill="#fff" opacity=".7"/><circle cx="51" cy="54" r="3" fill="#fff" opacity=".7"/>
+      <path d="M30 74 q6 -6 12 0 q6 -6 12 0 q-6 5 -12 1 q-6 4 -12 -1z" fill="${INK}"/>
+      <path d="M96 28 q-6 10 0 14 q6 -4 0 -14z" fill="#8fd3ff" stroke="${INK}" stroke-width="2.5"/>` },
+];
+window.LOGOS = LOGOS;
+const svgOf = s => `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+document.getElementById('grid').innerHTML = LOGOS.map((l, i) => `
+  <div class="card">
+    <div class="big">${svgOf(l.svg)}</div>
+    <div class="row"><div class="sm">${svgOf(l.svg)}</div><div><b>${l.id.split('-').slice(0,2).join('')}</b><span>Postingan baru · 2 mnt</span></div></div>
+    <div class="lbl"><div class="n"><i>${i + 1}</i>${l.name}</div><p>${l.desc}</p></div>
+  </div>`).join('');
+</script>
+</body>
+</html>
