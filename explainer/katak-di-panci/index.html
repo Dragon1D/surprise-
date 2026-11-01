@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Katak di Panci</title>
+<style>
+  html, body { margin: 0; background: #05070d; }
+  body { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+  svg { height: 100vh; width: auto; aspect-ratio: 9 / 16; display: block; font-family: Inter, system-ui, sans-serif; }
+  body.render { display: block; min-height: 0; }
+  body.render svg { width: 720px; height: 1280px; }
+</style>
+</head>
+<body>
+<svg id="v" viewBox="0 0 720 1280" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+/* Animasi explainer "Katak di Panci" — Dompet Bocor eps. 01.
+   Semua digambar ulang per frame dari waktu t (detik), jadi bisa dirender
+   deterministik frame-per-frame oleh render.cjs, atau diputar langsung di browser. */
+
+const DURATION = 57;
+window.DURATION = DURATION;
+
+const C = {
+  bg0: '#06090f', bg1: '#141d36', line: '#efe6d2', red: '#e5483b', green: '#3fbf8f',
+  amber: '#f0b23f', frog: '#6f9d68', frogB: '#b9d39c', steel: '#2a3552', dark: '#0e1322',
+  water: '#3f71ab', hot: '#b8503d', skin: '#f1c9a1', hood: '#e3a83e', hair: '#2a2230'
+};
+
+/* ---------- helpers ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const eout = k => 1 - Math.pow(1 - k, 3);
+const back = k => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const f = n => n.toFixed(1);
+function mix(h1, h2, k) {
+  const a = parseInt(h1.slice(1), 16), b = parseInt(h2.slice(1), 16);
+  const ch = s => Math.round(lerp((a >> s) & 255, (b >> s) & 255, clamp(k)));
+  return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
+}
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const txt = (x, y, s, o = {}) =>
+  `<text x="${f(x)}" y="${f(y)}" text-anchor="${o.anchor || 'middle'}" font-size="${o.size || 28}" font-weight="${o.weight || 800}" fill="${o.fill || C.line}" letter-spacing="${o.ls || 0}" opacity="${o.op ?? 1}"${o.filter ? ` filter="url(#${o.filter})"` : ''}>${esc(s)}</text>`;
+
+/* ---------- static defs ---------- */
+const DEFS = `<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.bg1}"/><stop offset="1" stop-color="${C.bg0}"/></linearGradient>
+  <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".13"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <radialGradient id="warm" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f08a3c" stop-opacity=".35"/><stop offset="1" stop-color="#f08a3c" stop-opacity="0"/></radialGradient>
+  <radialGradient id="vig" cx=".5" cy=".45" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></radialGradient>
+  <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <clipPath id="waterclip"><ellipse cx="360" cy="786" rx="194" ry="32"/></clipPath>
+  <filter id="sh" x="-20%" y="-40%" width="140%" height="180%"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity=".85"/></filter>
+</defs>`;
+
+/* ---------- backdrop ---------- */
+function backdrop(t, o = {}) {
+  let s = `<rect width="720" height="1280" fill="url(#bg)"/>`;
+  // garis cahaya vertikal tipis (suasana malam / hujan)
+  for (let i = 0; i < 9; i++) {
+    const x = 40 + i * 80 + rnd(i) * 30;
+    s += `<line x1="${x}" y1="0" x2="${x}" y2="1280" stroke="#9fb3e0" stroke-width="${1 + rnd(i + 9) * 2}" opacity="${.03 + rnd(i + 3) * .04}"/>`;
+  }
+  if (o.spot) {
+    s += `<polygon points="290,0 430,0 640,1060 80,1060" fill="url(#cone)" opacity="${o.spot}"/>`;
+    s += `<ellipse cx="360" cy="1060" rx="300" ry="40" fill="#fff" opacity="${.06 * o.spot}"/>`;
+  }
+  if (o.warm) s += `<circle cx="360" cy="930" r="420" fill="url(#warm)" opacity="${o.warm}"/>`;
+  // debu melayang
+  for (let i = 0; i < 26; i++) {
+    const x = (rnd(i) * 720 + Math.sin(t * .4 + i) * 20) % 720;
+    const y = (1280 - ((rnd(i + 50) * 1280 + t * (10 + rnd(i + 7) * 18)) % 1280));
+    s += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(1 + rnd(i + 30) * 2)}" fill="#fff" opacity="${f(.05 + rnd(i + 70) * .12)}"/>`;
+  }
+  return s;
+}
+
+/* ---------- karakter: katak ---------- */
+function frog(o) {
+  const { x, y, s = 1, rot = 0, eyes = 'normal', mouth = 'smile', arms = 'down', pose = 'sit', look = [0, 0] } = o;
+  let g = `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(${s})">`;
+  const st = `stroke="${C.line}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"`;
+  // kaki belakang
+  if (pose === 'jump') {
+    g += `<path d="M-40 30 L-80 75 L-105 120" fill="none" ${st} stroke-width="14" stroke="${C.line}"/><path d="M-40 30 L-80 75 L-105 120" fill="none" stroke="${C.frog}" stroke-width="7" stroke-linecap="round"/>`;
+    g += `<path d="M40 30 L80 75 L105 120" fill="none" stroke="${C.line}" stroke-width="14" stroke-linecap="round"/><path d="M40 30 L80 75 L105 120" fill="none" stroke="${C.frog}" stroke-width="7" stroke-linecap="round"/>`;
+  } else {
+    g += `<ellipse cx="-60" cy="34" rx="32" ry="22" fill="${C.frog}" ${st}/><ellipse cx="60" cy="34" rx="32" ry="22" fill="${C.frog}" ${st}/>`;
+  }
+  // tangan di belakang kepala (santai)
+  if (arms === 'behind') {
+    g += `<path d="M-62 -10 Q-95 -55 -55 -78" fill="none" stroke="${C.line}" stroke-width="16" stroke-linecap="round"/><path d="M-62 -10 Q-95 -55 -55 -78" fill="none" stroke="${C.frog}" stroke-width="8" stroke-linecap="round"/>`;
+    g += `<path d="M62 -10 Q95 -55 55 -78" fill="none" stroke="${C.line}" stroke-width="16" stroke-linecap="round"/><path d="M62 -10 Q95 -55 55 -78" fill="none" stroke="${C.frog}" stroke-width="8" stroke-linecap="round"/>`;
+  }
+  if (arms === 'up') {
+    g += `<path d="M-60 -5 L-95 -60" stroke="${C.line}" stroke-width="16" stroke-linecap="round"/><path d="M-60 -5 L-95 -60" stroke="${C.frog}" stroke-width="8" stroke-linecap="round"/>`;
+    g += `<path d="M60 -5 L95 -60" stroke="${C.line}" stroke-width="16" stroke-linecap="round"/><path d="M60 -5 L95 -60" stroke="${C.frog}" stroke-width="8" stroke-linecap="round"/>`;
+  }
+  // badan
+  g += `<ellipse cx="0" cy="0" rx="72" ry="56" fill="${C.frog}" ${st}/>`;
+  g += `<ellipse cx="0" cy="18" rx="44" ry="30" fill="${C.frogB}"/>`;
+  if (arms === 'down') g += `<ellipse cx="-30" cy="50" rx="16" ry="9" fill="${C.frog}" ${st}/><ellipse cx="30" cy="50" rx="16" ry="9" fill="${C.frog}" ${st}/>`;
+  // rona panas
+  if (o.tint) g += `<ellipse cx="0" cy="0" rx="72" ry="56" fill="${C.red}" opacity="${f(o.tint * .55)}"/>`;
+  // mata
+  for (const sx of [-1, 1]) {
+    const ex = sx * 34, ey = -50;
+    g += `<circle cx="${ex}" cy="${ey}" r="23" fill="${C.frog}" ${st}/>`;
+    if (o.tint) g += `<circle cx="${ex}" cy="${ey}" r="23" fill="${C.red}" opacity="${f(o.tint * .45)}"/>`;
+    if (eyes === 'happy') {
+      g += `<path d="M${ex - 11} ${ey + 3} Q${ex} ${ey - 10} ${ex + 11} ${ey + 3}" fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/>`;
+    } else {
+      const r = eyes === 'wide' ? 17 : 15, pr = eyes === 'wide' ? 4.5 : 7.5;
+      g += `<circle cx="${ex}" cy="${ey}" r="${r}" fill="#fff"/><circle cx="${ex + look[0]}" cy="${ey + look[1]}" r="${pr}" fill="#141414"/>`;
+    }
+  }
+  // mulut
+  if (mouth === 'smile') g += `<path d="M-26 -4 Q0 16 26 -4" fill="none" stroke="#1d2a1b" stroke-width="5" stroke-linecap="round"/>`;
+  if (mouth === 'o') g += `<ellipse cx="0" cy="2" rx="12" ry="14" fill="#2a1414" stroke="#1d2a1b" stroke-width="4"/>`;
+  if (mouth === 'flat') g += `<path d="M-20 0 Q0 -6 20 0" fill="none" stroke="#1d2a1b" stroke-width="5" stroke-linecap="round"/>`;
+  if (o.blush) g += `<ellipse cx="-44" cy="0" rx="10" ry="6" fill="#f08a8a" opacity=".7"/><ellipse cx="44" cy="0" rx="10" ry="6" fill="#f08a8a" opacity=".7"/>`;
+  if (o.sweat) {
+    for (let i = 0; i < 3; i++) {
+      const k = (o.t * 1.3 + i / 3) % 1;
+      const sx = [-80, 78, -66][i], sy = [-70, -60, -95][i] + k * 40;
+      g += `<path d="M${sx} ${f(sy)} q-8 14 0 18 q8 -4 0 -18z" fill="#8fd3ff" stroke="${C.line}" stroke-width="2.5" opacity="${f(o.sweat * (1 - k))}"/>`;
+    }
+  }
+  if (o.alert) {
+    g += `<g opacity="${f(o.alert)}"><path d="M-8 -150 L8 -150 L4 -105 L-4 -105 Z" fill="${C.red}" stroke="${C.line}" stroke-width="3"/><circle cx="0" cy="-90" r="7" fill="${C.red}" stroke="${C.line}" stroke-width="3"/></g>`;
+  }
+  return g + '</g>';
+}
+
+/* ---------- karakter: orang ---------- */
+function person(o) {
+  const { x, y, t } = o;
+  let g = `<g transform="translate(${x} ${y})">`;
+  const st = `stroke="${C.line}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"`;
+  // badan (hoodie)
+  g += `<path d="M-80 140 Q-82 55 -40 48 L40 48 Q82 55 80 140 Z" fill="${C.hood}" ${st}/>`;
+  g += `<path d="M-18 50 L0 78 L18 50" fill="none" stroke="#b37f22" stroke-width="4"/>`;
+  // tangan kiri di bibir panci
+  g += `<path d="M-70 80 Q-130 90 -165 100" fill="none" stroke="${C.line}" stroke-width="24" stroke-linecap="round"/><path d="M-70 80 Q-130 90 -165 100" fill="none" stroke="${C.hood}" stroke-width="15" stroke-linecap="round"/>`;
+  g += `<circle cx="-170" cy="100" r="13" fill="${C.skin}" ${st}/>`;
+  // tangan kanan pegang HP
+  g += `<path d="M65 85 Q105 70 100 20" fill="none" stroke="${C.line}" stroke-width="24" stroke-linecap="round"/><path d="M65 85 Q105 70 100 20" fill="none" stroke="${C.hood}" stroke-width="15" stroke-linecap="round"/>`;
+  g += `<rect x="82" y="-48" width="40" height="66" rx="8" fill="#151a28" ${st}/><rect x="88" y="-41" width="28" height="48" rx="4" fill="#7fd6ff" opacity="${f(.65 + Math.sin(t * 6) * .15)}"/>`;
+  g += `<circle cx="100" cy="18" r="13" fill="${C.skin}" ${st}/>`;
+  // kepala
+  g += `<circle cx="0" cy="-10" r="58" fill="${C.skin}" ${st}/>`;
+  if (o.tint) g += `<circle cx="0" cy="-10" r="58" fill="${C.red}" opacity="${f(o.tint * .4)}"/>`;
+  g += `<path d="M-58 -18 Q-55 -78 0 -70 Q50 -78 58 -22 Q35 -45 0 -42 Q-30 -48 -58 -18 Z" fill="${C.hair}" ${st}/>`;
+  // mata melihat HP
+  g += `<circle cx="-14" cy="-6" r="6" fill="#141414"/><circle cx="24" cy="-6" r="6" fill="#141414"/>`;
+  if (o.mouth === 'smile') g += `<path d="M-10 18 Q8 32 26 18" fill="none" stroke="#3a2420" stroke-width="5" stroke-linecap="round"/>`;
+  else g += `<path d="M-6 24 Q8 18 22 24" fill="none" stroke="#3a2420" stroke-width="5" stroke-linecap="round"/>`;
+  g += `<ellipse cx="-38" cy="14" rx="10" ry="6" fill="#f08a8a" opacity="${f(.4 + (o.tint || 0) * .5)}"/>`;
+  if (o.sweat) {
+    for (let i = 0; i < 3; i++) {
+      const k = (t * 1.2 + i / 3) % 1, sx = [-70, 62, -52][i], sy = [-50, -40, -78][i] + k * 40;
+      g += `<path d="M${sx} ${f(sy)} q-8 14 0 18 q8 -4 0 -18z" fill="#8fd3ff" stroke="${C.line}" stroke-width="2.5" opacity="${f(o.sweat * (1 - k))}"/>`;
+    }
+  }
+  return g + '</g>';
+}
+
+/* ---------- panci, kompor, termometer ---------- */
+function flame(x, y, size, t, seed) {
+  const fl = 1 + Math.sin(t * 14 + seed * 3) * .12 + Math.sin(t * 23 + seed) * .07;
+  const h = 70 * size * fl, w = 20 * size;
+  const p = (hh, ww) => `M${x} ${y} C${f(x - ww)} ${f(y - hh * .2)} ${f(x - ww * .8)} ${f(y - hh * .6)} ${f(x + Math.sin(t * 9 + seed) * 4)} ${f(y - hh)} C${f(x + ww * .8)} ${f(y - hh * .6)} ${f(x + ww)} ${f(y - hh * .2)} ${x} ${y} Z`;
+  return `<path d="${p(h, w)}" fill="${C.red}" stroke="${C.line}" stroke-width="3"/><path d="${p(h * .62, w * .6)}" fill="${C.amber}"/><path d="${p(h * .3, w * .3)}" fill="#fff3d6"/>`;
+}
+
+function thermometer(x, y, temp, o = {}) {
+  const k = clamp(temp / 100), col = mix('#4f8fd6', C.red, prog(temp, 35, 85));
+  const sc = o.s || 1;
+  let g = `<g transform="translate(${x} ${y}) scale(${sc})">`;
+  g += `<rect x="-15" y="-250" width="30" height="240" rx="15" fill="${C.dark}" stroke="${C.line}" stroke-width="4"/>`;
+  for (let i = 1; i < 5; i++) g += `<line x1="15" y1="${-10 - i * 46}" x2="27" y2="${-10 - i * 46}" stroke="${C.line}" stroke-width="3" opacity=".6"/>`;
+  g += `<rect x="-7" y="${f(-14 - k * 226)}" width="14" height="${f(k * 226 + 14)}" rx="7" fill="${col}"/>`;
+  g += `<circle cx="0" cy="12" r="26" fill="${col}" stroke="${C.line}" stroke-width="4"/>`;
+  g += txt(0, -270, `${Math.round(temp)}°C`, { size: 30, fill: col });
+  return g + '</g>';
+}
+
+function potScene(o) {
+  const { t, heat = 0, content = '', knobs = null } = o;
+  let s = '';
+  // kompor
+  s += `<rect x="170" y="1060" width="380" height="80" rx="14" fill="#1a2135" stroke="${C.line}" stroke-width="5"/>`;
+  const nk = knobs ? knobs.length : 2;
+  for (let i = 0; i < nk; i++) {
+    const kx = nk === 2 ? [250, 470][i] : 230 + i * 130;
+    const ang = -60 + (knobs ? knobs[i].v : heat) * 150;
+    s += `<g transform="translate(${kx} 1100) rotate(${f(ang)})"><circle r="17" fill="${C.steel}" stroke="${C.line}" stroke-width="4"/><line x1="0" y1="0" x2="0" y2="-13" stroke="${C.line}" stroke-width="4" stroke-linecap="round"/></g>`;
+  }
+  if (knobs) {
+    knobs.forEach((kn, i) => {
+      const kx = 230 + i * 130, w = kn.label.length * 11 + 22;
+      s += `<g opacity="${f(kn.op)}"><rect x="${kx - w / 2}" y="1158" width="${w}" height="36" rx="8" fill="${C.red}" stroke="${C.line}" stroke-width="3"/>${txt(kx, 1182, kn.label, { size: 16, fill: '#fff', ls: .5 })}<line x1="${kx}" y1="1120" x2="${kx}" y2="1156" stroke="${C.line}" stroke-width="3" opacity=".7"/></g>`;
+    });
+  }
+  // api
+  const n = 7;
+  for (let i = 0; i < n; i++) s += flame(222 + i * 46, 1060, (.35 + heat * .85) * (.8 + rnd(i) * .35), t, i);
+  // dinding belakang & air
+  s += `<rect x="128" y="800" width="26" height="22" rx="8" fill="${C.steel}" stroke="${C.line}" stroke-width="5"/><rect x="566" y="800" width="26" height="22" rx="8" fill="${C.steel}" stroke="${C.line}" stroke-width="5"/>`;
+  s += `<ellipse cx="360" cy="780" rx="210" ry="42" fill="${C.dark}" stroke="${C.line}" stroke-width="5"/>`;
+  const wcol = mix(C.water, C.hot, heat);
+  s += `<ellipse cx="360" cy="786" rx="194" ry="32" fill="${wcol}"/>`;
+  s += content;
+  // gelembung
+  const nb = Math.round(heat * 14);
+  let bub = '';
+  for (let i = 0; i < nb; i++) {
+    const per = .6 + rnd(i) * .7, k = ((t + rnd(i + 3) * 5) / per) % 1;
+    const bx = 190 + rnd(i + 11) * 340, by = 790 + (rnd(i + 21) - .5) * 40;
+    bub += `<circle cx="${f(bx)}" cy="${f(by - k * 8)}" r="${f(3 + k * 10 * (.5 + heat))}" fill="none" stroke="#fff" stroke-width="2.5" opacity="${f((1 - k) * .7)}"/>`;
+  }
+  s += `<g clip-path="url(#waterclip)"><rect x="160" y="786" width="400" height="40" fill="${wcol}" opacity=".88"/>${bub}</g>`;
+  // dinding depan
+  s += `<path d="M150 780 A210 42 0 0 0 570 780 L556 960 Q552 1012 492 1012 L228 1012 Q168 1012 164 960 Z" fill="${C.steel}" stroke="${C.line}" stroke-width="5" stroke-linejoin="round"/>`;
+  s += `<path d="M190 840 L198 960" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".08"/>`;
+  // uap
+  const ns = Math.round(heat * 6);
+  for (let i = 0; i < ns; i++) {
+    const k = ((t * .45 + i / ns) % 1), sx = 220 + i * 55 + Math.sin(t + i) * 10, sy = 760 - k * 220;
+    s += `<path d="M${f(sx)} ${f(sy)} c-14 -18 14 -36 0 -54 s14 -36 0 -54" fill="none" stroke="${C.line}" stroke-width="5" stroke-linecap="round" opacity="${f(Math.sin(k * Math.PI) * .45 * heat)}"/>`;
+  }
+  return s;
+}
+
+/* ---------- caption ---------- */
+const CAPS = [
+  [3.8, 6.9, 'Konon, katak yang dicemplungin|ke air *mendidih*...'],
+  [6.9, 9.9, 'langsung *melompat*|keluar.'],
+  [10.2, 12.6, 'Tapi kalau airnya|^hangat^...'],
+  [12.6, 15.0, 'lalu dipanaskan|pelan-pelan,'],
+  [15.0, 17.0, 'ia malah ^betah^.'],
+  [17.3, 19.5, 'Begitu sadar|airnya *panas*,'],
+  [19.5, 22.0, 'ia sudah tak kuat|melompat.'],
+  [23.8, 27.0, 'Kita cepat *terbiasa*|dengan kenyamanan baru.', { y: 900, size: 40 }],
+  [27.2, 29.2, 'Gaji _naik_,'],
+  [29.2, 31.6, 'gaya hidup|ikut *naik*.'],
+  [31.6, 35.0, 'Tabungan? Tetap|segitu-segitu aja.'],
+  [35.2, 37.4, 'Yang dulu|^mewah^,'],
+  [37.4, 40.0, 'kini terasa|*wajib*.'],
+  [40.3, 42.4, 'Tanpa sadar,'],
+  [42.4, 47.0, 'kita sedang *direbus*|pelan-pelan.'],
+  [47.4, 50.0, 'Bukan gajimu|yang kurang.', { y: 560, size: 60 }],
+  [50.0, 52.8, 'Airnya yang|terlalu *nyaman*.', { y: 560, size: 60 }],
+];
+const MARK = { '*': C.red, '_': C.green, '^': C.amber };
+
+function captions(t) {
+  let s = '';
+  for (const [t0, t1, text, o = {}] of CAPS) {
+    if (t < t0 || t > t1) continue;
+    const size = o.size || 46, y0 = o.y || 330, lh = size * 1.22;
+    const lines = text.split('|');
+    const out = prog(t, t1 - .22, t1);
+    const pop = back(prog(t, t0, t0 + .28));
+    let wi = 0;
+    const cy = y0 + (lines.length - 1) * lh / 2;
+    s += `<g opacity="${f(1 - out)}" transform="translate(360 ${f(cy)}) scale(${f(.85 + .15 * pop)}) translate(-360 ${f(-cy)})" filter="url(#sh)">`;
+    lines.forEach((line, li) => {
+      s += `<text x="360" y="${f(y0 + li * lh)}" text-anchor="middle" font-size="${size}" font-weight="800" fill="#fff" letter-spacing="-.5">`;
+      line.split(' ').forEach((w, j) => {
+        const on = prog(t, t0 + wi * .13, t0 + wi * .13 + .12); wi++;
+        const m = w.match(/^([*_^])(.+?)\1(.*)$/);
+        const sp = j ? ' ' : '';
+        if (m) s += `<tspan opacity="${f(on)}">${sp}</tspan><tspan fill="${MARK[m[1]]}" opacity="${f(on)}">${esc(m[2])}</tspan><tspan opacity="${f(on)}">${esc(m[3])}</tspan>`;
+        else s += `<tspan opacity="${f(on)}">${sp}${esc(w)}</tspan>`;
+      });
+      s += `</text>`;
+    });
+    s += `</g>`;
+  }
+  return s;
+}
+
+/* ---------- scenes ---------- */
+const SCENES = [
+  { a: 0, b: 3.6, bg: { spot: 1 }, draw(l, t) { // judul
+    const k1 = eout(prog(l, .1, .7)), k2 = eout(prog(l, .5, 1.2)), k3 = eout(prog(l, 1.0, 1.7));
+    let s = `<g opacity="${f(k1)}" transform="translate(0 ${f((1 - k1) * 20)})">`;
+    s += `<text x="360" y="440" text-anchor="middle" font-size="26" font-weight="800" letter-spacing="6"><tspan fill="${C.line}">DOMPET </tspan><tspan fill="${C.red}">BOCOR</tspan></text>`;
+    s += txt(360, 474, 'EPS. 01', { size: 18, ls: 5, op: .6, weight: 600 }) + '</g>';
+    s += `<g opacity="${f(k2)}" transform="translate(0 ${f((1 - k2) * 30)})">${txt(360, 580, 'Katak', { size: 96, filter: 'sh' })}${txt(360, 680, 'di Panci', { size: 96, fill: C.amber, filter: 'sh' })}</g>`;
+    // panci kecil + katak mengintip
+    s += `<g opacity="${f(k3)}" transform="translate(360 900) scale(.55) translate(-360 -880)">`;
+    s += `<ellipse cx="360" cy="780" rx="210" ry="42" fill="${C.dark}" stroke="${C.line}" stroke-width="7"/>`;
+    s += frog({ x: 360, y: 800 - eout(prog(l, 1.6, 2.4)) * 45, s: 1, eyes: 'normal', mouth: 'flat', look: [0, -3] });
+    s += `<path d="M150 780 A210 42 0 0 0 570 780 L556 960 Q552 1012 492 1012 L228 1012 Q168 1012 164 960 Z" fill="${C.steel}" stroke="${C.line}" stroke-width="7"/>`;
+    for (let i = 0; i < 3; i++) {
+      const k = (t * .5 + i / 3) % 1;
+      s += `<path d="M${280 + i * 80} ${f(740 - k * 160)} c-14 -18 14 -36 0 -54 s14 -36 0 -54" fill="none" stroke="${C.line}" stroke-width="8" stroke-linecap="round" opacity="${f(Math.sin(k * Math.PI) * .5)}"/>`;
+    }
+    return s + '</g>';
+  } },
+  { a: 3.6, b: 10.0, bg: { warm: .9 }, draw(l, t) { // air mendidih -> langsung lompat
+    let fr = '';
+    let out = '';
+    const fall = prog(l, 2.3, 3.0), jump = prog(l, 3.7, 5.0);
+    if (l < 3.7) {
+      const y = lerp(-120, 768, fall * fall);
+      const fs = frog({ x: 360, y, eyes: l > 3.0 ? 'wide' : 'normal', mouth: l > 3.0 ? 'o' : 'smile', arms: 'down', tint: prog(l, 3.0, 3.5) * .5, alert: prog(l, 3.1, 3.3) });
+      if (fall < 1) out += fs; else fr = fs;
+    } else {
+      const x = lerp(360, 920, eout(jump)), y = 768 - Math.sin(jump * Math.PI) * 520 + jump * 120;
+      out += frog({ x, y, rot: jump * 50, pose: 'jump', arms: 'up', eyes: 'wide', mouth: 'o', tint: .5 * (1 - jump) });
+    }
+    let splash = '';
+    const sp = prog(l, 3.0, 3.7);
+    if (sp > 0 && sp < 1) for (let i = 0; i < 8; i++) {
+      const a = Math.PI + (i / 7) * Math.PI;
+      splash += `<circle cx="${f(360 + Math.cos(a) * 140 * sp)}" cy="${f(770 + Math.sin(a) * 120 * sp + sp * sp * 80)}" r="${f(9 * (1 - sp))}" fill="#9cc7f0" stroke="${C.line}" stroke-width="2"/>`;
+    }
+    return potScene({ t, heat: 1, content: fr }) + thermometer(640, 760, 100) + splash + out;
+  } },
+  { a: 10.0, b: 17.0, bg: { warm: .35 }, draw(l, t) { // air hangat, katak santai
+    const heat = lerp(.15, .55, prog(l, 1, 7)), temp = lerp(30, 62, prog(l, 1, 7));
+    const fr = frog({ x: 360, y: 766 + Math.sin(t * 2) * 4, eyes: 'happy', mouth: 'smile', arms: 'behind', blush: true });
+    let zz = '';
+    if (l > 4.8) {
+      const k = eout(prog(l, 4.8, 5.4));
+      zz = `<g opacity="${f(k)}" transform="translate(470 ${f(640 - k * 20)})"><rect x="-10" y="-34" width="130" height="50" rx="25" fill="${C.line}"/>${txt(55, 0, 'ahh~ enak', { size: 22, fill: C.dark })}</g>`;
+    }
+    return potScene({ t, heat, content: fr }) + thermometer(640, 760, temp) + zz;
+  } },
+  { a: 17.0, b: 22.2, bg: { warm: 1 }, draw(l, t) { // panas, terlambat
+    const k = eio(prog(l, 0, 2.2));
+    const heat = lerp(.55, 1, prog(l, 0, 3)), temp = lerp(62, 98, prog(l, 0, 3));
+    const hop = l > 2.8 ? Math.max(0, Math.sin(prog(l, 2.8, 3.5) * Math.PI)) * 22 : 0;
+    const fr = frog({ x: 360 + Math.sin(t * 30) * 2 * k, y: 768 - hop, eyes: 'wide', mouth: 'o', arms: l > 2.8 ? 'up' : 'down', tint: k, sweat: k, t });
+    const z = 1 + k * .55;
+    let s = `<g transform="translate(360 760) scale(${f(z)}) translate(-360 -760)">${potScene({ t, heat, content: fr })}</g>`;
+    s += `<rect width="720" height="1280" fill="${C.red}" opacity="${f(k * .1 + Math.sin(t * 6) * .02 * k)}"/>`;
+    s += thermometer(645, 610, temp, { s: .7 });
+    return s;
+  } },
+  { a: 22.2, b: 27.2, bg: { spot: 1 }, draw(l) { // konsep
+    const k1 = eout(prog(l, .2, .8)), k2 = eout(prog(l, .6, 1.3)), k3 = eout(prog(l, 1.0, 1.7));
+    let s = `<g opacity="${f(k1)}">${txt(360, 520, 'DALAM PSIKOLOGI', { size: 20, ls: 6, op: .7, weight: 700 })}</g>`;
+    s += `<g opacity="${f(k2)}" transform="translate(0 ${f((1 - k2) * 25)})">${txt(360, 620, 'Hedonic', { size: 84, filter: 'sh' })}${txt(360, 710, 'Adaptation', { size: 84, fill: C.red, filter: 'sh' })}</g>`;
+    s += `<rect x="${f(360 - 40 * k3)}" y="748" width="${f(80 * k3)}" height="5" rx="2.5" fill="${C.line}" opacity=".7"/>`;
+    s += `<g opacity="${f(k3)}">${txt(360, 800, 'adaptasi hedonis', { size: 24, weight: 500, op: .65 })}</g>`;
+    return s;
+  } },
+  { a: 27.2, b: 35.0, bg: { spot: .7 }, draw(l, t) { // grafik gaji vs pengeluaran
+    const base = 1010, steps = [0, 1.9, 3.6, 5.2];
+    const G = [170, 250, 330, 410], P = [160, 243, 325, 405];
+    const gl = ['Rp5 jt', 'Rp6,5 jt', 'Rp8 jt', 'Rp10 jt'], pl = ['Rp4,9 jt', 'Rp6,4 jt', 'Rp7,9 jt', 'Rp9,9 jt'];
+    const chips = ['☕ Kopi kekinian', '📱 HP baru', '🛵 Ojol tiap hari', '🍜 Nongkrong tiap minggu'];
+    const lvl = (arr, d) => { let v = 0; steps.forEach((s0, i) => { const k = back(prog(l, s0 + d, s0 + d + .6)); if (k > 0) v = lerp(i ? arr[i - 1] : 0, arr[i], k); }); return v; };
+    const curIdx = (d) => { let c = 0; steps.forEach((s0, i) => { if (l >= s0 + d) c = i; }); return c; };
+    const gh = lvl(G, 0), ph = lvl(P, .55), th = 14;
+    const bars = [
+      { x: 150, h: gh, col: C.green, lab: 'GAJI', val: gl[curIdx(0)] },
+      { x: 360, h: ph, col: C.red, lab: 'PENGELUARAN', val: pl[curIdx(.55)] },
+      { x: 570, h: th * eout(prog(l, .2, .8)), col: C.line, lab: 'TABUNGAN', val: 'Rp100rb' },
+    ];
+    let s = `<line x1="60" y1="${base}" x2="660" y2="${base}" stroke="${C.line}" stroke-width="5" stroke-linecap="round"/>`;
+    bars.forEach((b, i) => {
+      s += `<rect x="${b.x - 60}" y="${f(base - b.h)}" width="120" height="${f(b.h)}" rx="10" fill="${b.col}" stroke="${C.line}" stroke-width="4"/>`;
+      s += txt(b.x, base + 44, b.lab, { size: 20, ls: 2, fill: b.col === C.line ? C.line : b.col, weight: 800 });
+      const blink = i === 2 && l > 4.6 ? (Math.sin(t * 9) > 0 ? C.red : C.line) : C.line;
+      if (b.h > 4) s += txt(b.x, base - b.h - 18, b.val, { size: 26, fill: blink });
+    });
+    // chip pengeluaran baru
+    steps.forEach((s0, i) => {
+      const k = prog(l, s0 + .55, s0 + 2.0);
+      if (k <= 0 || k >= 1) return;
+      const a = Math.min(1, k * 6) * (1 - prog(k, .75, 1)), w = chips[i].length * 12 + 40;
+      const y = base - P[i] - 80 - eout(k) * 40;
+      s += `<g opacity="${f(a)}"><rect x="${360 - w / 2}" y="${f(y - 30)}" width="${w}" height="44" rx="22" fill="${C.dark}" stroke="${C.red}" stroke-width="3"/>${txt(360, y, chips[i], { size: 20, weight: 700 })}</g>`;
+    });
+    return s;
+  } },
+  { a: 35.0, b: 40.1, bg: { spot: .9 }, draw(l) { // mewah -> wajib
+    const flip = prog(l, 2.1, 2.6), sx = Math.abs(Math.cos(flip * Math.PI));
+    const front = flip < .5, k = eout(prog(l, .1, .6));
+    let s = `<g opacity="${f(k)}" transform="translate(360 640) scale(${f(sx * (.9 + .1 * k))} ${f(.9 + .1 * k)})">`;
+    s += `<rect x="-220" y="-120" width="440" height="240" rx="26" fill="${C.dark}" stroke="${front ? C.amber : C.red}" stroke-width="6"/>`;
+    if (front) s += txt(0, -45, 'DULU', { size: 22, ls: 5, op: .6, weight: 700 }) + txt(0, 40, 'MEWAH', { size: 80, fill: C.amber }) + txt(-150, -60, '✦', { size: 34, fill: C.amber }) + txt(160, 70, '✦', { size: 26, fill: C.amber });
+    else s += txt(0, -45, 'SEKARANG', { size: 22, ls: 5, op: .6, weight: 700 }) + txt(0, 40, 'WAJIB', { size: 80, fill: C.red });
+    s += '</g>';
+    const items = ['☕ Kopi 45rb tiap hari', '📱 Cicilan HP terbaru', '📺 5 langganan streaming'];
+    items.forEach((it, i) => {
+      const a = eout(prog(l, 2.7 + i * .35, 3.2 + i * .35));
+      s += `<g opacity="${f(a)}" transform="translate(${f((1 - a) * -30)} 0)">${txt(180, 850 + i * 62, it, { size: 28, anchor: 'start', weight: 600 })}</g>`;
+    });
+    return s;
+  } },
+  { a: 40.1, b: 47.2, bg: { warm: .6 }, draw(l, t) { // kita direbus pelan-pelan
+    const heat = lerp(.25, .85, prog(l, .5, 6.5)), temp = lerp(34, 82, prog(l, .5, 6.5));
+    const hot = prog(l, 4.2, 5.2);
+    const ps = person({ x: 360, y: 700, t, mouth: hot > .5 ? 'flat' : 'smile', tint: hot * .8, sweat: hot });
+    const kn = ['PAYLATER', 'CICILAN', 'LANGGANAN'].map((label, i) => ({ label, op: eout(prog(l, 1.0 + i * .5, 1.5 + i * .5)), v: lerp(.2, .9, prog(l, 1 + i * .5, 6.5)) }));
+    let s = potScene({ t, heat, content: ps, knobs: kn }) + thermometer(80, 700, temp, { s: .8 });
+    const nk = back(prog(l, 4.8, 5.3));
+    if (nk > 0) s += `<g transform="translate(520 470) scale(${f(nk)})"><rect x="-145" y="-34" width="290" height="62" rx="16" fill="${C.line}" stroke="${C.red}" stroke-width="4"/><circle cx="-118" cy="-3" r="10" fill="${C.red}"/>${txt(16, 6, 'Tagihan jatuh tempo!', { size: 21, fill: C.dark })}<path d="M-60 28 L-80 52 L-40 28 Z" fill="${C.line}"/></g>`;
+    return s;
+  } },
+  { a: 47.2, b: 52.9, bg: { spot: 1 }, draw() { return ''; } },
+  { a: 52.9, b: 57.0, bg: { spot: 1 }, draw(l, t) { // penutup
+    const k1 = back(prog(l, .1, .6)), k2 = eout(prog(l, .7, 1.3)), k3 = eout(prog(l, 1.4, 2.0));
+    let s = `<g transform="translate(360 470) scale(${f(k1)})"><circle r="38" fill="${C.green}" stroke="${C.line}" stroke-width="5"/><path d="M-16 0 H16 M0 -16 V16" stroke="#fff" stroke-width="7" stroke-linecap="round"/></g>`;
+    s += `<g opacity="${f(k2)}" transform="translate(0 ${f((1 - k2) * 20)})">${txt(360, 600, 'Naikkan tabungan dulu,', { size: 46, filter: 'sh' })}${txt(360, 660, 'baru gaya hidup.', { size: 46, fill: C.green, filter: 'sh' })}</g>`;
+    s += `<g opacity="${f(k3 * .75)}">${txt(360, 760, 'Simpan & kirim ke temanmu', { size: 26, weight: 600 })}${txt(360, 796, 'yang lagi "direbus".', { size: 26, weight: 600 })}</g>`;
+    // katak lompat keluar dengan senang
+    const j = prog(l, 1.6, 2.6);
+    const fx = lerp(250, 470, j), fy = 1040 - Math.sin(j * Math.PI) * 120;
+    s += `<g opacity="${f(eout(prog(l, 1.2, 1.6)))}">` + frog({ x: fx, y: fy, s: .7, pose: j > 0 && j < 1 ? 'jump' : 'sit', arms: j > 0 && j < 1 ? 'up' : 'down', eyes: 'happy', mouth: 'smile', blush: true }) + '</g>';
+    return s;
+  } },
+];
+
+const svg = document.getElementById('v');
+function renderAt(t) {
+  let body = DEFS;
+  let sc = SCENES.find(s => t >= s.a && t < s.b) || SCENES[SCENES.length - 1];
+  body += backdrop(t, sc.bg);
+  const l = t - sc.a;
+  const fin = sc.a === 0 ? 1 : prog(l, 0, .35);
+  const fade = Math.min(fin, sc.b >= DURATION ? 1 : 1 - prog(t, sc.b - .3, sc.b));
+  const black = Math.max(1 - prog(t, 0, .4), prog(t, DURATION - .8, DURATION));
+  body += `<g opacity="${f(fade)}">${sc.draw(l, t)}</g>`;
+  body += captions(t);
+  body += `<rect width="720" height="1280" fill="url(#vig)"/>`;
+  body += `<rect width="720" height="1280" fill="#000" opacity="${f(black)}"/>`;
+  svg.innerHTML = body;
+}
+window.renderAt = renderAt;
+
+if (new URLSearchParams(location.search).has('render')) {
+  document.body.classList.add('render');
+  renderAt(0);
+} else {
+  const start = performance.now();
+  const loop = () => { renderAt(((performance.now() - start) / 1000) % DURATION); requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
