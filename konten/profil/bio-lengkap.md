@@ -1,7 +1,7 @@
 # Bio Lengkap — Bokek Anonim
 
 Teks profil siap salin untuk tiap platform. Jumlah karakter sudah dihitung (emoji dihitung 2, mengikuti cara aplikasi menghitung).
-Nada: **kita senasib**, bukan "lu bokek". Disclaimer "bukan jualan produk" selalu ikut.
+Nada: **kita senasib**, bukan "lu bokek". Disclaimer "bukan jualan produk" selalu ikut. **Bio tidak memakai kata "dompet"** (keputusan Deny).
 
 ---
 
@@ -18,11 +18,11 @@ Bokek Anonim · Keuangan
 
 ### Bio (pilih satu)
 
-**A — Utama, pakai Dompet sebagai pembuka sesi** (147/150):
+**A — Utama, pembuka ala kelompok dukungan** (146/150):
 ```
-Halo, nama gua Dompet, dan gua bokek 👋
+Halo, gua bokek. Lu juga? 👋
 Tempat pulih buat yang gajinya numpang lewat.
-🎬 Kok Bisa? · 💬 Curhat Dompet
+🎬 Kok Bisa? · Dana darurat · Anti pinjol
 Edukasi, bukan jualan produk.
 ```
 
@@ -41,7 +41,7 @@ Belajar ngatur duit bareng, tanpa ceramah.
 Edukasi, bukan jualan produk.
 ```
 
-Saran: mulai dengan **A** (paling nyambung ke maskot dan seri). Kalau setelah 2–3 minggu banyak yang tanya "akun apa ini?", ganti ke **B**.
+Saran: mulai dengan **A** (paling kerasa "kelompok dukungan"-nya). Kalau setelah 2–3 minggu banyak yang tanya "akun apa ini?", ganti ke **B**.
 
 ### Tombol & link
 - **Tombol kontak:** aktifkan "Email" saja (untuk kerja sama), jangan nomor HP pribadi.
@@ -67,9 +67,9 @@ Saran: mulai dengan **A** (paling nyambung ke maskot dan seri). Kalau setelah 2�
 ## TikTok
 
 **Nama:** `Bokek Anonim`
-**Bio** (74/80):
+**Bio** (71/80):
 ```
-Halo, gua Dompet & gua bokek 👋 Belajar ngatur duit bareng, tanpa ceramah.
+Halo, gua bokek. Lu juga? 👋 Belajar ngatur duit bareng, tanpa ceramah.
 ```
 
 ---
@@ -79,13 +79,13 @@ Halo, gua Dompet & gua bokek 👋 Belajar ngatur duit bareng, tanpa ceramah.
 **Nama channel:** `Bokek Anonim`
 **Deskripsi channel:**
 ```
-Halo, nama gua Dompet, dan gua bokek.
+Halo, gua bokek. Lu juga?
 
 Bokek Anonim itu "kelompok dukungan" buat lu yang gajinya cuma numpang lewat. Di sini kita ngobrolin duit ala temen: kenapa gaji habis duluan, kenapa checkout jam 2 pagi kerasa wajar, sampai cara nabung yang beneran jalan.
 
 Seri yang ada di channel ini:
 🎬 Kok Bisa? — cerita masalah duit sehari-hari, terus kita bedah bareng
-💬 Curhat Dompet — Dompet akhirnya ngomong soal kebiasaan lu
+💬 Sesi curhat — kebiasaan duit yang diam-diam kita semua lakuin
 🧯 Dana darurat, budgeting, psikologi uang, dan waspada pinjol & investasi bodong
 
 Semua konten di sini edukasi, bukan ajakan beli produk keuangan apa pun. Kalau ragu sama tawaran investasi atau pinjaman, cek legalitasnya ke OJK dulu.

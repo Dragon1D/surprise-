@@ -4,7 +4,7 @@
 
 > ⚠️ Ketersediaan handle **belum dicek**. Cadangan: @bokek.anonim · @bokekanonim.id · @klubbokekanonim. Amankan juga di TikTok & YouTube.
 
-**Konsep:** parodi kelompok dukungan ("Halo, nama gua Dompet, dan gua bokek"). Nadanya **"kita senasib"**, bukan "lu bokek": yang disindir kebiasaannya, bukan orangnya, dan selalu ada pujian kalau penonton berhasil. Seri *Kok Bisa?* dan *Curhat Dompet* jalan di dalam akun ini; konten bisa disebut "sesi" (mis. "Sesi #12: paylater").
+**Konsep:** parodi kelompok dukungan ("Halo, gua bokek. Lu juga?"). Nadanya **"kita senasib"**, bukan "lu bokek": yang disindir kebiasaannya, bukan orangnya, dan selalu ada pujian kalau penonton berhasil. Seri *Kok Bisa?* dan *Curhat Dompet* jalan di dalam akun ini; konten bisa disebut "sesi" (mis. "Sesi #12: paylater").
 
 ---
 *Arsip pilihan awal (sebelum riset brand) di bawah ini untuk referensi.*
@@ -25,11 +25,11 @@ Tips memilih: hindari angka & underscore berlebihan, pastikan handle yang sama j
 
 ## 2. Bio (≤150 karakter — versi utama 133 karakter)
 
-**Versi utama Bokek Anonim (dipakai di mockup, 147/150 karakter; versi lain di `bio-lengkap.md`):**
+**Versi utama Bokek Anonim (146/150 karakter, tanpa kata "dompet"; versi lain di `bio-lengkap.md`):**
 ```
-Halo, nama gua Dompet, dan gua bokek 👋
+Halo, gua bokek. Lu juga? 👋
 Tempat pulih buat yang gajinya numpang lewat.
-🎬 Kok Bisa? · 💬 Curhat Dompet
+🎬 Kok Bisa? · Dana darurat · Anti pinjol
 Edukasi, bukan jualan produk.
 ```
 
