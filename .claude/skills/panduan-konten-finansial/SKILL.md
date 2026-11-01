@@ -67,12 +67,12 @@ File `konten/bank-ide.csv` (kolom: no, pilar, judul_hook, segmen, format, angle_
 
 ## Profil akun: Bokek Anonim (diputuskan Deny, 2026-11-01)
 Detail ada di `konten/profil/profil-instagram.md`, mockup di `konten/profil/contoh-profil.png`, dan riset brandnya di dokumen [Riset Brand Akun Edukasi Finansial](https://claude.ai/artifact/Gtirj8RkWDKjGuurjw4SMb).
-- **Handle:** @bokekanonim. Nama tampilan "Bokek Anonim · Edukasi Keuangan". Ketersediaan handle belum dicek; cadangannya @bokek.anonim dan @bokekanonim.id. Nama lama "Duit Kemana" **tidak dipakai**.
+- **Handle:** @bokekanonim. Nama tampilan "Bokek Anonim · Keuangan" (batas Instagram 30 karakter). Ketersediaan handle belum dicek; cadangannya @bokek.anonim dan @bokekanonim.id. Nama lama "Duit Kemana" **tidak dipakai**.
 - **Konsep:** parodi kelompok dukungan, dengan Dompet sebagai anggota yang membuka sesi ("Halo, nama gua Dompet, dan gua bokek"). Konten boleh disebut "sesi", misalnya "Sesi #12: paylater". Seri *Kok Bisa?* dan *Curhat Dompet* tetap jalan di dalam akun ini.
 - **Nada wajib:** "kita senasib", bukan "lu bokek". Yang disindir kebiasaannya, bukan orangnya. Selalu ada pujian atau semangat saat penonton berhasil. Jangan menertawakan orang yang benar-benar kesulitan, misalnya kena PHK, sakit, atau terjerat pinjol; untuk topik itu nadanya empatik.
 - **Logo dan foto profil:** dompet coral berkacamata dan berkumis penyamaran di latar kuning (`konten/profil/foto-profil-bokek-anonim.png`, sumber di `konten/profil/logo-v2/`). Hindari koin dengan grafik naik, daun, perisai, dan warna hijau atau biru ala bank.
 - **Palet:** kuning `#ffd84d`, coral `#ef6f50`, krem `#f4ede1`, ink `#1d1b26`, plus ungu `#5b4bff` sebagai aksen. Font Inter.
-- **Bio (149/150 karakter):** "Halo, nama gua Dompet, dan gua bokek 👋 / Tempat pulih buat yang gajinya numpang lewat. / 🎬 Kok Bisa? · 💬 Curhat Dompet / Edukasi, bukan ajakan beli produk."
+- **Bio:** teks siap salin untuk Instagram (3 versi), TikTok, YouTube, link di bio, dan caption postingan pertama ada di `konten/profil/bio-lengkap.md`. Versi utama Instagram (147/150): "Halo, nama gua Dompet, dan gua bokek 👋 / Tempat pulih buat yang gajinya numpang lewat. / 🎬 Kok Bisa? · 💬 Curhat Dompet / Edukasi, bukan jualan produk." Hitung karakter dengan emoji = 2.
 - **Highlight:** Mulai Sini, Dana Darurat, Anti Pinjol, Budgeting, Curhat.
 - **Cover reels:** label seri kecil berhuruf kapital, lalu judul 2–3 baris dengan satu kata disorot. Grid diselang-seling antara video gelap dan carousel terang.
 - **Tag penutup video:** `BOKEK ANONIM · <SERI> EPS. NN`. Label lama "DOMPET BOCOR" di video Katak di Panci harus diganti.

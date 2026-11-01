@@ -1,6 +1,6 @@
 # Profil Instagram — Bokek Anonim
 
-**Keputusan (2026-11-01): nama akun @bokekanonim · "Bokek Anonim · Edukasi Keuangan".** Dipilih Deny dari hasil riset brand ([dokumen riset](https://claude.ai/artifact/Gtirj8RkWDKjGuurjw4SMb)). Foto profil: `foto-profil-bokek-anonim.png` (dompet coral berkacamata dan berkumis penyamaran, latar kuning). Mockup: `contoh-profil.png`.
+**Keputusan (2026-11-01): nama akun @bokekanonim · "Bokek Anonim · Keuangan".** Dipilih Deny dari hasil riset brand ([dokumen riset](https://claude.ai/artifact/Gtirj8RkWDKjGuurjw4SMb)). Foto profil: `foto-profil-bokek-anonim.png` (dompet coral berkacamata dan berkumis penyamaran, latar kuning). Mockup: `contoh-profil.png`.
 
 > ⚠️ Ketersediaan handle **belum dicek**. Cadangan: @bokek.anonim · @bokekanonim.id · @klubbokekanonim. Amankan juga di TikTok & YouTube.
 
@@ -25,12 +25,12 @@ Tips memilih: hindari angka & underscore berlebihan, pastikan handle yang sama j
 
 ## 2. Bio (≤150 karakter — versi utama 133 karakter)
 
-**Versi utama Bokek Anonim (dipakai di mockup, 149/150 karakter):**
+**Versi utama Bokek Anonim (dipakai di mockup, 147/150 karakter; versi lain di `bio-lengkap.md`):**
 ```
 Halo, nama gua Dompet, dan gua bokek 👋
 Tempat pulih buat yang gajinya numpang lewat.
 🎬 Kok Bisa? · 💬 Curhat Dompet
-Edukasi, bukan ajakan beli produk.
+Edukasi, bukan jualan produk.
 ```
 
 **Alternatif:**
@@ -39,7 +39,7 @@ Edukasi, bukan ajakan beli produk.
 
 Baris "Edukasi, bukan ajakan beli produk" sengaja dipertahankan — melindungi akun saat bahas konsep investasi.
 
-**Nama tampilan** memuat kata kunci yang bisa dicari: "Bokek Anonim · Edukasi Keuangan".
+**Nama tampilan** memuat kata kunci yang bisa dicari: "Bokek Anonim · Keuangan".
 **Kategori:** Pendidikan (atau "Kreator digital").
 **Link di bio:** sementara arahkan ke satu halaman berisi kalkulator dana darurat + bank ide (bisa dibuat nanti; sampai siap, kosongkan saja).
 
