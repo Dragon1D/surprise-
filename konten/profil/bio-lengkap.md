@@ -76,22 +76,61 @@ Halo, gua bokek. Lu juga? 👋 Belajar ngatur duit bareng, tanpa ceramah.
 
 ## YouTube
 
+Pasang di **YouTube Studio › Kustomisasi**.
+
 **Nama channel:** `Bokek Anonim`
-**Deskripsi channel:**
+**Handle:** `@bokekanonim`
+
+**Deskripsi channel** (765/1000 karakter):
 ```
 Halo, gua bokek. Lu juga?
 
 Bokek Anonim itu "kelompok dukungan" buat lu yang gajinya cuma numpang lewat. Di sini kita ngobrolin duit ala temen: kenapa gaji habis duluan, kenapa checkout jam 2 pagi kerasa wajar, sampai cara nabung yang beneran jalan.
 
-Seri yang ada di channel ini:
+Yang bakal lu temuin di sini:
 🎬 Kok Bisa? — cerita masalah duit sehari-hari, terus kita bedah bareng
 💬 Sesi curhat — kebiasaan duit yang diam-diam kita semua lakuin
-🧯 Dana darurat, budgeting, psikologi uang, dan waspada pinjol & investasi bodong
+🧯 Dana darurat & budgeting yang realistis
+🧠 Psikologi uang: gengsi, FOMO, belanja impulsif
+🚫 Waspada pinjol ilegal & investasi bodong
 
 Semua konten di sini edukasi, bukan ajakan beli produk keuangan apa pun. Kalau ragu sama tawaran investasi atau pinjaman, cek legalitasnya ke OJK dulu.
 
-Sesi baru terus. Subscribe biar nggak bokek sendirian.
+Sesi baru terus. Subscribe biar nggak bokek sendirian 🫶
 ```
+
+**Link di channel** (tab Info):
+| Judul link | Isi |
+|---|---|
+| Instagram | instagram.com/bokekanonim |
+| TikTok | tiktok.com/@bokekanonim |
+| Mulai di sini | link halaman link-in-bio (saat sudah ada) |
+
+**Email kerja sama:** pakai email khusus akun, jangan email pribadi.
+
+**Kata kunci channel** (Setelan › Channel; 204/500 karakter):
+```
+bokek anonim, keuangan pribadi, atur gaji, gaji numpang lewat, cara nabung, dana darurat, budgeting, psikologi uang, paylater, pinjol ilegal, investasi bodong, literasi keuangan, first jobber, tanggal tua
+```
+
+**Template deskripsi video** (Setelan › Default upload; isi `[...]` tiap video):
+```
+[1 kalimat hook, sama dengan judul/teks pembuka video]
+
+Sesi #[nomor] · [Kok Bisa? / Sesi curhat / topik]
+[2–3 kalimat isi: masalahnya apa, pelajarannya apa]
+
+Gaji lu biasanya habis tanggal berapa? Cerita di komen 👇
+
+—
+Bokek Anonim: kelompok dukungan buat gaji yang numpang lewat.
+Edukasi, bukan ajakan beli produk keuangan apa pun. Angka di video adalah ilustrasi.
+Instagram & TikTok: @bokekanonim
+
+#bokekanonim #keuanganpribadi #[topik]
+```
+
+**Playlist awal:** Kok Bisa? · Sesi Curhat · Dana Darurat · Anti Pinjol & Penipuan · Mulai di Sini (5 sesi pertama)
 
 ---
 
