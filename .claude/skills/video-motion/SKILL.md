@@ -1,6 +1,7 @@
 ---
 name: video-motion
-description: Bikin video motion graphic vertikal (MP4 9:16, 1080x1920, siap Reels/TikTok/Shorts) dari ide atau naskah, lengkap dengan musik dan efek suara buatan sendiri. Tiga mode yang bisa dicampur. 2D: flat vector, caption kata per kata, infografis. Chat: simulasi chat plus karakter yang bereaksi. 3D: Three.js, objek, kamera bergerak, koin, HP, grafik 3D. Pakai skill ini setiap kali user minta video, reel, konten animasi, explainer, motion graphic, video 3D, animasi karakter, atau bilang "bikinin video kayak gini" sambil kirim contoh, walaupun kata "motion" tidak disebut. Pakai juga untuk episode lanjutan seri video yang sudah ada (Kok Bisa?, Curhat Dompet, Katak di Panci) dan untuk mengubah naskah, durasi, warna, atau karakter video yang sudah dirender.
+description: >-
+  Bikin video motion graphic vertikal (MP4 9:16, 1080x1920, siap Reels/TikTok/Shorts) dari ide atau naskah, lengkap dengan musik dan efek suara buatan sendiri. Tiga mode yang bisa dicampur. 2D: flat vector, caption kata per kata, infografis. Chat: simulasi chat plus karakter yang bereaksi. 3D: Three.js, objek, kamera bergerak, koin, HP, grafik 3D. Pakai skill ini setiap kali user minta video, reel, konten animasi, explainer, motion graphic, video 3D, animasi karakter, atau bilang "bikinin video kayak gini" sambil kirim contoh, walaupun kata "motion" tidak disebut. Pakai juga untuk episode lanjutan seri video yang sudah ada (Kok Bisa?, Curhat Dompet, Katak di Panci) dan untuk mengubah naskah, durasi, warna, atau karakter video yang sudah dirender.
 ---
 
 # Video Motion
