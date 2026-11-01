@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Opsi Logo</title>
+<style>
+  body { margin: 0; background: #f4f1fa; font-family: Inter, system-ui, sans-serif; color: #1d1b26; }
+  .sheet { width: 1200px; padding: 40px 40px 30px; }
+  h1 { margin: 0 0 4px; font-size: 34px; letter-spacing: -1px; }
+  .sub { color: #7b7486; font-size: 17px; margin-bottom: 26px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .card { background: #fff; border-radius: 26px; padding: 22px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 2px 0 rgba(40,30,80,.06); }
+  .big { width: 220px; height: 220px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 1px #e6e1f0; }
+  .big svg, .sm svg { width: 100%; height: 100%; display: block; }
+  .row { display: flex; align-items: center; gap: 12px; margin-top: 16px; width: 100%; background: #faf8fd; border-radius: 14px; padding: 10px 12px; }
+  .sm { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex: none; box-shadow: 0 0 0 1px #e6e1f0; }
+  .row b { font-size: 14px; display: block; }
+  .row span { font-size: 12px; color: #7b7486; }
+  .lbl { margin-top: 14px; text-align: center; }
+  .lbl .n { font-weight: 800; font-size: 20px; }
+  .lbl .n i { font-style: normal; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #5b4bff; color: #fff; font-size: 15px; margin-right: 6px; vertical-align: 2px; }
+  .lbl p { margin: 6px 0 0; font-size: 14.5px; color: #5d5768; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <h1>Opsi logo @duitkemana</h1>
+  <div class="sub">Tiap logo ditampilkan besar dan kecil (seukuran foto profil di feed). Logo yang bagus harus tetap kebaca di ukuran kecil.</div>
+  <div class="grid" id="grid"></div>
+</div>
+<script>
+const INK = '#1d1b26', VIO = '#5b4bff', YEL = '#ffd84d', CRE = '#f4ede1', COR = '#ef6f50', GRN = '#1fa971';
+const coin = (cx, cy, r, inner) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${YEL}" stroke="${INK}" stroke-width="4"/><circle cx="${cx}" cy="${cy}" r="${r * .74}" fill="none" stroke="#e0a800" stroke-width="3"/>${inner || ''}`;
+const LOGOS = [
+  { id: 'koin-tanya', name: 'Koin Tanda Tanya', desc: 'Koin emas dengan "?" di tengah. Langsung bilang "duit… ke mana?". Paling simpel dan paling kebaca di ukuran kecil.',
+    svg: `<rect width="120" height="120" fill="${VIO}"/>${coin(60, 60, 38)}<text x="60" y="78" text-anchor="middle" font-size="52" font-weight="900" fill="${INK}" font-family="Inter">?</text>` },
+  { id: 'koin-terbang', name: 'Koin Kabur', desc: 'Koin bersayap yang lagi kabur, kayak gaji yang terbang pas tanggal tua. Lucu dan gampang diingat.',
+    svg: `<rect width="120" height="120" fill="${CRE}"/>
+      <path d="M16 92 l14 -10 M10 80 l16 -11 M24 104 l12 -9" stroke="${VIO}" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+      <g transform="rotate(-12 64 58)">
+      <path d="M44 56 C30 36 10 36 6 48 C14 48 16 52 12 58 C20 56 24 60 20 66 C30 62 38 64 44 62 Z" fill="#fff" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M84 56 C98 36 118 36 122 48 C114 48 112 52 116 58 C108 56 104 60 108 66 C98 62 90 64 84 62 Z" fill="#fff" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" transform="translate(-8 0)"/>
+      ${coin(62, 60, 25, `<text x="62" y="69" text-anchor="middle" font-size="21" font-weight="900" fill="${INK}" font-family="Inter">Rp</text>`)}</g>` },
+  { id: 'pin-koin', name: 'Pin Lokasi', desc: '"Ke mana" jadi pin peta yang isinya koin. Kesannya kita melacak uang lu pergi ke mana.',
+    svg: `<rect width="120" height="120" fill="${YEL}"/>
+      <path d="M60 104 C46 86 30 70 30 50 a30 30 0 0 1 60 0 C90 70 74 86 60 104 Z" fill="${COR}" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>
+      ${coin(60, 50, 18, `<text x="60" y="57" text-anchor="middle" font-size="17" font-weight="900" fill="${INK}" font-family="Inter">Rp</text>`)}
+      <ellipse cx="60" cy="108" rx="16" ry="4" fill="${INK}" opacity=".18"/>` },
+  { id: 'lup-koin', name: 'Kaca Pembesar', desc: 'Kaca pembesar ngeliat koin, sesuai bio "kita bedah bareng". Kesannya detektif keuangan yang ramah.',
+    svg: `<rect width="120" height="120" fill="${VIO}"/>
+      <path d="M78 78 L100 100" stroke="${INK}" stroke-width="14" stroke-linecap="round"/><path d="M78 78 L100 100" stroke="${COR}" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="54" cy="54" r="34" fill="#cfe8ff" stroke="${INK}" stroke-width="5"/>
+      ${coin(54, 54, 20, `<text x="54" y="61" text-anchor="middle" font-size="19" font-weight="900" fill="${INK}" font-family="Inter">?</text>`)}
+      <path d="M32 40 a26 26 0 0 1 14 -12" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>` },
+  { id: 'monogram', name: 'Monogram dk?', desc: 'Huruf "dk" ditambah "?" kuning. Paling "brand" dan serius, fleksibel kalau akun makin besar, tapi kurang personal.',
+    svg: `<rect width="120" height="120" fill="${INK}"/>
+      <text x="47" y="78" text-anchor="middle" font-size="50" font-weight="900" fill="#fff" font-family="Inter" letter-spacing="-3">dk</text>
+      <text x="94" y="80" text-anchor="middle" font-size="54" font-weight="900" fill="${YEL}" font-family="Inter">?</text>` },
+  { id: 'dompet-bubble', name: 'Dompet + Gelembung', desc: 'Versi baru maskot: Dompet lagi bingung dengan gelembung "?". Tetap nyambung ke karakter seri, tapi lebih bersih dari logo sebelumnya.',
+    svg: `<rect width="120" height="120" fill="${GRN}"/>
+      <path d="M64 20 h28 a8 8 0 0 1 8 8 v16 a8 8 0 0 1 -8 8 h-12 l-8 8 v-8 h-8 a8 8 0 0 1 -8 -8 v-16 a8 8 0 0 1 8 -8 z" fill="#fff" stroke="${INK}" stroke-width="3.5"/>
+      <text x="78" y="45" text-anchor="middle" font-size="26" font-weight="900" fill="${VIO}" font-family="Inter">?</text>
+      <rect x="12" y="48" width="74" height="54" rx="15" fill="#d9782f" stroke="${INK}" stroke-width="4"/>
+      <path d="M52 64 h34 v22 h-34 a11 11 0 0 1 0 -22z" fill="#b85e1f" stroke="${INK}" stroke-width="3.5"/>
+      <circle cx="66" cy="75" r="3.6" fill="#ffd27a"/>
+      <circle cx="23" cy="70" r="4" fill="${INK}"/><circle cx="36" cy="70" r="4" fill="${INK}"/>
+      <path d="M22 86 q7 -5 14 0" stroke="${INK}" stroke-width="3.5" fill="none" stroke-linecap="round"/>` },
+];
+window.LOGOS = LOGOS;
+const svgOf = s => `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+document.getElementById('grid').innerHTML = LOGOS.map((l, i) => `
+  <div class="card">
+    <div class="big">${svgOf(l.svg)}</div>
+    <div class="row"><div class="sm">${svgOf(l.svg)}</div><div><b>duitkemana</b><span>Postingan baru · 2 mnt</span></div></div>
+    <div class="lbl"><div class="n"><i>${i + 1}</i>${l.name}</div><p>${l.desc}</p></div>
+  </div>`).join('');
+</script>
+</body>
+</html>
