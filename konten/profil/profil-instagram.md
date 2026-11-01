@@ -1,8 +1,13 @@
-# Profil Instagram — Akun Edukasi Finansial
+# Profil Instagram — Bokek Anonim
 
-Lihat `contoh-profil.png` untuk mockup tampilan, dan `foto-profil-dompet.png` (1080×1080) untuk foto profil.
+**Keputusan (2026-11-01): nama akun @bokekanonim · "Bokek Anonim · Edukasi Keuangan".** Dipilih Deny dari hasil riset brand ([dokumen riset](https://claude.ai/artifact/Gtirj8RkWDKjGuurjw4SMb)). Foto profil: `foto-profil-bokek-anonim.png` (dompet coral berkacamata dan berkumis penyamaran, latar kuning). Mockup: `contoh-profil.png`.
 
-> ⚠️ Ketersediaan handle **belum dicek** (Instagram tidak bisa diakses dari sini). Cek manual di aplikasi sebelum memutuskan; siapkan cadangan.
+> ⚠️ Ketersediaan handle **belum dicek**. Cadangan: @bokek.anonim · @bokekanonim.id · @klubbokekanonim. Amankan juga di TikTok & YouTube.
+
+**Konsep:** parodi kelompok dukungan ("Halo, nama gua Dompet, dan gua bokek"). Nadanya **"kita senasib"**, bukan "lu bokek": yang disindir kebiasaannya, bukan orangnya, dan selalu ada pujian kalau penonton berhasil. Seri *Kok Bisa?* dan *Curhat Dompet* jalan di dalam akun ini; konten bisa disebut "sesi" (mis. "Sesi #12: paylater").
+
+---
+*Arsip pilihan awal (sebelum riset brand) di bawah ini untuk referensi.*
 
 ## 1. Pilihan nama
 
@@ -20,10 +25,10 @@ Tips memilih: hindari angka & underscore berlebihan, pastikan handle yang sama j
 
 ## 2. Bio (≤150 karakter — versi utama 133 karakter)
 
-**Versi utama (dipakai di mockup):**
+**Versi utama Bokek Anonim (dipakai di mockup, 149/150 karakter):**
 ```
-Ngobrolin duit ala temen 🫶
-Kok gaji habis duluan? Kita bedah bareng.
+Halo, nama gua Dompet, dan gua bokek 👋
+Tempat pulih buat yang gajinya numpang lewat.
 🎬 Kok Bisa? · 💬 Curhat Dompet
 Edukasi, bukan ajakan beli produk.
 ```
@@ -34,7 +39,7 @@ Edukasi, bukan ajakan beli produk.
 
 Baris "Edukasi, bukan ajakan beli produk" sengaja dipertahankan — melindungi akun saat bahas konsep investasi.
 
-**Nama tampilan** memuat kata kunci yang bisa dicari: "Duit Kemana? · Edukasi Keuangan".
+**Nama tampilan** memuat kata kunci yang bisa dicari: "Bokek Anonim · Edukasi Keuangan".
 **Kategori:** Pendidikan (atau "Kreator digital").
 **Link di bio:** sementara arahkan ke satu halaman berisi kalkulator dana darurat + bank ide (bisa dibuat nanti; sampai siap, kosongkan saja).
 
@@ -52,7 +57,7 @@ Sampul highlight: lingkaran warna pastel (kuning, hijau mint, merah muda, ungu m
 ## 4. Grid 9 postingan pertama (urutan tayang: no. 9 dulu → no. 1 terakhir)
 | Posisi | Jenis | Konten | Sumber |
 |---|---|---|---|
-| 1 📌 | Carousel | **Mulai sini**: "Akun ini buat lu yang gajinya cuma numpang lewat 👋" — perkenalan + isi akun | baru |
+| 1 📌 | Carousel | **Sesi pertama**: "Selamat datang di Bokek Anonim. Lu nggak sendirian 🫶" — perkenalan + isi akun | baru |
 | 2 📌 | Reel | *Kok Bisa?* eps. 01 — "Tanggal 3, saldo tinggal 416 ribu" | sudah jadi (`explainer/kok-bisa`) |
 | 3 📌 | Carousel | "Dana darurat lu harusnya berapa?" (bank ide #5) | baru |
 | 4 | Reel 3D | "Dana darurat = 3–6× pengeluaran" | draft uji skill (perlu cek & poles) |
