@@ -80,7 +80,7 @@ Detail ada di `konten/profil/profil-instagram.md`, mockup di `konten/profil/cont
 ## Rencana posting (keputusan Deny, 2026-11-01)
 - **Platform:** Instagram, Facebook, TikTok, YouTube Shorts, dan Threads.
 - **Frekuensi:** 3 postingan per hari selama 30 hari, total 90 konten: 2 video dan 1 carousel per hari.
-- **Satu tema per hari** (diambil dari bank ide), dikemas jadi 3 format:
+- **3 topik BERBEDA per hari** (keputusan Deny 2026-11-02, menggantikan "satu tema per hari"): video tips, carousel, dan video cerita masing-masing punya topik sendiri dari bank ide (butuh ±90 topik untuk 30 hari). Usahakan 3 topik sehari beda pilar atau beda segmen. Format per slot:
   1. **Video cerita** (30–45 dtk): seri *Kok Bisa?* atau sesi curhat.
   2. **Video tips cepat** (**21 dtk**, standar studio: 6 adegan × 3,5 dtk = Hook, Bukti/data, Inti, Inti, Dampak, CTA; 120 BPM; VO ±45 kata): gaya **2D teks dan animasi**. Detail dan QA di `references/standar-studio.md` skill video-motion. Contoh jadi: `explainer/h1-tiga-kantong/`.
      - Hook wajib menampilkan angka konkret di visual; kata kunci judul bereaksi di klimaks (≤ 2,5 dtk).
