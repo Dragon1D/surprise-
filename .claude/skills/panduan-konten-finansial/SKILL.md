@@ -89,7 +89,7 @@ Detail ada di `konten/profil/profil-instagram.md`, mockup di `konten/profil/cont
   3. **Carousel** (6–8 slide) yang layak disimpan.
 - **Distribusi:**
   - Instagram: 2 video + carousel.
-  - Facebook: 2 video, dibagikan ulang dari Instagram.
+  - Facebook: **otomatis dari Instagram** (Deny menyalakan bagikan otomatis IG → FB, 2026-11-02). Caption FB = caption IG, jadi tidak perlu caption FB terpisah; tulis caption IG yang tetap enak dibaca di FB.
   - TikTok: 2 video + carousel dalam **mode foto**.
   - YouTube Shorts: 2 video.
   - Threads: **versi teks** dari tema hari itu.
