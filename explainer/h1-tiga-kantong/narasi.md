@@ -24,3 +24,4 @@ Total 45 kata.
 ## Versi audio
 - `h1-tiga-kantong.mp4`: musik + SFX penuh (siap upload tanpa VO).
 - `h1-tiga-kantong-untuk-vo.mp4`: musik lebih tipis supaya suara dubbing jelas; tinggal tempel rekaman VO.
+- `h1-tiga-kantong-dengan-vo.mp4`: **versi final dengan narasi ElevenLabs** (`vo/vo1–vo6.mp3`), tiap kalimat di awal adegannya; kalimat 5 dipercepat 1,1×. Buat ulang: `./gabung-vo.sh`. −15 LUFS.
