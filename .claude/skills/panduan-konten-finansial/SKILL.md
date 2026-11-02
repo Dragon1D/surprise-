@@ -93,7 +93,7 @@ Detail ada di `konten/profil/profil-instagram.md`, mockup di `konten/profil/cont
   - TikTok: 2 video + carousel dalam **mode foto**.
   - YouTube Shorts: 2 video.
   - Threads: **versi teks** dari tema hari itu.
-- **Narasi (voice over):** Deny akan mencari dubbing sendiri. Setiap video wajib disertai **naskah VO dengan timecode** (`narasi.md` + `narasi.srt`) dengan tempo sekitar 2,3 kata per detik. Caption di layar tetap ada, supaya video bisa dinikmati tanpa suara. Kalau audio dubbing sudah ada, gabungkan dengan ffmpeg (lihat `references/audio.md` di skill video-motion) dan sesuaikan timing kalau perlu.
+- **Narasi (voice over):** Deny akan mencari dubbing sendiri. Setiap video wajib disertai **naskah VO dengan timecode** (`narasi.md` + `narasi.srt`) dengan tempo sekitar 2,3 kata per detik. Caption di layar tetap ada, supaya video bisa dinikmati tanpa suara. Deny generate **1 file suara per video** di ElevenLabs (hemat kredit; teks ditempel 1 kalimat per baris). Claude memotong dan menyelaraskannya dengan `scripts/gabung-vo.py` di skill video-motion, hasilnya `<slug>-dengan-vo.mp4`. Saat menyerahkan naskah, berikan teks siap tempel (1 kalimat per baris).
 - **Produksi per minggu:** buat 7 hari (14 video, 7 carousel, 7 thread), minta Deny mengecek, baru lanjut ke minggu berikutnya.
 - **Kalender:** `konten/kalender-30-hari.csv` dan Google Sheets di folder Drive "Bokek Anonim". Rencana mingguan ada di `konten/minggu-NN/`.
 - **Pengiriman file:** konektor Drive tidak bisa mengunggah video (terlalu besar). Teks dan jadwal disimpan di Drive. Video dan gambar dikirim lewat chat atau halaman unduhan.

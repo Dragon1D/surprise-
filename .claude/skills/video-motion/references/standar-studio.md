@@ -39,6 +39,9 @@ Tidak boleh ada jeda > 1 dtk tanpa sesuatu yang baru masuk. Pola timeline yang t
 
 ## Audio
 - Musik `upbeat` 120 BPM, drum sampai ±20,5 dtk, + SFX untuk **setiap** kejadian: `swipe` (uang terbang), `minus` (angka turun), `slap` + `boom` (klimaks), `tick` (bar), `pop` (objek), `coin`, `income` (angka selesai), `pluck` (chip), `save`, `end`.
+- **Narasi dari Deny = 1 file per video** (sekali generate di ElevenLabs, hemat kredit). Minta teks ditempel 1 kalimat per baris supaya ada jeda. Gabungkan otomatis:
+  `python3 <skill>/scripts/gabung-vo.py explainer/<slug> --vo narasi.mp3 --cek` (lihat potongan) lalu tanpa `--cek` untuk render → `<slug>-dengan-vo.mp4`.
+  Skrip memotong di jeda hening (dipilih berdasarkan panjang teks tiap baris .srt, jadi jeda koma tidak salah dikira akhir kalimat), menaruh tiap kalimat di detik mulai .srt, mempercepat kalimat yang melebihi slot (atempo, nada tetap), dan loudnorm −15. Kalau ada ⚠, dengarkan; potong manual dengan `--potong 3.1,6.3,...`.
 - Dua versi: `<slug>.mp4` (−15/−16 LUFS) dan `<slug>-untuk-vo.mp4` (musik 0,45, gain SFX × 0,7, loudnorm I=−22) untuk ditimpa dubbing.
 
 ## Akurasi & caption

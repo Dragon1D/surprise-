@@ -40,3 +40,6 @@ Semua menerima `gain` (default 1). Jenis baru: tambahkan cabang di fungsi `sfx()
 Kalau user memberi rekaman narasi: render video seperti biasa, lalu
 `ffmpeg -i video.mp4 -i narasi.m4a -filter_complex "[0:a]volume=0.35[m];[m][1:a]amix=inputs=2:duration=first[a]" -map 0:v -map "[a]" -c:v copy -c:a aac out.mp4`
 dan sesuaikan timing caption dengan durasi kalimat di narasi.
+
+## Narasi satu file (ElevenLabs dll.)
+Satu file berisi semua kalimat → `scripts/gabung-vo.py <folder> --vo narasi.mp3 [--cek]`. Dipotong otomatis per kalimat dan ditaruh sesuai `narasi.srt`. Detail di `standar-studio.md`.
