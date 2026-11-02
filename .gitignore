@@ -5,3 +5,5 @@ explainer/chat-dompet/events.json
 explainer/kok-bisa/sound.wav
 explainer/kok-bisa/events.json
 **/preview/
+explainer/*/sound*.wav
+explainer/*/events*.json

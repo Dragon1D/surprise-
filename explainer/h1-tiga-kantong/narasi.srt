@@ -1,0 +1,23 @@
+1
+00:00:00,200 --> 00:00:03,300
+Gaji lima juta, tapi tanggal sepuluh udah tipis?
+
+2
+00:00:03,600 --> 00:00:06,900
+Pakai rumus lima puluh, tiga puluh, dua puluh.
+
+3
+00:00:07,100 --> 00:00:10,300
+Lima puluh persen buat kebutuhan: dua setengah juta.
+
+4
+00:00:10,600 --> 00:00:13,800
+Tiga puluh persen keinginan: satu setengah juta.
+
+5
+00:00:14,100 --> 00:00:17,300
+Dua puluh persen masa depan: satu juta. Pindahin duluan.
+
+6
+00:00:17,600 --> 00:00:20,600
+Simpan, terus coba gajian depan.
