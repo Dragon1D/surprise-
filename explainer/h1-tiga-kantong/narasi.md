@@ -24,4 +24,7 @@ Total 45 kata.
 ## Versi audio
 - `h1-tiga-kantong.mp4`: musik + SFX penuh (siap upload tanpa VO).
 - `h1-tiga-kantong-untuk-vo.mp4`: musik lebih tipis supaya suara dubbing jelas; tinggal tempel rekaman VO.
-- `h1-tiga-kantong-dengan-vo.mp4`: **versi final dengan narasi ElevenLabs** (`vo/vo1–vo6.mp3`), tiap kalimat di awal adegannya; kalimat 5 dipercepat 1,1×. Buat ulang dari 1 file narasi: `python3 .claude/skills/video-motion/scripts/gabung-vo.py explainer/h1-tiga-kantong --vo narasi.mp3`. −15 LUFS.
+- `h1-tiga-kantong-dengan-vo.mp4`: **versi final dengan narasi ElevenLabs** (`vo/vo1–vo6.mp3`), tiap kalimat di awal adegannya; kalimat 5 dipercepat 1,1×. Buat ulang dari 1 file narasi: `python3 .claude/skills/video-motion/scripts/gabung-vo.py explainer/h1-tiga-kantong --vo vo/narasi.mp3 --lufs -14`. −14 LUFS, peak ≤ −1,5 dBFS.
+
+## Versi 2 (standar PANDUAN-VIDEO-MOTION)
+Font Poppins, judul kinetik per kata, kamera push-in, 3 lapis parallax, guncangan saat impact, 5 transisi berbeda (panel, iris, push dari kiri, panel menyamping, koin membesar jadi logo), musik berstruktur dengan drop di adegan Dampak. Narasi: satu file `vo/narasi.mp3` dipotong otomatis oleh `gabung-vo.py`.

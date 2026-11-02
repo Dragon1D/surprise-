@@ -8,6 +8,13 @@ description: >-
 
 Skill ini mengubah ide menjadi video MP4 vertikal yang bisa langsung diupload. Animasinya berupa halaman web (SVG/HTML/Three.js) yang dihitung **murni dari waktu `t`**. `scripts/render.cjs` lalu memotretnya frame per frame dengan Playwright, menjahitnya dengan ffmpeg, dan menambahkan audio sintetis dari `scripts/sound.py`. Karena tiap frame deterministik, hasilnya bisa dipratinjau di detik mana pun dan dirender ulang sama persis setelah revisi.
 
+## Standar kualitas (instruksi tetap dari Deny)
+`references/panduan-video-motion.md` adalah instruksi tetap Deny untuk semua video motion: tanya dulu (Fase 1, satu pesan, lewati yang sudah jelas), riset & label fakta (Fase 2), CUE sebagai satu-satunya sumber waktu (Fase 3), standar gerak setara After Effects (Fase 4), musik + SFX wajib (Fase 6), QA dari MP4 final (Fase 7), laporan maks 8 baris (Fase 8). Baca sebelum membuat video baru.
+- **Mesin:** panduan memakai Remotion; skill ini memakai mesin HTML/SVG + Playwright (`render.cjs`) dengan aturan yang setara (deterministik dari t, tanpa CSS animation/Math.random). Remotion boleh dipakai kalau Deny minta (npm registry bisa diakses). Sebutkan mesin yang dipakai di laporan.
+- **Audio:** `window.MUSIC = { engine: 'studio', bpm, bars, breaks, build, final, lufs: -14, ... }` memakai `scripts/studio_audio.py` (musik berstruktur, sidechain, SFX impact/thud/clap/bell/sparkle/riser/ticks). Butuh `pip install scipy --break-system-packages`. Target −14 ±1 LUFS, peak ≤ −1,2 dBFS (cek `ebur128=peak=true`).
+- **Font:** Poppins 600/800/900 di `assets/fonts/` (OFL). Salin ke `explainer/<slug>/fonts/`, daftarkan dengan `@font-face`, dan set `window.READY = Promise.all([...document.fonts.load(...)])`.
+- **Contoh lengkap standar ini:** `explainer/h1-tiga-kantong/index.html` (CUE, tipografi kinetik mask-reveal + pegas, kamera push-in, 3 lapis parallax, shake, squash, 5 transisi berbeda ber-SFX, audio diturunkan dari CUE).
+
 ## Alur kerja
 
 1. **Tangkap brief.** Cari tahu topik dan pesan utama, target penonton, durasi (default 45–60 detik; **video tips cepat = 21 detik standar studio, baca `references/standar-studio.md`**), gaya, dan contoh video kalau ada. Kalau user mengirim video contoh, ambil frame-nya dulu (`ffmpeg -i in.mp4 -vf "fps=1/2.5,scale=240:-1,tile=6x4" grid.jpg`) dan baca strukturnya. Jangan bertanya hal yang bisa diputuskan sendiri dengan wajar.

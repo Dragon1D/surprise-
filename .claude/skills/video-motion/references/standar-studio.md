@@ -1,5 +1,16 @@
 # Standar studio: video tips 21 detik
 
+Turunan praktis dari `panduan-video-motion.md` (instruksi tetap Deny) untuk seri video tips. Kalau ada yang bertentangan, panduan menang.
+
+## Ringkasan standar gerak & teknis (wajib)
+- **CUE tunggal:** semua waktu kejadian di objek `CUE` dalam halaman; `AUDIO_EVENTS` dibangun dari `CUE`, tidak ada angka detik ganda.
+- **Tipografi kinetik:** judul per kata, mask-reveal naik dari bawah + rotasi kecil + pegas (overshoot). Hook boleh langsung tampil (frame 0); kata kunci slam (skala ±1,3, getar, ganti warna) di klimaks.
+- **Kamera & kedalaman:** tiap adegan push-in 1,00→1,05 + pan kecil + rotasi ≤ 0,8°. Tiga lapis: pola titik (jauh), bentuk datar besar berwarna adegan (tengah), partikel kecil (depan).
+- **Fisika:** pegas untuk pop, squash & stretch saat mendarat/menghantam, guncangan layar 14 frame meluruh di tiap impact.
+- **Transisi:** setiap batas berbeda (panel berlapis, iris, push, panel menyamping, objek membesar → match-cut), semua dengan `whoosh` + `thud`.
+- **Keterbacaan:** teks ≥ 27 px CSS (≥ 40 px final), footer sumber ≥ 24 px CSS (36 px final), warna mute gelap (`#6b6357`), zona aman y 120–1100 px CSS.
+- **Audio:** `MUSIC.engine = 'studio'`, drop jatuh di adegan Dampak (breakdown di Inti 2 + build), −14 LUFS, peak ≤ −1,2 dBFS.
+
 Format bawaan untuk **video tips cepat** (seri harian Bokek Anonim dan sejenisnya). Video cerita (30–60 dtk) tetap memakai struktur di `craft.md`.
 
 ## Kerangka waktu
@@ -42,7 +53,7 @@ Tidak boleh ada jeda > 1 dtk tanpa sesuatu yang baru masuk. Pola timeline yang t
 - **Narasi dari Deny = 1 file per video** (sekali generate di ElevenLabs, hemat kredit). Minta teks ditempel 1 kalimat per baris supaya ada jeda. Gabungkan otomatis:
   `python3 <skill>/scripts/gabung-vo.py explainer/<slug> --vo narasi.mp3 --cek` (lihat potongan) lalu tanpa `--cek` untuk render → `<slug>-dengan-vo.mp4`.
   Skrip memotong di jeda hening (dipilih berdasarkan panjang teks tiap baris .srt, jadi jeda koma tidak salah dikira akhir kalimat), menaruh tiap kalimat di detik mulai .srt, mempercepat kalimat yang melebihi slot (atempo, nada tetap), dan loudnorm −15. Kalau ada ⚠, dengarkan; potong manual dengan `--potong 3.1,6.3,...`.
-- Dua versi: `<slug>.mp4` (−15/−16 LUFS) dan `<slug>-untuk-vo.mp4` (musik 0,45, gain SFX × 0,7, loudnorm I=−22) untuk ditimpa dubbing.
+- Dua versi: `<slug>.mp4` (−14 LUFS) dan `<slug>-untuk-vo.mp4` (musik 0,45, gain SFX × 0,7, loudnorm I=−22) untuk ditimpa dubbing.
 
 ## Akurasi & caption
 - Fakta diberi label: [FAKTA — sumber], [HITUNGAN], [ANGKA CONTOH]. Kalau sumber belum dibuka, tulis "ringkasan pencarian, belum dibuka".
@@ -58,5 +69,6 @@ Lembar kontak padat: `ffmpeg -i out.mp4 -vf "fps=2,scale=180:-1,tile=7x6" -frame
 - [ ] Adegan 3 dan 4 terlihat berbeda (arah/tata letak)
 - [ ] Objek metafora terbaca tanpa teks
 - [ ] Angka akhir tepat dan konsisten dengan VO + caption
-- [ ] Loudness −14 s.d. −16 LUFS (`ffmpeg -i out.mp4 -af ebur128 -f null -`)
+- [ ] Loudness −14 ±1 LUFS dan peak ≤ −1,2 dBFS (`ffmpeg -nostats -i out.mp4 -af ebur128=peak=true -f null - 2>&1 | grep -E "I:|Peak:" | tail -2`)
+- [ ] Tiap transisi & kejadian penting punya SFX; tidak ada frame diam > 0,5 dtk
 - [ ] Batasan/caveat ada di caption

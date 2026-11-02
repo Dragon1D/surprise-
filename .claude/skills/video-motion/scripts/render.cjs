@@ -8,7 +8,8 @@
 // - Proyek disajikan lewat server http lokal (supaya ES module / Three.js bisa dimuat).
 // - Halaman dibuka dengan ?render=1, viewport 720x1280 x scale (default 1.5 -> 1080x1920).
 // - Audio: window.AUDIO_EVENTS + window.MUSIC -> events.json -> sound.py -> sound.wav,
-//   lalu dinormalisasi ke loudness medsos (-15 LUFS).
+//   lalu dinormalisasi ke loudness medsos (default -15 LUFS; MUSIC.lufs atau --lufs, standar studio -14).
+//   MUSIC.engine = 'studio' memakai studio_audio.py (musik berstruktur + SFX berlapis).
 const { chromium } = require('playwright');
 const { spawn, execFileSync } = require('child_process');
 const http = require('http');
@@ -90,7 +91,9 @@ function serve() {
   const { events, music } = await page.evaluate(() => ({ events: window.AUDIO_EVENTS || [], music: window.MUSIC || {} }));
   fs.writeFileSync(path.join(dir, 'events.json'), JSON.stringify({ duration, events, music }));
   const wav = path.join(dir, 'sound.wav');
-  execFileSync('python3', [path.join(__dirname, 'sound.py'), path.join(dir, 'events.json'), wav], { stdio: 'inherit' });
+  const engine = music.engine === 'studio' ? 'studio_audio.py' : 'sound.py'; // studio = musik berstruktur (PANDUAN Fase 6)
+  execFileSync('python3', [path.join(__dirname, engine), path.join(dir, 'events.json'), wav], { stdio: 'inherit' });
+  const LUFS = +opt('lufs', music.lufs ?? -15);
 
   // ---- video ----
   const out = path.resolve(opt('out', path.join(dir, path.basename(dir) + '.mp4')));
@@ -98,7 +101,7 @@ function serve() {
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error',
     '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', '-i', wav,
     '-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p',
-    '-af', 'loudnorm=I=-15:TP=-1.5:LRA=11', '-c:a', 'aac', '-b:a', '160k', '-ar', '44100',
+    '-af', `loudnorm=I=${LUFS}:TP=-1.5:LRA=11`, '-c:a', 'aac', '-b:a', '160k', '-ar', '44100',
     '-shortest', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
   const t0 = Date.now();
   for (let i = 0; i < frames; i++) {

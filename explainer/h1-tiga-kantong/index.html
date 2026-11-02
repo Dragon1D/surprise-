@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bagi Gaji Jadi 3 Kantong</title>
 <style>
+  @font-face { font-family: Pop; src: url(fonts/poppins-600.woff2) format('woff2'); font-weight: 600; }
+  @font-face { font-family: Pop; src: url(fonts/poppins-800.woff2) format('woff2'); font-weight: 800; }
+  @font-face { font-family: Pop; src: url(fonts/poppins-900.woff2) format('woff2'); font-weight: 900; }
   html, body { margin: 0; background: #1d1b26; }
   body { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-  svg { height: 100vh; width: auto; aspect-ratio: 9 / 16; display: block; font-family: Inter, system-ui, sans-serif; }
+  svg { height: 100vh; width: auto; aspect-ratio: 9 / 16; display: block; font-family: Pop, sans-serif; }
   body.render { display: block; min-height: 0; }
   body.render svg { width: 720px; height: 1280px; }
 </style>
@@ -15,29 +18,47 @@
 <body>
 <svg id="v" viewBox="0 0 720 1280" xmlns="http://www.w3.org/2000/svg"></svg>
 <script>
-/* Bokek Anonim · Sesi #1 · Video tips "Bagi gaji jadi 3 kantong"
-   21 dtk = 42 beat @120 BPM = 6 adegan x 3,5 dtk (7 beat). Semua dihitung dari t. */
+/* Bokek Anonim · Sesi #1 · Video tips "Bagi gaji jadi 3 kantong" — v2 (standar PANDUAN-VIDEO-MOTION)
+   21 dtk = 42 beat @120 BPM = 6 adegan x 3,5 dtk. Semua dihitung dari t (deterministik).
+   CUE = satu-satunya tempat angka waktu: gambar DAN bunyi membaca dari sini. */
 
-const C = { bg: '#f4ede1', ink: '#1d1b26', yel: '#ffd84d', cor: '#ef6f50', corD: '#c9553b', vio: '#5b4bff', vioD: '#4335d8', grn: '#1fa971', grnD: '#168457', red: '#e5483b', mute: '#8a8173', white: '#fffdf6' };
-const BEAT = 0.5, SC = 3.5, DURATION = 21;
+const C = { bg: '#f4ede1', ink: '#1d1b26', yel: '#ffd84d', cor: '#ef6f50', corD: '#c9553b', vio: '#5b4bff', vioD: '#4335d8', grn: '#1fa971', grnD: '#168457', red: '#e5483b', mute: '#6b6357', white: '#fffdf6', blob: '#ebe1cf' };
+const SC = 3.5, DURATION = 21, FPS = 30;
 window.DURATION = DURATION;
+
+/* ---------- CUE: semua waktu (detik lokal per adegan, kecuali bounds) ---------- */
+const CUE = {
+  bounds: [3.5, 7, 10.5, 14, 17.5],
+  hook: { bills: [.35, .73, 1.11, 1.49], flyDur: .55, cal: [.1, 2.0], squash: [2.0, 2.5], stamp: 2.5, emph: 2.5 },
+  data: { bars: [.35, .85, 1.35], barDur: .5, pouches: [1.9, 2.08, 2.26], src: 2.4 },
+  inti: { pouch: .05, coin0: .4, coinStep: .24, coinDur: .4, icons: [1.0, 1.2, 1.4], amtEnd: 2.0, chips: [2.3, 2.6, 2.9] },
+  dampak: { cardA: .25, x: 1.0, arrow: [1.25, 1.7], cardB: 1.5, coins: [1.95, 2.15, 2.35, 2.55], fill: [1.95, 2.9], check: 2.9 },
+  cta: { match: .45, logo: .45, name: .6, btn: 1.2, press: 1.9, saved: 2.05, src: 1.6 },
+};
+const S0 = i => i * SC; // awal adegan i (global)
 
 /* ---------- helper ---------- */
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
 const prog = (t, a, b) => clamp((t - a) / (b - a));
 const eout = k => 1 - Math.pow(1 - k, 3);
+const ein = k => k * k * k;
 const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
 const back = k => { const c1 = 1.9, c3 = c1 + 1; return k <= 0 ? 0 : 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
-const elastic = k => k <= 0 ? 0 : k >= 1 ? 1 : Math.pow(2, -10 * k) * Math.sin((k * 10 - .75) * (2 * Math.PI / 3)) + 1;
+// pegas teredam (overshoot lalu mengendap); dt = detik sejak mulai
+const spr = (dt, zeta = .42, w = 15) => { if (dt <= 0) return 0; const wd = w * Math.sqrt(1 - zeta * zeta); return 1 - Math.exp(-zeta * w * dt) * (Math.cos(wd * dt) + zeta / Math.sqrt(1 - zeta * zeta) * Math.sin(wd * dt)); };
+// squash & stretch saat mendarat; dt = detik sejak menyentuh
+const squash = dt => { const k = dt < 0 ? 0 : Math.max(0, 1 - dt / .33) * Math.cos(dt * 27); return { sx: 1 + .22 * k, sy: 1 - .22 * k }; };
 const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const f = n => (+n).toFixed(1);
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const rp = n => 'Rp' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 const ST = `stroke="${C.ink}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"`;
 const txt = (x, y, s, o = {}) => `<text x="${f(x)}" y="${f(y)}" text-anchor="${o.anchor || 'middle'}" font-size="${o.size || 32}" font-weight="${o.weight || 800}" fill="${o.fill || C.ink}" letter-spacing="${o.ls || 0}" opacity="${o.op ?? 1}">${esc(s)}</text>`;
-// pop: skala dari 0 dengan overshoot, pivot di (x,y)
 const pop = (k, x, y, inner, rot = 0) => k <= 0 ? '' : `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(${back(k).toFixed(3)})">${inner}</g>`;
+const popS = (dt, x, y, inner, rot = 0) => dt <= 0 ? '' : `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot + (1 - spr(dt)) * -8)}) scale(${spr(dt).toFixed(3)})">${inner}</g>`;
+const breathe = (t, ph = 0) => 1 + Math.sin(t * 2.6 + ph) * .02;
+let UID = 0; // id clipPath unik per frame
 
 /* ---------- objek vektor ---------- */
 function bill(w = 220, h = 110) {
@@ -85,261 +106,322 @@ function calendar(day) {
 }
 const LOGO = `<rect x="18" y="40" width="84" height="46" rx="14" fill="#ef6f50" stroke="#1d1b26" stroke-width="4.5"/><path d="M68 52 h34 v22 h-34 a11 11 0 0 1 0 -22z" fill="#c9553b" stroke="#1d1b26" stroke-width="4"/><circle cx="31" cy="57" r="10" fill="#1d1b26"/><circle cx="54" cy="57" r="10" fill="#1d1b26"/><path d="M41 56 h3" stroke="#1d1b26" stroke-width="4"/><circle cx="28" cy="54" r="3" fill="#fff" opacity=".7"/><circle cx="51" cy="54" r="3" fill="#fff" opacity=".7"/><path d="M30 74 q6 -6 12 0 q6 -6 12 0 q-6 5 -12 1 q-6 4 -12 -1z" fill="#1d1b26"/>`;
 
-/* ---------- judul per adegan (kata muncul berurutan dengan overshoot) ---------- */
+/* ---------- tipografi kinetik: mask-reveal per kata + pegas ---------- */
 const MARK = { '*': C.cor, '_': C.grn, '^': C.vio };
-function headline(l, lines, o = {}) {
-  const size = o.size || 62, y0 = o.y || 300, lh = size * 1.15, d0 = o.delay ?? .05;
-  const out = o.noOut ? 0 : prog(l, SC - .3, SC - .05);
+const _cv = document.createElement('canvas').getContext('2d'), _wc = {};
+const measure = (s, size, weight, ls) => { const k = s + size + weight; if (!(k in _wc)) { _cv.font = `${weight} ${size}px Pop`; _wc[k] = _cv.measureText(s).width; } return _wc[k] + ls * s.length; };
+function kinetic(l, lines, o = {}) {
+  const size = o.size || 64, y0 = o.y || 300, lh = size * 1.14, d0 = o.delay ?? .05, stg = o.stagger ?? .1, W = 800, LS = -1.5;
   let s = '', wi = 0;
   lines.forEach((line, li) => {
-    s += `<text x="360" y="${f(y0 + li * lh)}" text-anchor="middle" font-size="${size}" font-weight="800" fill="${C.ink}" letter-spacing="-1.5">`;
-    line.split(' ').forEach((w, j) => {
-      const k = o.instant ? 1 : prog(l, d0 + wi * .07, d0 + wi * .07 + .3); wi++;
-      const dy = (1 - eout(k)) * 26 - out * 30;
-      const op = Math.min(1, k * 2) * (1 - out);
-      const m = w.match(/^([*_^])(.+?)\1(.*)$/), sp = j ? ' ' : '';
-      const e = m && o.emph ? o.emph(m[2]) : null;
-      if (e) s += `<tspan opacity="${f(op)}">${sp}</tspan><tspan dx="${f(e.dx)}" dy="${f(e.dy)}" font-size="${f(size * e.scale)}" fill="${e.fill || MARK[m[1]]}">${esc(m[2])}</tspan><tspan dx="${f(-e.dx)}" dy="${f(-e.dy)}" opacity="${f(op)}">${esc(m[3])}</tspan>`;
-      else if (m) s += `<tspan dy="0" opacity="${f(op)}">${sp}</tspan><tspan fill="${MARK[m[1]]}" opacity="${f(op)}">${esc(m[2])}</tspan><tspan opacity="${f(op)}">${esc(m[3])}</tspan>`;
-      else s += `<tspan opacity="${f(op)}">${sp}${esc(w)}</tspan>`;
+    const y = y0 + li * lh, id = 'kc' + (UID++);
+    const words = line.split(' ').map(w => { const m = w.match(/^([*_^])(.+?)\1(.*)$/); return m ? { a: m[2], b: m[3], col: MARK[m[1]] } : { a: w, b: '', col: null }; });
+    const sp = measure(' ', size, W, LS), ws = words.map(w => measure(w.a + w.b, size, W, LS));
+    let x = 360 - (ws.reduce((p, c) => p + c, 0) + sp * (words.length - 1)) / 2;
+    s += `<clipPath id="${id}"><rect x="-200" y="${f(y - size * 1.3)}" width="1120" height="${f(size * 1.62)}"/></clipPath><g clip-path="url(#${id})">`;
+    words.forEach((w, j) => {
+      const p = o.instant ? 1 : spr(l - (d0 + wi * stg)); wi++;
+      const e = w.col && o.emph ? o.emph(w.a) : null;
+      const inner = `<text x="${f(x)}" y="${f(y)}" font-size="${size}" font-weight="${W}" letter-spacing="${LS}" fill="${C.ink}"><tspan fill="${e?.fill || w.col || C.ink}">${esc(w.a)}</tspan>${esc(w.b)}</text>`;
+      const cx = x + ws[j] / 2, cy = y - size * .35;
+      let tr = `translate(0 ${f((1 - p) * size * 1.15)}) rotate(${f((1 - p) * 7)} ${f(x)} ${f(y)})`;
+      if (e) tr += ` translate(${f(cx + e.dx)} ${f(cy + e.dy)}) rotate(${f(e.rot || 0)}) scale(${e.scale.toFixed(3)}) translate(${f(-cx)} ${f(-cy)})`;
+      s += `<g transform="${tr}">${inner}</g>`;
+      x += ws[j] + sp;
     });
-    s += `</text>`;
+    s += `</g>`;
   });
-  // geser seluruh blok naik saat masuk/keluar
-  const kin = o.instant ? 1 : eout(prog(l, d0, d0 + .4));
-  return `<g transform="translate(0 ${f((1 - kin) * 20 - out * 30)})">${s}</g>`;
+  return s;
 }
 
 /* ---------- adegan ---------- */
 const SCENES = [
-  // 1 HOOK 0–3,5: judul sudah tampil di frame 0; uang terbang, kalender ke 10, stempel TIPIS di 2,5 dtk
+  // 1 HOOK: judul tampil di frame 0; uang terbang + sisa gaji menghitung turun; stempel TIPIS + kata "tipis" slam di 2,5
   (l, t) => {
-    // kata "tipis" bergetar + membesar tepat saat stempel mendarat (2,5 dtk), lalu tetap merah
-    const ek = prog(l, 2.5, 2.95), shake = Math.sin(l * 70) * 7 * (1 - ek) * (ek > 0 ? 1 : 0);
-    const head = headline(l, ['Gaji 5 juta,', 'tanggal 10 udah *tipis*?'], { instant: true, y: 290,
-      emph: () => ({ scale: 1 + Math.sin(ek * Math.PI) * .3, dx: shake, dy: Math.cos(l * 55) * 4 * (1 - ek) * (ek > 0 ? 1 : 0), fill: ek > 0 ? C.red : null }) });
+    const H = CUE.hook;
+    const ed = l - H.emph, slam = ed >= 0 ? 1 + (1 - spr(ed, .35, 18)) * .28 : 1, sh = ed >= 0 && ed < .45 ? Math.sin(ed * 70) * 7 * (1 - ed / .45) : 0;
+    const head = kinetic(l, ['Gaji 5 juta,', 'tanggal 10 udah *tipis*?'], { instant: true, y: 290, size: 60,
+      emph: () => ({ scale: slam, dx: sh, dy: 0, rot: ed >= 0 ? -4 * (1 - spr(ed)) : 0, fill: ed >= 0 ? C.red : null }) });
     let s = '';
-    const day = Math.min(10, 1 + Math.floor(prog(l, .1, 2.0) * 9.999));
-    const flip = (l * 4.5) % 1;
-    s += `<g transform="translate(560 ${f(700 + Math.sin(t * 3) * 4)}) rotate(6)">${calendar(day)}</g>`;
-    if (l < 2.05) s += `<g transform="translate(560 640) scale(1 ${f(1 - Math.sin(flip * Math.PI) * .12)})"></g>`;
-    // tumpukan 5 lembar; lembar atas terbang satu per satu (stagger 0,35 dtk)
-    for (let i = 4; i >= 0; i--) {
-      const t0 = .35 + (4 - i) * .38, k = prog(l, t0, t0 + .55);
-      if (i === 0) continue;
+    // kalender: tiap ganti tanggal, halaman "dibalik" (squash vertikal lalu mengendap)
+    const span = H.cal[1] - H.cal[0], day = Math.min(10, 1 + Math.floor(prog(l, H.cal[0], H.cal[1]) * 9.999));
+    const since = l < H.cal[0] ? 9 : (l - H.cal[0]) % (span / 9), flip = l > H.cal[1] + .2 ? 1 : 1 - (1 - spr(since, .4, 22)) * .35;
+    s += `<g transform="translate(565 ${f(700 + Math.sin(t * 3) * 4)}) rotate(6) scale(1 ${f(flip)})">${calendar(day)}</g>`;
+    // tumpukan uang: lembar atas mundur sedikit (antisipasi) lalu terbang
+    for (let i = 4; i >= 1; i--) {
+      const t0 = H.bills[4 - i], k = prog(l, t0, t0 + H.flyDur), ant = Math.sin(prog(l, t0 - .12, t0) * Math.PI) * 8;
       const fly = eio(k);
-      const x = 280 + fly * 520 + Math.sin(fly * 3) * 20, y = 760 - i * 22 - fly * 520 - Math.sin(fly * Math.PI) * 60;
-      if (fly < 1) s += `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(-6 + fly * 140)})">${bill()}</g>`;
+      const x = 280 + fly * 520 + Math.sin(fly * 3) * 20, y = 760 - i * 22 - fly * 520 - Math.sin(fly * Math.PI) * 60 + ant;
+      if (fly < 1) s += `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(-6 + fly * 140)}) scale(${f(1 - fly * .25)})">${bill()}</g>`;
     }
-    // lembar terakhir: gepeng dulu (antisipasi), lalu goyang
-    const sq = prog(l, 2.0, 2.5), wob = Math.sin(t * 18) * 3 * prog(l, 2.5, 2.7) * (1 - prog(l, 2.7, 3.3));
+    const sq = prog(l, H.squash[0], H.squash[1]), wob = Math.sin(t * 18) * 3 * prog(l, 2.5, 2.7) * (1 - prog(l, 2.7, 3.3));
     s += `<g transform="translate(${f(280 + wob)} 760) scale(${f(1 + sq * .08)} ${f(1 - sq * .55)})">${bill()}</g>`;
-    // label sisa gaji di tumpukan: menghitung turun Rp5.000.000 → Rp1.000.000 tiap lembar terbang
+    // sisa gaji: menghitung turun, tiap lembar pill memantul
     let gone = 0;
-    for (let i = 0; i < 4; i++) gone += eio(prog(l, .35 + i * .38, .9 + i * .38));
-    const left = 5000000 - gone * 1000000, low = prog(l, 1.6, 2.1);
-    const bump = Math.sin(((l - .35) % .38) / .38 * Math.PI) * (l > .35 && l < 2.0 ? .06 : 0);
-    s += `<g transform="translate(280 852) scale(${f(1 + bump)})"><rect x="-150" y="-32" width="300" height="64" rx="32" fill="${C.white}" ${ST}/>${txt(0, 14, rp(Math.round(left / 50000) * 50000), { size: 38, fill: low > .5 ? C.red : C.ink })}</g>`;
-    // stempel TIPIS: turun dari skala besar, mendarat tepat 2,5 dtk
-    const st = prog(l, 2.25, 2.5);
+    H.bills.forEach(b => gone += eio(prog(l, b, b + H.flyDur)));
+    const left = 5000000 - gone * 1000000;
+    const bump = H.bills.reduce((a, b) => a + Math.max(0, Math.sin(prog(l, b + .3, b + .55) * Math.PI)) * .07, 0);
+    s += `<g transform="translate(280 852) scale(${f(1 + bump)})"><rect x="-150" y="-32" width="300" height="64" rx="32" fill="${C.white}" ${ST}/>${txt(0, 14, rp(Math.round(left / 50000) * 50000), { size: 38, fill: prog(l, 1.6, 2.1) > .5 ? C.red : C.ink })}</g>`;
+    // stempel: turun dari besar, squash saat mendarat, debu memercik
+    const st = prog(l, H.stamp - .25, H.stamp);
     if (st > 0) {
-      const sc = st < 1 ? lerp(2.4, 1, eio(st)) : 1 + Math.sin(prog(l, 2.5, 2.8) * Math.PI) * .06;
-      s += `<g transform="translate(330 955) rotate(-10) scale(${f(sc)})" opacity="${f(Math.min(1, st * 3))}"><rect x="-120" y="-44" width="240" height="88" rx="14" fill="none" stroke="${C.red}" stroke-width="9"/>${txt(0, 22, 'TIPIS', { size: 64, fill: C.red, ls: 6 })}</g>`;
+      const sc = st < 1 ? lerp(2.4, 1, ein(st)) : 1, q = squash(l - H.stamp);
+      s += `<g transform="translate(330 955) rotate(-10) scale(${f(sc * q.sx)} ${f(sc * q.sy)})" opacity="${f(Math.min(1, st * 3))}"><rect x="-120" y="-44" width="240" height="88" rx="14" fill="${C.bg}" stroke="${C.red}" stroke-width="9"/>${txt(0, 22, 'TIPIS', { size: 64, fill: C.red, ls: 6, weight: 900 })}</g>`;
+      const dk = prog(l, H.stamp, H.stamp + .45);
+      if (dk > 0 && dk < 1) for (let i = 0; i < 9; i++) {
+        const a = Math.PI * (1.05 + i * .1), r = eout(dk) * (70 + rnd(i) * 50);
+        s += `<circle cx="${f(330 + Math.cos(a) * (130 + r))}" cy="${f(990 + Math.sin(a) * r * .5)}" r="${f((1 - dk) * (5 + rnd(i + 9) * 5))}" fill="${C.ink}" opacity=".35"/>`;
+      }
     }
-    return s + head; // judul digambar paling atas supaya uang terbang tidak menutup hook
+    return s + head;
   },
-  // 2 DATA 3,5–7: bar 50/30/20 menggambar diri + persen menghitung, lalu 3 kantong pop
+  // 2 DATA: bar 50/30/20 menggambar diri + persen menghitung, 3 karung mendarat
   (l, t) => {
-    let s = headline(l, ['Pakai rumus', '*50* / ^30^ / _20_'], { y: 280, size: 70 });
-    const X0 = 80, W = 560, Y = 520, H = 96;
-    const segs = [[.5, C.cor, 'Kebutuhan'], [.3, C.vio, 'Keinginan'], [.2, C.grn, 'Masa depan']];
-    let acc = 0;
-    s += `<rect x="${X0}" y="${Y}" width="${W}" height="${H}" rx="22" fill="${C.white}" ${ST}/>`;
-    s += `<defs><clipPath id="barc"><rect x="${X0}" y="${Y}" width="${W}" height="${H}" rx="22"/></clipPath></defs><g clip-path="url(#barc)">`;
-    const labels = [];
+    const D = CUE.data;
+    let s = kinetic(l, ['Pakai rumus', '*50* / ^30^ / _20_'], { y: 280, size: 72 });
+    const X0 = 80, W = 560, Y = 520, H = 96, id = 'bar' + (UID++);
+    const segs = [[.5, C.cor, 'Kebutuhan', C.corD], [.3, C.vio, 'Keinginan', C.vioD], [.2, C.grn, 'Masa depan', C.grnD]];
+    let acc = 0; const labels = [];
+    const bk = spr(l - .1, .5, 14);
+    s += `<g transform="translate(360 ${Y + H / 2}) scale(${f(bk)} 1) translate(-360 ${-(Y + H / 2)})"><rect x="${X0}" y="${Y}" width="${W}" height="${H}" rx="22" fill="${C.white}" ${ST}/>`;
+    s += `<clipPath id="${id}"><rect x="${X0}" y="${Y}" width="${W}" height="${H}" rx="22"/></clipPath><g clip-path="url(#${id})">`;
     segs.forEach(([p, col], i) => {
-      const t0 = .35 + i * .5, k = eout(prog(l, t0, t0 + .5));
+      const t0 = D.bars[i], k = eout(prog(l, t0, t0 + D.barDur));
       const x = X0 + acc * W, w = p * W * k;
       s += `<rect x="${f(x)}" y="${Y}" width="${f(w)}" height="${H}" fill="${col}"/>`;
       if (k > 0 && i > 0) s += `<path d="M${f(x)} ${Y} v${H}" stroke="${C.ink}" stroke-width="5"/>`;
-      const pct = Math.round(p * 100 * k);
-      if (k > 0) labels.push(txt(x + p * W / 2, Y + 64, pct + '%', { size: 42, fill: C.white }));
+      if (k > 0) { const pb = 1 + Math.sin(prog(l, t0 + D.barDur, t0 + D.barDur + .25) * Math.PI) * .2; labels.push(`<g transform="translate(${f(x + p * W / 2)} ${Y + 62}) scale(${f(pb)})">${txt(0, 0, Math.round(p * 100 * k) + '%', { size: 40, fill: C.white, weight: 900 })}</g>`); }
       acc += p;
     });
-    s += `</g><rect x="${X0}" y="${Y}" width="${W}" height="${H}" rx="22" fill="none" ${ST}/>` + labels.join('');
-    // 3 kantong kecil muncul berurutan (stagger) di bawah bar
-    segs.forEach(([p, col, name], i) => {
-      const k = prog(l, 1.9 + i * .18, 2.4 + i * .18);
-      const x = 160 + i * 200, y = 790 + Math.sin(t * 4 + i) * 5 * k;
-      s += pop(k, x, y, pouch(col, [C.corD, C.vioD, C.grnD][i], .45, '', '', .62));
-      if (k > 0) s += `<g opacity="${f(Math.min(1, k * 2))}">${txt(x, 905, name, { size: 26 })}</g>`;
+    s += `</g><rect x="${X0}" y="${Y}" width="${W}" height="${H}" rx="22" fill="none" ${ST}/>` + labels.join('') + '</g>';
+    // karung jatuh dari atas, squash saat mendarat
+    segs.forEach(([p, col, name, colD], i) => {
+      const t0 = D.pouches[i], k = prog(l, t0, t0 + .28), x = 160 + i * 200, op = clamp(k * 3);
+      if (k <= 0) return;
+      const y = lerp(700, 790, ein(k)) + Math.sin(t * 4 + i) * 4 * prog(l, t0 + .5, t0 + .8), q = squash(l - t0 - .28);
+      s += `<g opacity="${f(op)}" transform="translate(${x} ${f(y)}) scale(${f(q.sx * breathe(t, i))} ${f(q.sy * breathe(t, i))})">${pouch(col, colD, .45, '', '', .62)}</g>`;
+      s += `<g opacity="${f(Math.min(1, prog(l, t0 + .2, t0 + .4) * 1))}">${txt(x, 910, name, { size: 28 })}</g>`;
     });
-    s += `<g opacity="${f(eout(prog(l, 2.4, 2.9)))}">${txt(360, 990, 'Rumus dipopulerkan buku All Your Worth (Warren & Tyagi)', { size: 20, weight: 600, fill: C.mute })}</g>`;
+    s += `<g opacity="${f(eout(prog(l, D.src, D.src + .4)))}">${txt(360, 995, 'Sumber: buku All Your Worth (Warren & Tyagi)', { size: 24, weight: 600, fill: C.mute })}</g>`;
     return s;
   },
-  // 3 INTI 7–10,5: kantong kebutuhan diisi koin, nominal menghitung naik, ikon pop
   (l, t) => kantongScene(l, t, { pct: '*50%*', name: 'kebutuhan', col: C.cor, colD: C.corD, amount: 2500000, icons: ['rumah', 'makan', 'bus'], sub: 'kos · makan · transport' }),
-  // 4 INTI 10,5–14: kantong keinginan
   (l, t) => kantongScene(l, t, { pct: '^30%^', name: 'keinginan', col: C.vio, colD: C.vioD, amount: 1500000, icons: ['kopi', 'tiket', 'belanja'], sub: 'nongkrong · jajan · langganan', mirror: true }),
-  // 5 DAMPAK 14–17,5: sebelum (nabung dari sisa = Rp0) → sesudah (nabung duluan = Rp1 jt)
+  // 5 DAMPAK: sebelum (nabung dari sisa = Rp0) dicoret → sesudah (nabung duluan = Rp1 jt) ✓
   (l, t) => {
-    let s = headline(l, ['_20%_ masa depan:', 'pindahin _duluan_'], { y: 270, size: 58 });
-    // kartu SEBELUM
-    const a = prog(l, .25, .65);
-    s += pop(a, 190, 640, `<rect x="-150" y="-190" width="300" height="400" rx="26" fill="${C.white}" ${ST}/>
-      ${txt(0, -145, 'SEBELUM', { size: 22, ls: 3, fill: C.mute })}${txt(0, -110, 'nabung dari sisa', { size: 24 })}
-      <g transform="translate(0 20)">${pouch(C.grn, C.grnD, 0, '', '', .7, 'sad')}</g>${txt(0, 175, 'Rp0', { size: 36, fill: C.red })}`);
-    const x = prog(l, 1.0, 1.25);
-    if (x > 0) s += `<g transform="translate(190 640) scale(${f(lerp(1.8, 1, eio(x)))})" opacity="${f(Math.min(1, x * 3))}"><path d="M-70 -70 L70 70 M70 -70 L-70 70" stroke="${C.red}" stroke-width="16" stroke-linecap="round"/></g>`;
-    // panah
-    const ar = eout(prog(l, 1.25, 1.75));
-    if (ar > 0) s += `<path d="M352 640 h${f(ar * 36)}" stroke="${C.ink}" stroke-width="8" stroke-linecap="round"/>${ar > .95 ? `<path d="M378 626 l14 14 l-14 14" fill="none" stroke="${C.ink}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>` : ''}`;
-    // kartu SESUDAH: gaji masuk → 20% langsung ke kantong
-    const b = prog(l, 1.5, 1.9), fill = eout(prog(l, 1.95, 2.9));
-    s += pop(b, 545, 640, `<rect x="-150" y="-190" width="300" height="400" rx="26" fill="${C.white}" stroke="${C.grn}" stroke-width="7"/>
-      ${txt(0, -145, 'SESUDAH', { size: 22, ls: 3, fill: C.grnD })}${txt(0, -110, 'nabung duluan', { size: 24 })}
-      <g transform="translate(0 20)">${pouch(C.grn, C.grnD, fill * .8, '', '', .7, 'ok')}</g>${txt(0, 175, rp(1000000 * fill), { size: 36, fill: C.grnD })}`);
-    // koin melompat dari samping kartu ke mulut kantong SESUDAH; lengkung dibatasi di bawah label (y > 560)
-    for (let i = 0; i < 4; i++) {
-      const k = prog(l, 1.95 + i * .2, 2.4 + i * .2), side = i % 2 ? 1 : -1;
+    const D = CUE.dampak;
+    let s = kinetic(l, ['_20%_ masa depan:', 'pindahin _duluan_'], { y: 270, size: 58 });
+    const card = (label, sub, stroke, lc) => `<rect x="-150" y="-190" width="300" height="400" rx="26" fill="${C.white}" stroke="${stroke}" stroke-width="${stroke === C.ink ? 5 : 7}"/>${txt(0, -142, label, { size: 27, ls: 3, fill: lc })}${txt(0, -104, sub, { size: 27 })}`;
+    const shrinkA = 1 - prog(l, D.x + .25, D.x + .5) * .06; // kartu lama sedikit mengecil setelah dicoret
+    s += `<g transform="translate(190 640) scale(${f(shrinkA)}) translate(-190 -640)">` + popS(l - D.cardA, 190, 640, card('SEBELUM', 'nabung dari sisa', C.ink, C.mute) + `<g transform="translate(0 20)">${pouch(C.grn, C.grnD, 0, '', '', .7, 'sad')}</g>${txt(0, 175, 'Rp0', { size: 38, fill: C.red, weight: 900 })}`) + '</g>';
+    const x = prog(l, D.x - .2, D.x);
+    if (x > 0) s += `<g transform="translate(190 640) scale(${f(lerp(2, 1, ein(x)))})" opacity="${f(Math.min(1, x * 3))}"><path d="M-70 -70 L70 70 M70 -70 L-70 70" stroke="${C.red}" stroke-width="16" stroke-linecap="round"/></g>`;
+    // panah menggambar diri
+    const ar = eout(prog(l, D.arrow[0], D.arrow[1]));
+    if (ar > 0) s += `<path d="M350 640 h40 M376 624 l16 16 l-16 16" fill="none" stroke="${C.ink}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="120" stroke-dashoffset="${f(120 * (1 - ar))}"/>`;
+    const fill = eout(prog(l, D.fill[0], D.fill[1]));
+    s += popS(l - D.cardB, 545, 640, card('SESUDAH', 'nabung duluan', C.grn, C.grnD) + `<g transform="translate(0 20) scale(${f(breathe(t))})">${pouch(C.grn, C.grnD, fill * .8, '', '', .7, 'ok')}</g>${txt(0, 175, rp(Math.round(1000000 * fill / 50000) * 50000), { size: 38, fill: C.grnD, weight: 900 })}`);
+    // koin melompat dari samping kartu ke mulut karung, lengkung di bawah label
+    D.coins.forEach((c0, i) => {
+      const k = prog(l, c0, c0 + .45), side = i % 2 ? 1 : -1;
       const cx = lerp(545 + side * 115, 545 + side * 8, eio(k)), cy = lerp(640, 600, eio(k)) - Math.sin(k * Math.PI) * 30;
       if (k > 0 && k < 1) s += `<g transform="translate(${f(cx)} ${f(cy)}) rotate(${f(side * k * 180)}) scale(${f(Math.min(1, k * 4))})">${coin(18)}</g>`;
-    }
-    const ck = prog(l, 2.9, 3.15);
-    if (ck > 0) s += pop(ck, 650, 470, `<circle r="36" fill="${C.grn}" ${ST}/><path d="M-15 0 l10 11 l20 -22" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`);
+    });
+    s += popS(l - D.check, 650, 470, `<circle r="36" fill="${C.grn}" ${ST}/><path d="M-15 0 l10 11 l20 -22" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`);
     return s;
   },
-  // 6 CTA 17,5–21: logo memantul, ajakan simpan, sumber
+  // 6 CTA: match-cut dari koin → lingkaran logo; ajakan simpan, sumber
   (l, t) => {
-    let s = headline(l, ['Simpan, terus', 'coba _gajian_ _depan_'], { y: 300, size: 62, noOut: true });
-    const k = prog(l, .2, .7);
-    s += pop(k, 360, 600, `<circle r="150" fill="${C.yel}" ${ST}/><g transform="translate(-130 -142) scale(2.17)">${LOGO}</g>`, Math.sin(t * 2) * 3);
-    s += `<g opacity="${f(eout(prog(l, .6, 1.0)))}" transform="translate(0 ${f((1 - eout(prog(l, .6, 1.0))) * 20)})">${txt(360, 815, 'Bokek Anonim', { size: 54, letter: 0 })}${txt(360, 852, 'kelompok dukungan buat gaji yang numpang lewat', { size: 22, weight: 600, fill: C.mute })}</g>`;
-    // tombol simpan (bookmark) yang "ditekan"
-    const b = prog(l, 1.2, 1.6), press = Math.sin(prog(l, 1.9, 2.2) * Math.PI);
-    s += pop(b, 360, 945, `<g transform="scale(${f(1 - press * .12)})"><rect x="-150" y="-38" width="300" height="76" rx="38" fill="${press > 0 || l > 2.2 ? C.ink : C.white}" ${ST}/>
-      <path d="M-100 -18 h26 v38 l-13 -10 l-13 10 z" fill="${l > 2.05 ? C.yel : 'none'}" stroke="${l > 2.05 ? C.yel : C.ink}" stroke-width="4" stroke-linejoin="round"/>
-      ${txt(20, 12, l > 2.05 ? 'Tersimpan' : 'Simpan', { size: 30, fill: l > 2.05 ? C.white : C.ink })}</g>`);
-    s += `<g opacity="${f(eout(prog(l, 1.6, 2.0)))}">${txt(360, 1022, 'Sumber rumus: All Your Worth (Warren & Tyagi) · gaji = contoh', { size: 19, weight: 600, fill: C.mute })}</g>`;
+    const K = CUE.cta;
+    let s = kinetic(l, ['Simpan, terus', 'coba _gajian_ _depan_'], { y: 300, size: 62 });
+    const bob = Math.sin(t * 2) * 3;
+    s += `<g transform="translate(360 600) rotate(${f(bob)}) scale(${f(breathe(t))})"><circle r="150" fill="${C.yel}" ${ST}/>${popS(l - K.logo, 0, 0, `<g transform="translate(-130 -142) scale(2.17)">${LOGO}</g>`)}</g>`;
+    const nk = spr(l - K.name);
+    s += `<g opacity="${f(clamp(nk))}" transform="translate(0 ${f((1 - nk) * 24)})">${txt(360, 815, 'Bokek Anonim', { size: 54, weight: 900 })}${txt(360, 852, 'kelompok dukungan buat gaji', { size: 27, weight: 600, fill: C.mute })}${txt(360, 885, 'yang numpang lewat', { size: 27, weight: 600, fill: C.mute })}</g>`;
+    const press = Math.sin(prog(l, K.press, K.press + .3) * Math.PI), saved = l > K.saved;
+    s += popS(l - K.btn, 360, 962, `<g transform="scale(${f(1 - press * .12)})"><rect x="-160" y="-38" width="320" height="76" rx="38" fill="${press > 0 || saved ? C.ink : C.white}" ${ST}/>
+      <path d="M-108 -18 h26 v38 l-13 -10 l-13 10 z" fill="${saved ? C.yel : 'none'}" stroke="${saved ? C.yel : C.ink}" stroke-width="4" stroke-linejoin="round"/>
+      ${txt(18, 11, saved ? 'Tersimpan' : 'Simpan', { size: 30, fill: saved ? C.white : C.ink })}</g>`);
+    s += `<g opacity="${f(eout(prog(l, K.src, K.src + .4)))}">${txt(360, 1050, 'Sumber rumus: All Your Worth · gaji = contoh', { size: 24, weight: 600, fill: C.mute })}</g>`;
     return s;
   },
 ];
 
 function kantongScene(l, t, o) {
-  // timeline: kantong .05–.4 · koin .4–2.0 · ikon 1.0–1.8 · nominal selesai 2.0 (+pantul) · chip 2.3/2.6/2.9 · keluar 3.2
-  const dir = o.mirror ? -1 : 1, mx = x => o.mirror ? 720 - x : x;
-  let s = headline(l, [`${o.pct} ${o.name}`], { y: 290, size: 76 });
-  const fill = eout(prog(l, .4, 2.0));
-  const k = prog(l, .05, .4);
-  const bob = Math.sin(t * 3.4) * 6;
-  // kantong sedikit "menelan" tiap koin (squash kecil)
+  const I = CUE.inti, dir = o.mirror ? -1 : 1, mx = x => o.mirror ? 720 - x : x;
+  let s = kinetic(l, [`${o.pct} ${o.name}`], { y: 290, size: 76 });
+  const fill = eout(prog(l, I.coin0, I.amtEnd)), k = prog(l, I.pouch, I.pouch + .35), bob = Math.sin(t * 3.4) * 6;
   let gulp = 0;
-  for (let i = 0; i < 6; i++) gulp += Math.sin(prog(l, .78 + i * .24, .95 + i * .24) * Math.PI) * .04;
-  s += `<g transform="translate(360 ${f(660 + bob)}) scale(${f(1 + gulp)} ${f(1 - gulp)})">${pop(k, 0, 0, pouch(o.col, o.colD, fill * .85, '', '', 1.4, 'ok'), dir * -3)}</g>`;
-  // koin jatuh berurutan ke mulut kantong, datang dari sisi yang berbeda tiap adegan
+  for (let i = 0; i < 6; i++) { const land = I.coin0 + i * I.coinStep + I.coinDur; gulp += Math.sin(prog(l, land - .02, land + .15) * Math.PI) * .045; }
+  s += `<g transform="translate(360 ${f(660 + bob)}) scale(${f((1 + gulp) * breathe(t))} ${f((1 - gulp) * breathe(t, 1))})">${pop(k, 0, 0, pouch(o.col, o.colD, fill * .85, '', '', 1.4, 'ok'), dir * -3)}</g>`;
   for (let i = 0; i < 6; i++) {
-    const t0 = .4 + i * .24, c = prog(l, t0, t0 + .4);
-    if (c > 0 && c < 1) s += `<g transform="translate(${f(360 + dir * lerp(160, (rnd(i + o.amount) - .5) * 50, eio(c)))} ${f(lerp(380, 530, eio(c)) - Math.sin(c * Math.PI) * 50)}) rotate(${f(dir * c * 200)})">${coin(24)}</g>`;
+    const t0 = I.coin0 + i * I.coinStep, c = prog(l, t0, t0 + I.coinDur);
+    if (c > 0 && c < 1) s += `<g transform="translate(${f(360 + dir * lerp(170, (rnd(i + o.amount) - .5) * 50, eio(c)))} ${f(lerp(370, 530, ein(c)) - Math.sin(c * Math.PI) * 60)}) rotate(${f(dir * c * 220)}) scale(${f(1 - c * .2)})">${coin(24)}</g>`;
   }
-  // nominal menghitung naik, selesai 2,0 lalu memantul
-  s += `<g transform="translate(360 935) scale(${f(1 + Math.sin(prog(l, 2.0, 2.3) * Math.PI) * .14)})">${txt(0, 0, rp(o.amount * fill), { size: 62, fill: o.colD })}</g>`;
-  // ikon pop berurutan di sekitar kantong; ikon menyala lagi saat chip-nya muncul
+  // nominal menghitung naik, slam di akhir + kilau garis
+  const ab = l >= I.amtEnd ? 1 + (1 - spr(l - I.amtEnd, .35, 18)) * .25 : 1;
+  s += `<g transform="translate(360 935) scale(${f(ab)})">${txt(0, 0, rp(Math.round(o.amount * fill / 50000) * 50000), { size: 64, fill: o.colD, weight: 900 })}</g>`;
+  const gk = prog(l, I.amtEnd, I.amtEnd + .4);
+  if (gk > 0 && gk < 1) for (let i = 0; i < 6; i++) {
+    const a = -Math.PI / 2 + (i - 2.5) * .5, r0 = 150 + eout(gk) * 30, r1 = r0 + 26 * (1 - gk);
+    s += `<path d="M${f(360 + Math.cos(a) * r0 * 1.4)} ${f(918 + Math.sin(a) * r0 * .45)} L${f(360 + Math.cos(a) * r1 * 1.4)} ${f(918 + Math.sin(a) * r1 * .45)}" stroke="${o.col}" stroke-width="6" stroke-linecap="round"/>`;
+  }
   const chips = o.sub.split(' · ');
   o.icons.forEach((ic, i) => {
-    const ki = prog(l, 1.0 + i * .2, 1.4 + i * .2);
-    const hi = Math.sin(prog(l, 2.3 + i * .3, 2.55 + i * .3) * Math.PI) * .25;
+    const hi = Math.sin(prog(l, I.chips[i], I.chips[i] + .25) * Math.PI) * .25;
     const pos = [[140, 520], [580, 520], [590, 780]][i];
-    s += `<g transform="translate(${f(mx(pos[0]))} ${f(pos[1] + Math.sin(t * 3 + i * 2) * 6 * ki)}) scale(${f(1 + hi)})">${pop(ki, 0, 0, ICON[ic], Math.sin(t * 2 + i) * 4)}</g>`;
+    s += `<g transform="translate(${f(mx(pos[0]))} ${f(pos[1] + Math.sin(t * 3 + i * 2) * 6)}) scale(${f(1 + hi)})">${popS(l - I.icons[i], 0, 0, ICON[ic], Math.sin(t * 2 + i) * 4)}</g>`;
   });
-  // chip rincian muncul satu per satu sampai 3,2 dtk (mengisi sisa adegan, tidak ada detik mati)
-  const widths = chips.map(c => c.length * 15 + 44), gap = 14, total = widths.reduce((a, b) => a + b, 0) + gap * (chips.length - 1);
+  const widths = chips.map(c => measure(c, 27, 800, 0) + 40), gap = 14, total = widths.reduce((a, b) => a + b, 0) + gap * (chips.length - 1);
   let cx = 360 - total / 2;
   chips.forEach((c, i) => {
-    const kc = prog(l, 2.3 + i * .3, 2.6 + i * .3), w = widths[i];
-    s += pop(kc, cx + w / 2, 1000, `<rect x="${f(-w / 2)}" y="-24" width="${f(w)}" height="48" rx="24" fill="${o.col}" ${ST}/>${txt(0, 9, c, { size: 25, fill: C.white })}`, (i - 1) * 3);
+    const w = widths[i];
+    s += popS(l - I.chips[i], cx + w / 2, 1002, `<rect x="${f(-w / 2)}" y="-25" width="${f(w)}" height="50" rx="25" fill="${o.colD}" ${ST}/>${txt(0, 10, c, { size: 27, fill: C.white })}`, (i - 1) * 3);
     cx += w + gap;
   });
   return s;
 }
 
-/* ---------- transisi antar adegan (di batas beat) ---------- */
-// 1→2 wipe tinta, 2→3 geser dari kanan, 3→4 geser dari kiri (arah berlawanan), 4→5 wipe, 5→6 zoom
-const TRANS = ['wipe', 'slide', 'slideR', 'wipe', 'zoom'];
-function sceneTransform(i, l) {
-  const kind = TRANS[i - 1], kout = TRANS[i];
-  let tr = '';
-  const kin = eout(prog(l, 0, .35)), kx = eio(prog(l, SC - .3, SC));
-  if (kind === 'slide' && kin < 1) tr += `translate(${f((1 - kin) * 720)} 0)`;
-  if (kout === 'slide' && kx > 0) tr += `translate(${f(-kx * 720)} 0)`;
-  if (kind === 'slideR' && kin < 1) tr += `translate(${f(-(1 - kin) * 720)} 0)`;
-  if (kout === 'slideR' && kx > 0) tr += `translate(${f(kx * 720)} 0)`;
-  if (kind === 'zoom' && kin < 1) tr += `translate(360 640) scale(${f(lerp(1.4, 1, kin))}) translate(-360 -640)`;
-  if (kout === 'zoom' && kx > 0) tr += `translate(360 640) scale(${f(lerp(1, .6, kx))}) translate(-360 -640)`;
-  return tr;
+/* ---------- kamera, kedalaman, guncangan ---------- */
+function cam(i, l) { // push-in 1.00→1.05, pan kecil, rotasi ≤ 0,8°
+  const p = clamp(l / SC), d = [1, -1, 1, -1, 1, 1][i];
+  return `translate(360 640) scale(${(1 + .05 * p).toFixed(4)}) rotate(${f(.8 * d * (p - .5))}) translate(${f(-360 - 12 * d * p)} ${f(-640 - 8 * p)})`;
 }
-function wipeOverlay(t) {
-  let s = '';
-  [3.5, 14].forEach(b => {
-    const k = prog(t, b - .25, b + .25);
-    if (k > 0 && k < 1) {
-      const x = lerp(-900, 900, eio(k));
-      s += `<g transform="translate(${f(x)} 0) skewX(-12)"><rect x="-80" y="-50" width="820" height="1380" fill="${C.ink}"/><rect x="740" y="-50" width="60" height="1380" fill="${C.yel}"/></g>`;
-    }
+const IMPACTS = [[2.5, 13], [S0(2) + CUE.inti.amtEnd, 5], [S0(3) + CUE.inti.amtEnd, 5], [S0(4) + CUE.dampak.x, 10], [S0(4) + CUE.dampak.check, 6], [S0(5) + CUE.cta.match, 7]];
+function shake(t) {
+  let x = 0, y = 0;
+  IMPACTS.forEach(([ti, a]) => { const fr = (t - ti) * FPS; if (fr >= 0 && fr < 14) { x += Math.sin(fr * 2.4) * (14 - fr) / 14 * a; y += Math.cos(fr * 2.1) * (14 - fr) / 14 * a * .6; } });
+  return `translate(${f(x)} ${f(y)})`;
+}
+const TINT = [C.cor, C.vio, C.cor, C.vio, C.grn, C.yel];
+function backdrop(t, i, l) {
+  const p = clamp(l / SC);
+  let s = `<rect x="-40" y="-40" width="800" height="1360" fill="${C.bg}"/>`;
+  const off = (t * 10) % 40;
+  s += `<defs><pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="translate(${f(off)} ${f(off * .6)})"><circle cx="6" cy="6" r="3" fill="${C.ink}" opacity=".07"/></pattern></defs><rect x="-40" y="-40" width="800" height="1360" fill="url(#dots)"/>`;
+  // lapisan tengah: bentuk datar besar, ikut warna adegan, parallax pelan
+  [[110, 420, 170], [640, 880, 210], [90, 1120, 140]].forEach(([x, y, r], k) => {
+    s += `<g transform="translate(${f(x - 20 * p + Math.sin(t * .6 + k) * 10)} ${f(y - 12 * p + Math.cos(t * .5 + k) * 8)}) rotate(${f(t * 6 * (k % 2 ? 1 : -1))})"><rect x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" rx="${r * .45}" fill="${TINT[i]}" opacity=".09"/></g>`;
   });
   return s;
 }
-
-/* ---------- latar & bingkai ---------- */
-function backdrop(t) {
-  let s = `<rect width="720" height="1280" fill="${C.bg}"/>`;
-  const off = (t * 12) % 40;
-  s += `<defs><pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="translate(${f(off)} ${f(off)})"><circle cx="6" cy="6" r="3" fill="${C.ink}" opacity=".07"/></pattern></defs><rect width="720" height="1280" fill="url(#dots)"/>`;
-  return s;
-}
-function chrome(t) {
-  // label seri + bar progres 6 segmen (struktur sesi)
-  let s = `<g transform="translate(360 168)"><rect x="-170" y="-24" width="340" height="48" rx="24" fill="${C.ink}"/>${txt(0, 9, 'BOKEK ANONIM · SESI #1', { size: 18, fill: C.yel, ls: 2 })}</g>`;
-  for (let i = 0; i < 6; i++) {
-    const x = 90 + i * 92, k = prog(t, i * SC, (i + 1) * SC);
-    s += `<rect x="${x}" y="1046" width="80" height="8" rx="4" fill="${C.ink}" opacity=".15"/><rect x="${x}" y="1046" width="${f(80 * k)}" height="8" rx="4" fill="${C.ink}"/>`;
+function foreground(t, l) { // partikel depan, naik pelan dengan ayunan (deterministik)
+  const p = clamp(l / SC); let s = '';
+  for (let k = 0; k < 12; k++) {
+    const sp = 18 + rnd(k) * 30, y = 1300 - ((t * sp + rnd(k + 40) * 1400) % 1400), x = rnd(k + 80) * 720 + Math.sin(t * 1.3 + k) * 14 - 30 * p;
+    s += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(3 + rnd(k + 20) * 5)}" fill="${k % 3 ? C.ink : C.yel}" opacity="${k % 3 ? .1 : .6}"/>`;
   }
   return s;
 }
 
-/* ---------- audio ---------- */
-window.AUDIO_EVENTS = [
-  ...[3.5, 7, 10.5, 14, 17.5].map(b => ({ t: b - .2, type: 'whoosh', dur: .45, gain: .8 })),
-  ...[0, 1, 2, 3].map(i => ({ t: .35 + i * .38, type: 'swipe', dur: .3, gain: .35 })),
-  { t: 2.5, type: 'slap', gain: 1 },
-  ...[0, 1, 2].map(i => ({ t: 3.5 + .35 + i * .5, type: 'tick', gain: 1.2 })),
-  ...[0, 1, 2].map(i => ({ t: 3.5 + 1.9 + i * .18, type: 'pop', gain: .8 })),
-  ...[7, 10.5].flatMap(b => [0, 1, 2, 3, 4, 5].map(i => ({ t: b + .4 + i * .24 + .38, type: 'coin', gain: .6 }))),
-  ...[7, 10.5].flatMap(b => [0, 1, 2].map(i => ({ t: b + 1.0 + i * .2, type: 'pop', gain: .55 }))),
-  ...[7, 10.5].map(b => ({ t: b + 2.0, type: 'income', gain: .8 })),
-  ...[7, 10.5].flatMap(b => [0, 1, 2].map(i => ({ t: b + 2.3 + i * .3, type: 'pluck', note: 72 + i * 4, gain: .7 }))),
-  ...[0, 1, 2, 3].map(i => ({ t: .35 + i * .38 + .45, type: 'minus', gain: .45 })),
-  { t: 2.5, type: 'boom', gain: .5 },
-  { t: 14 + 1.0, type: 'slap', gain: .7 },
-  ...[0, 1, 2, 3].map(i => ({ t: 14 + 1.95 + i * .2 + .4, type: 'coin', gain: .6 })),
-  { t: 14 + 2.9, type: 'save', gain: 1 },
-  { t: 17.5 + .2, type: 'pop', gain: 1 },
-  { t: 17.5 + 1.9, type: 'tick', gain: 1 },
-  { t: 18.5, type: 'end', gain: 1 },
+/* ---------- transisi (tiap batas berbeda, tiap transisi ber-SFX) ---------- */
+const TRANS = [
+  { k: 'wipe', cols: [C.yel, C.ink], axis: 'y' }, // 3,5 panel berlapis naik
+  { k: 'iris', cx: 360, cy: 660, ring: C.cor },   // 7 lingkaran membuka dari karung
+  { k: 'push', dir: 1 },                           // 10,5 adegan 4 didorong masuk dari KIRI
+  { k: 'wipe', cols: [C.grn, C.ink], axis: 'x' },  // 14 panel berlapis menyamping
+  { k: 'grow', from: [545, 600], to: [360, 600] }, // 17,5 koin membesar → jadi lingkaran logo (match-cut)
 ];
-window.MUSIC = { style: 'upbeat', bpm: 120, drumsFrom: 0, drumsTo: 20.5, volume: 1 };
+const scene = (i, l, t) => `<g transform="${cam(i, l)}">${SCENES[i](l, t)}</g>`;
+function stage(t) {
+  const i = Math.min(5, Math.floor(t / SC)), l = t - i * SC;
+  let body = scene(i, l, t), over = '';
+  CUE.bounds.forEach((b, j) => {
+    const T = TRANS[j];
+    if (T.k === 'push' && t > b - .25 && t < b + .25) {
+      const k = eio(prog(t, b - .25, b + .25));
+      body = `<g transform="translate(${f(k * 720 * T.dir)} 0)">${scene(j, Math.min(SC, t - S0(j)), t)}</g><g transform="translate(${f((k - 1) * 720 * T.dir)} 0)">${scene(j + 1, Math.max(0, t - b), t)}</g>`;
+    }
+    if (T.k === 'iris' && t >= b && t < b + .45) {
+      const k = eout(prog(t, b, b + .45)), r = 10 + k * 900, id = 'iris' + (UID++);
+      body = scene(j, SC, t) + `<clipPath id="${id}"><circle cx="${T.cx}" cy="${T.cy}" r="${f(r)}"/></clipPath><g clip-path="url(#${id})">${backdrop(t, j + 1, t - b)}${scene(j + 1, t - b, t)}</g><circle cx="${T.cx}" cy="${T.cy}" r="${f(r)}" fill="none" stroke="${T.ring}" stroke-width="${f(18 * (1 - k) + 4)}"/>`;
+    }
+    if (T.k === 'wipe' && t > b - .32 && t < b + .32) {
+      const panel = (lag, col) => {
+        const tt = t - lag; if (tt < b - .3 || tt > b + .3) return '';
+        const v = tt < b ? lerp(1, 0, eout(prog(tt, b - .3, b))) : lerp(0, -1, ein(prog(tt, b, b + .3)));
+        const tr = T.axis === 'y' ? `translate(0 ${f(v * 1300)})` : `translate(${f(-v * 760)} 0)`;
+        return `<g transform="${tr}"><rect x="-40" y="-20" width="800" height="1320" fill="${col}"/></g>`;
+      };
+      over += panel(.1, T.cols[0]) + panel(0, T.cols[1]);
+    }
+    if (T.k === 'grow') {
+      if (t > b - .35 && t < b) { const k = ein(prog(t, b - .35, b)); over += `<circle cx="${T.from[0]}" cy="${T.from[1]}" r="${f(18 + k * 1500)}" fill="${C.yel}" ${ST}/>`; }
+      if (t >= b && t < b + CUE.cta.match) {
+        const k = eio(prog(t, b, b + CUE.cta.match));
+        over += `<circle cx="${f(lerp(T.from[0], T.to[0], k))}" cy="${f(lerp(T.from[1], T.to[1], k))}" r="${f(lerp(1500, 150, k))}" fill="${C.yel}" ${ST}/>`;
+      }
+    }
+  });
+  return { i, l, body, over };
+}
+
+/* ---------- bingkai ---------- */
+function chrome(t) {
+  let s = `<g transform="translate(360 168)"><rect x="-200" y="-26" width="400" height="52" rx="26" fill="${C.ink}"/>${txt(0, 9, 'BOKEK ANONIM · SESI #1', { size: 22, fill: C.yel, ls: 2 })}</g>`;
+  for (let i = 0; i < 6; i++) {
+    const x = 90 + i * 92, k = prog(t, i * SC, (i + 1) * SC);
+    s += `<rect x="${x}" y="1088" width="80" height="8" rx="4" fill="${C.ink}" opacity=".15"/><rect x="${x}" y="1088" width="${f(80 * k)}" height="8" rx="4" fill="${C.ink}"/>`;
+  }
+  return s;
+}
+
+/* ---------- audio: diturunkan dari CUE (tidak ada angka waktu ganda) ---------- */
+(() => {
+  const E = [], add = (t, type, o = {}) => E.push({ t: +t.toFixed(3), type, ...o });
+  const H = CUE.hook, D = CUE.data, I = CUE.inti, P = CUE.dampak, K = CUE.cta;
+  add(0, 'impact', { gain: .45 });
+  CUE.bounds.forEach(b => { add(b - .32, 'whoosh', { d: .5, gain: .85 }); add(b, 'thud', { gain: .45 }); });
+  // hook
+  H.bills.forEach((b, i) => { add(b, 'swipe', { gain: .45, pan: .4 }); add(b + .45, 'minus', { gain: .5 }); });
+  add(H.cal[0], 'ticks', { d: H.cal[1] - H.cal[0], step: (H.cal[1] - H.cal[0]) / 9, gain: .45, pan: .5 });
+  add(H.stamp - 1.1, 'riser', { d: 1.1, gain: .45 });
+  add(H.stamp, 'impact', { gain: .9 }); add(H.stamp, 'clap', { gain: .9 });
+  // data
+  D.bars.forEach(b => { add(S0(1) + b, 'ticks', { d: D.barDur, step: .1, gain: .4 }); add(S0(1) + b + D.barDur, 'pop', { gain: .7 }); });
+  D.pouches.forEach((b, i) => add(S0(1) + b + .28, 'thud', { gain: .5, pan: (i - 1) * .5 }));
+  // inti x2
+  [2, 3].forEach(sc => {
+    const o = S0(sc);
+    add(o + I.pouch, 'pop', { gain: .7 });
+    for (let i = 0; i < 6; i++) add(o + I.coin0 + i * I.coinStep + I.coinDur, 'coin', { gain: .45, pan: sc === 2 ? .3 : -.3 });
+    add(o + I.coin0, 'ticks', { d: I.amtEnd - I.coin0, step: .1, gain: .25 });
+    I.icons.forEach(b => add(o + b, 'pop', { gain: .5 }));
+    add(o + I.amtEnd, 'income', { gain: .8 }); add(o + I.amtEnd, 'thud', { gain: .5 });
+    I.chips.forEach((b, i) => add(o + b, 'pluck', { note: 72 + i * 4, gain: .8 }));
+  });
+  // dampak
+  const o5 = S0(4);
+  add(o5 + P.cardA, 'pop', { gain: .7, pan: -.4 });
+  add(o5 + P.x, 'impact', { gain: .7 }); add(o5 + P.x, 'clap', { gain: .8 });
+  add(o5 + P.arrow[0], 'swipe', { gain: .4 });
+  add(o5 + P.cardB, 'pop', { gain: .7, pan: .4 });
+  P.coins.forEach(b => add(o5 + b + .45, 'coin', { gain: .45, pan: .4 }));
+  add(o5 + P.fill[0], 'ticks', { d: P.fill[1] - P.fill[0], step: .1, gain: .3 });
+  add(o5 + P.check, 'thud', { gain: .7 }); add(o5 + P.check, 'bell', { f: 1318, gain: .5 }); add(o5 + P.check, 'sparkle', { gain: .6 });
+  // cta
+  const o6 = S0(5);
+  add(o6 + K.match, 'thud', { gain: .7 }); add(o6 + K.logo, 'pop', { gain: .8 });
+  add(o6 + K.btn, 'pop', { gain: .7 }); add(o6 + K.press, 'tick', { gain: 1 }); add(o6 + K.saved, 'sparkle', { gain: .7 });
+  window.AUDIO_EVENTS = E;
+})();
+// musik berstruktur: intro → drop → breakdown (adegan 4) → build + riser → DROP di adegan Dampak → akord penutup
+window.MUSIC = { engine: 'studio', bpm: 120, bars: ['C', 'G', 'Am', 'F'], breaks: [[10.5, 14]], build: [13, 14], final: 19.5, final_chord: 'C',
+  arp_from: 3.5, hat_from: 2, clap_from: 2, volume: 1, sfxGain: 1, lufs: -14 };
 
 /* ---------- render ---------- */
 const svg = document.getElementById('v');
 function renderAt(t) {
-  const i = Math.min(5, Math.floor(t / SC)), l = t - i * SC;
-  const tr = sceneTransform(i, l);
-  svg.innerHTML = backdrop(t) + `<g transform="${tr}">${SCENES[i](l, t)}</g>` + chrome(t) + wipeOverlay(t)
+  UID = 0;
+  const S = stage(t);
+  svg.innerHTML = `<g transform="${shake(t)}">${backdrop(t, S.i, S.l)}${S.body}${foreground(t, S.l)}${S.over}</g>` + chrome(t)
     + `<rect width="720" height="1280" fill="${C.ink}" opacity="${f(prog(t, DURATION - .35, DURATION))}"/>`;
 }
 window.renderAt = renderAt;
+window.READY = Promise.all([600, 800, 900].map(w => document.fonts.load(`${w} 40px Pop`)));
 
 if (new URLSearchParams(location.search).has('render')) document.body.classList.add('render');
-else { const st = performance.now(); const loop = () => { renderAt(((performance.now() - st) / 1000) % DURATION); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+else window.READY.then(() => { const st = performance.now(); const loop = () => { renderAt(((performance.now() - st) / 1000) % DURATION); requestAnimationFrame(loop); }; requestAnimationFrame(loop); });
 </script>
 </body>
 </html>

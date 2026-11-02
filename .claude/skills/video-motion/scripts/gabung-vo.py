@@ -72,7 +72,7 @@ def main():
     ap.add_argument('--video'); ap.add_argument('--srt'); ap.add_argument('--out')
     ap.add_argument('--noise', type=float, default=-40); ap.add_argument('--min-gap', type=float, default=0.12)
     ap.add_argument('--potong', help='titik potong manual (dtk, dipisah koma), mis. 3.1,6.3,9.5,12.0,15.8')
-    ap.add_argument('--lufs', type=float, default=-15); ap.add_argument('--cek', action='store_true')
+    ap.add_argument('--lufs', type=float, default=-14); ap.add_argument('--cek', action='store_true')
     o = ap.parse_args()
     d = o.dir
     video = o.video or (glob.glob(os.path.join(d, '*-untuk-vo.mp4')) or [None])[0]
@@ -112,7 +112,7 @@ def main():
     if o.cek: return
     out = o.out or (video.replace('-untuk-vo.mp4', '-dengan-vo.mp4'))
     fc = ';'.join(filt) + f";[0:a]{''.join(labels)}amix=inputs={n + 1}:duration=first:normalize=0," \
-         f'loudnorm=I={o.lufs}:TP=-1.5:LRA=11[a]'
+         f'loudnorm=I={o.lufs}:TP=-2:LRA=11,alimiter=limit=0.79:level=false,aresample=48000[a]'
     r = sh(['ffmpeg', '-v', 'error', '-y', '-i', video, '-i', vo, '-filter_complex', fc,
             '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', out])
     if r.returncode: sys.exit(r.stderr)
