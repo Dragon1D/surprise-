@@ -10,7 +10,7 @@ Skill ini mengubah ide menjadi video MP4 vertikal yang bisa langsung diupload. A
 
 ## Alur kerja
 
-1. **Tangkap brief.** Cari tahu topik dan pesan utama, target penonton, durasi (default 45–60 detik), gaya, dan contoh video kalau ada. Kalau user mengirim video contoh, ambil frame-nya dulu (`ffmpeg -i in.mp4 -vf "fps=1/2.5,scale=240:-1,tile=6x4" grid.jpg`) dan baca strukturnya. Jangan bertanya hal yang bisa diputuskan sendiri dengan wajar.
+1. **Tangkap brief.** Cari tahu topik dan pesan utama, target penonton, durasi (default 45–60 detik; **video tips cepat = 21 detik standar studio, baca `references/standar-studio.md`**), gaya, dan contoh video kalau ada. Kalau user mengirim video contoh, ambil frame-nya dulu (`ffmpeg -i in.mp4 -vf "fps=1/2.5,scale=240:-1,tile=6x4" grid.jpg`) dan baca strukturnya. Jangan bertanya hal yang bisa diputuskan sendiri dengan wajar.
 2. **Tulis konsep dan storyboard singkat** sebelum menulis kode: hook (0–3 detik), urutan adegan dengan detik, naskah caption, dan penutup atau CTA. Baca `references/craft.md` untuk ritme, hook, dan aturan keaslian. Kalau user meminta "kayak video X", ambil gaya umumnya, tapi cerita, karakter, nama seri, dan detail visualnya harus orisinal. Jangan meniru branding atau watermark kreator lain.
 3. **Pilih mode** (boleh dicampur dalam satu halaman):
    - Cerita dengan perumpamaan, infografis, atau tipografi kinetik: **2D**, lihat `references/mode-2d.md`.
@@ -26,7 +26,7 @@ Skill ini mengubah ide menjadi video MP4 vertikal yang bisa langsung diupload. A
    `NODE_PATH=$(npm root -g) node <skill>/scripts/render.cjs explainer/<slug> [--out nama.mp4]`
    Perkiraan waktu: 2D/chat ±0,1–0,2 dtk/frame (video 60 dtk ≈ 3–6 menit); 3D ±0,3–0,6 dtk/frame (60 dtk ≈ 10–18 menit). Pakai timeout Bash panjang (600000 ms) atau `run_in_background` untuk video 3D > 30 dtk, dan beri tahu user perkiraan waktunya.
    Audio dibuat otomatis dari `window.AUDIO_EVENTS` dan `window.MUSIC`, lalu dinormalisasi ke -15 LUFS.
-7. **Verifikasi hasil:** `ffprobe` (durasi, 1080x1920, h264 dan aac), lembar kontak dari MP4 final (`ffmpeg -i out.mp4 -vf "fps=1/3,scale=180:-1,tile=9x2" -frames:v 1 cek.jpg`), dan `volumedetect` (mean sekitar -16 sampai -22 dB). Jangan bilang selesai sebelum ini dicek.
+7. **Verifikasi hasil:** untuk video tips 21 dtk, jalankan QA lengkap di `references/standar-studio.md` (lembar kontak 42 frame, skor 7 aspek, loudness ebur128). Selain itu: `ffprobe` (durasi, 1080x1920, h264 dan aac), lembar kontak dari MP4 final (`ffmpeg -i out.mp4 -vf "fps=1/3,scale=180:-1,tile=9x2" -frames:v 1 cek.jpg`), dan `volumedetect` (mean sekitar -16 sampai -22 dB). Jangan bilang selesai sebelum ini dicek.
 8. **Serahkan:** kirim MP4 ke user dengan SendUserFile kalau tersedia. Masukkan `sound.wav` dan `events.json` ke .gitignore, lalu commit sumber dan MP4 kalau bekerja di repo. Ringkas konsep video dalam beberapa poin, sebutkan keterbatasannya (lihat di bawah), dan tawarkan revisi atau episode lanjutan.
 
 ## Kontrak halaman (wajib, semua mode)

@@ -5,10 +5,10 @@
 
 | Adegan | Waktu | Narasi | Yang terjadi di layar |
 |---|---|---|---|
-| 1 Hook | 0,2–3,3 | Gaji lima juta, tapi tanggal sepuluh udah tipis? | Uang terbang satu per satu, kalender lompat ke 10, stempel "TIPIS" jatuh di 2,5 dtk |
-| 2 Data | 3,6–6,9 | Pakai rumus lima puluh, tiga puluh, dua puluh. | Bar 50/30/20 menggambar diri, persen menghitung naik, 3 kantong muncul |
-| 3 Inti | 7,1–10,3 | Lima puluh persen buat kebutuhan: dua setengah juta. | Koin jatuh ke kantong coral, nominal naik ke Rp2.500.000, ikon rumah/makan/bus |
-| 4 Inti | 10,6–13,8 | Tiga puluh persen keinginan: satu setengah juta. | Kantong ungu terisi, nominal naik ke Rp1.500.000, ikon kopi/tiket/belanja |
+| 1 Hook | 0,2–3,3 | Gaji lima juta, tapi tanggal sepuluh udah tipis? | Uang terbang satu per satu, label Rp5.000.000 menghitung turun ke Rp1.000.000, kalender lompat ke 10, stempel "TIPIS" jatuh dan kata "tipis" bergetar membesar di 2,5 dtk |
+| 2 Data | 3,6–6,9 | Pakai rumus lima puluh, tiga puluh, dua puluh. | Bar 50/30/20 menggambar diri, persen menghitung naik, 3 karung kecil muncul |
+| 3 Inti | 7,1–10,3 | Lima puluh persen buat kebutuhan: dua setengah juta. | Koin jatuh ke karung coral, nominal selesai Rp2.500.000 di ±9,0 dtk, ikon rumah/makan/bus, chip kos · makan · transport muncul satu per satu |
+| 4 Inti | 10,6–13,8 | Tiga puluh persen keinginan: satu setengah juta. | Masuk dari kiri, tata letak dicerminkan; karung ungu terisi, Rp1.500.000, ikon kopi/tiket/belanja, chip nongkrong · jajan · langganan |
 | 5 Dampak | 14,1–17,3 | Dua puluh persen masa depan: satu juta. Pindahin duluan. | "Sebelum: nabung dari sisa = Rp0" dicoret → "Sesudah: nabung duluan = Rp1.000.000" ✓ |
 | 6 CTA | 17,6–20,6 | Simpan, terus coba gajian depan. | Logo Bokek Anonim memantul, tombol "Simpan" ditekan → "Tersimpan" |
 

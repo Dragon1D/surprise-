@@ -10,6 +10,7 @@
 | Penutup / CTA | 4–6 dtk | Kalimat kunci besar + ajakan simpan/kirim ke teman |
 
 ## Versi pendek (15–40 detik)
+- **Video tips cepat: pakai standar studio 21 dtk (6 adegan × 3,5 dtk) di `standar-studio.md`.**
 - 15–25 dtk: hook (0–2) → 2–3 ketukan inti (1 visual + 1 caption per ketukan) → penutup 3 dtk. Satu pesan saja.
 - 30–40 dtk: hook (0–4) → cerita/flashback ±14 dtk (4–6 kejadian) → titik balik ±4 dtk → solusi ±6 dtk → penutup 4 dtk.
 Pangkas jumlah kejadian, jangan mempercepat waktu baca caption.
@@ -38,3 +39,8 @@ Satu video = satu palet dominan + 1–2 aksen. Merah = uang keluar/bahaya, hijau
 - [ ] Angka konsisten (saldo, total, rekap) — hitung, jangan kira-kira
 - [ ] Penutup punya satu kalimat kunci + CTA
 - [ ] Tidak ada branding/nama kreator lain
+- [ ] Hook menampilkan angka konkret di visual, dan kata kunci judul bereaksi saat klimaks
+- [ ] Tidak ada jeda > 1 dtk tanpa elemen baru (isi sisa adegan dengan chip/rincian)
+- [ ] Objek terbang tidak melewati label; teks penting digambar paling akhir
+- [ ] Dua adegan berstruktur sama dibedakan (arah masuk, layout dicerminkan)
+- [ ] Objek metafora terbaca tanpa teks (kantong = karung bertali, bukan toples)

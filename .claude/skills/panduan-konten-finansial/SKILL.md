@@ -82,7 +82,10 @@ Detail ada di `konten/profil/profil-instagram.md`, mockup di `konten/profil/cont
 - **Frekuensi:** 3 postingan per hari selama 30 hari, total 90 konten: 2 video dan 1 carousel per hari.
 - **Satu tema per hari** (diambil dari bank ide), dikemas jadi 3 format:
   1. **Video cerita** (30–45 dtk): seri *Kok Bisa?* atau sesi curhat.
-  2. **Video tips cepat** (15–25 dtk): gaya **2D teks dan animasi**.
+  2. **Video tips cepat** (**21 dtk**, standar studio: 6 adegan × 3,5 dtk = Hook, Bukti/data, Inti, Inti, Dampak, CTA; 120 BPM; VO ±45 kata): gaya **2D teks dan animasi**. Detail dan QA di `references/standar-studio.md` skill video-motion. Contoh jadi: `explainer/h1-tiga-kantong/`.
+     - Hook wajib menampilkan angka konkret di visual; kata kunci judul bereaksi di klimaks (≤ 2,5 dtk).
+     - Caveat yang tidak muat di video (gaji bersih, angka contoh, porsi utang) wajib ada di caption + komentar sematan.
+     - Caption per platform mengikuti pola `konten/minggu-01/h1-video-tips-qa-caption.md`.
   3. **Carousel** (6–8 slide) yang layak disimpan.
 - **Distribusi:**
   - Instagram: 2 video + carousel.

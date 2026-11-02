@@ -1,11 +1,19 @@
 # Rencana Minggu 1 — Bokek Anonim (H1–H7)
 
-**Pola harian:** 07.00 video tips (2D, 15–25 dtk) · 12.00 carousel · 19.30 video cerita (30–60 dtk) · 20.00 thread (Threads).
+**Pola harian:** 07.00 video tips (2D, **21 dtk standar studio**) · 12.00 carousel · 19.30 video cerita (30–60 dtk) · 20.00 thread (Threads).
 Jam adalah usulan awal (WIB), nanti disesuaikan dengan data insight.
 
 **Narasi:** setiap video punya naskah VO di bawah. Waktu di kiri adalah target detik (tempo ±2,3 kata/detik, santai gua-lu). File `.srt` dengan timecode pasti dibuat saat video selesai dirender, supaya dubbing tinggal mengikuti.
 
 **Status media:** 🆕 = dibuat baru · ♻️ = video yang sudah ada, dirender ulang dengan label "BOKEK ANONIM" dan watermark.
+
+**Standar video tips (berlaku mulai H1, hasil QA H1):** 21 dtk = 6 adegan × 3,5 dtk @120 BPM (Hook · Bukti/data · Inti · Inti · Dampak · CTA). VO tiap adegan mulai 0,1–0,2 dtk setelah batas adegan: 0,2–3,3 · 3,6–6,9 · 7,1–10,3 · 10,6–13,8 · 14,1–17,3 · 17,6–20,6 (±45 kata). Wajib:
+- hook menampilkan **angka konkret di visual**, klimaks ≤ 2,5 dtk, kata kunci judul ikut bereaksi;
+- tidak ada jeda > 1 dtk (sisa adegan diisi chip rincian yang muncul satu per satu);
+- adegan Inti 1 dan Inti 2 dibedakan (arah masuk berlawanan, layout dicerminkan);
+- objek tidak melewati label; objek metafora terbaca tanpa teks;
+- caveat yang tidak muat di video masuk caption + komentar sematan.
+Detail & checklist QA: `.claude/skills/video-motion/references/standar-studio.md`. Caption 5 platform mengikuti pola `h1-video-tips-qa-caption.md` (kata kunci di kalimat pertama, rincian angka, ajakan komentar spesifik, disclaimer, 3–5 hashtag, alt text, judul YT).
 
 Hashtag dasar semua postingan: `#bokekanonim #keuanganpribadi` + 1–3 hashtag topik.
 
@@ -13,24 +21,25 @@ Hashtag dasar semua postingan: `#bokekanonim #keuanganpribadi` + 1–3 hashtag t
 
 ## H1 · Gaji 5 juta, kok tanggal 10 udah tipis? (Kebiasaan · FJ)
 
-### 07.00 · Video tips 🆕 — "Bagi gaji jadi 3 kantong" (±22 dtk)
-**Teks layar pembuka:** Gaji 5 juta? Bagi jadi 3 kantong.
-| Detik | Narasi |
-|---|---|
-| 0–3 | Gaji lima juta, tapi tanggal sepuluh udah tipis? Coba bagi jadi tiga kantong. |
-| 3–8 | Kantong satu, kebutuhan: dua setengah juta. Kos, makan, transport. |
-| 8–13 | Kantong dua, keinginan: satu setengah juta. Nongkrong, jajan, langganan. |
-| 13–19 | Kantong tiga, masa depan: satu juta. Pindahin duluan, begitu gaji masuk. |
-| 19–22 | Simpan, terus coba bulan depan. |
+### 07.00 · Video tips ✅ — "Bagi gaji jadi 3 kantong" (21 dtk · selesai, QA 57/70 → sudah diperbaiki)
+File: `explainer/h1-tiga-kantong/` (MP4, versi untuk VO, `narasi.srt`). Caption 5 platform: `h1-video-tips-qa-caption.md`.
+| # | Waktu | Narasi | Visual |
+|---|---|---|---|
+| 1 Hook | 0,2–3,3 | Gaji lima juta, tapi tanggal sepuluh udah tipis? | Label Rp5.000.000 menghitung turun saat uang terbang, kalender 1→10, stempel TIPIS + kata "tipis" bergetar di 2,5 dtk |
+| 2 Data | 3,6–6,9 | Pakai rumus lima puluh, tiga puluh, dua puluh. | Bar 50/30/20 menggambar diri, 3 karung kecil pop, sumber All Your Worth |
+| 3 Inti | 7,1–10,3 | Lima puluh persen buat kebutuhan: dua setengah juta. | Karung coral diisi koin, Rp2.500.000, ikon rumah/makan/bus, chip kos · makan · transport |
+| 4 Inti | 10,6–13,8 | Tiga puluh persen keinginan: satu setengah juta. | Masuk dari kiri, layout dicerminkan, karung ungu, chip nongkrong · jajan · langganan |
+| 5 Dampak | 14,1–17,3 | Dua puluh persen masa depan: satu juta. Pindahin duluan. | SEBELUM (nabung dari sisa = Rp0) dicoret → SESUDAH (nabung duluan = Rp1.000.000) ✓ |
+| 6 CTA | 17,6–20,6 | Simpan, terus coba gajian depan. | Logo, tombol Simpan → Tersimpan, sumber + "gaji = contoh" |
 
-**Caption:** Gaji numpang lewat? Coba 3 kantong ini: 50% kebutuhan, 30% keinginan, 20% masa depan. Yang 20% dipindah DULUAN, bukan nunggu sisa. Simpan biar inget pas gajian 👇 #bokekanonim #keuanganpribadi #aturgaji
+**Caption:** versi final per platform (IG, TikTok, YT Shorts, FB, Threads + alt text + komentar sematan) ada di `h1-video-tips-qa-caption.md`.
 
 ### 12.00 · Carousel 🆕 (7 slide)
 1. Gaji 5 juta, kok tanggal 10 udah tipis?
 2. Bukan karena gajinya kecil. Karena semua duit campur di satu tempat.
 3. Kantong 1 · Kebutuhan (50%) = Rp2,5 jt → kos, makan, transport, tagihan
 4. Kantong 2 · Keinginan (30%) = Rp1,5 jt → nongkrong, jajan, langganan
-5. Kantong 3 · Masa depan (20%) = Rp1 jt → tabungan & dana darurat
+5. Kantong 3 · Masa depan (20%) = Rp1 jt → tabungan, dana darurat, bayar utang (hitung dari **gaji bersih**)
 6. Kuncinya: kantong 3 dipindah **hari gajian**, bukan "nanti kalau sisa"
 7. Simpan & coba bulan depan. Gaji lu biasanya habis tanggal berapa?
 
@@ -109,14 +118,16 @@ Hashtag dasar semua postingan: `#bokekanonim #keuanganpribadi` + 1–3 hashtag t
 
 ## H3 · Kopi 25 ribu sehari itu… setahun berapa? (Kebiasaan · M, FJ)
 
-### 07.00 · Video tips 🆕 — "Hitung kebiasaan kecil lu" (±20 dtk)
-| Detik | Narasi |
-|---|---|
-| 0–3 | Kopi dua puluh lima ribu sehari. Kecil kan? |
-| 3–8 | Kali dua puluh dua hari kerja: lima ratus lima puluh ribu sebulan. |
-| 8–12 | Kali dua belas bulan: enam koma enam juta setahun. |
-| 12–17 | Bukan berarti stop ngopi. Tapi sadar, ini pilihan, bukan kebiasaan otomatis. |
-| 17–20 | Coba hitung kebiasaan kecil lu sendiri. |
+### 07.00 · Video tips 🆕 — "Hitung kebiasaan kecil lu" (21 dtk)
+**Angka:** [HITUNGAN] 25.000 × 22 hari kerja = 550.000/bln; × 12 = 6.600.000/thn. 3×/minggu = 156 gelas/thn = 3.900.000 → hemat 2.700.000. Harga kopi = [ANGKA CONTOH].
+| # | Waktu | Narasi | Visual |
+|---|---|---|---|
+| 1 Hook | 0,2–3,3 | Kopi dua puluh lima ribu sehari. Kecil, kan? | Gelas kopi + label Rp25.000 kecil; kata "Kecil" mengecil lalu "kan?" membesar di 2,5 dtk |
+| 2 Data | 3,6–6,9 | Kali dua puluh dua hari kerja: lima ratus lima puluh ribu. | Kalender kerja dicentang 22×, angka menghitung ke Rp550.000 |
+| 3 Inti | 7,1–10,3 | Kali dua belas bulan: enam koma enam juta. | Tumpukan gelas tumbuh jadi menara, Rp6.600.000, chip "per tahun" |
+| 4 Inti | 10,6–13,8 | Bukan berarti stop ngopi. Ini soal sadar. | Masuk dari kiri; gelas tersenyum, tanda ✗ "stop" diganti ✓ "sadar" |
+| 5 Dampak | 14,1–17,3 | Tiga kali seminggu aja, hemat dua koma tujuh juta. | Sebelum 264 gelas → sesudah 156 gelas, Rp2.700.000 masuk karung hijau ✓ |
+| 6 CTA | 17,6–20,6 | Hitung kebiasaan kecil lu. Simpan dulu. | Logo, tombol Simpan, "harga = contoh" |
 
 **Caption:** 25rb × 22 hari × 12 bulan = Rp6,6 jt. Bukan larangan ngopi ☕ — cuma biar sadar. Kebiasaan kecil apa yang mau lu hitung? #bokekanonim #keuanganpribadi
 
@@ -155,14 +166,15 @@ Hashtag dasar semua postingan: `#bokekanonim #keuanganpribadi` + 1–3 hashtag t
 
 > Sebelum tayang: cek nama dan alamat kanal resmi OJK untuk cek legalitas. Hindari klaim angka atau kasus yang belum diverifikasi.
 
-### 07.00 · Video tips 🆕 — "3 tanda pinjol ilegal" (±22 dtk)
-| Detik | Narasi |
-|---|---|
-| 0–3 | Ditawarin pinjaman cair lima menit tanpa syarat? Tahan dulu. |
-| 3–8 | Tanda satu: nawarin lewat SMS atau chat pribadi tanpa diminta. |
-| 8–13 | Tanda dua: minta akses kontak dan galeri HP lu. |
-| 13–18 | Tanda tiga: nggak jelas bunga dan dendanya. |
-| 18–22 | Cek dulu legalitasnya di kanal resmi OJK. |
+### 07.00 · Video tips 🆕 — "3 tanda pinjol ilegal" (21 dtk) ⚠️ cek nama kanal resmi OJK sebelum render
+| # | Waktu | Narasi | Visual |
+|---|---|---|---|
+| 1 Hook | 0,2–3,3 | Cair lima menit, tanpa syarat? Tahan dulu. | Notifikasi SMS "CAIR 5 MENIT" bergetar, tangan berhenti di atas tombol; kata "Tahan" membesar di 2,5 dtk |
+| 2 Data | 3,6–6,9 | Ada tiga tanda pinjol ilegal. Cek cepat. | Kaca pembesar + 3 kotak kosong bernomor |
+| 3 Inti | 7,1–10,3 | Satu: nawarin lewat SMS atau chat pribadi. | Gelembung SMS asing berdatangan, tanda ⚠️, chip "nggak diminta · nomor acak" |
+| 4 Inti | 10,6–13,8 | Dua: minta akses kontak dan galeri HP. | Masuk dari kiri; HP dengan izin Kontak/Galeri disorot merah, chip "kontak · galeri · lokasi" |
+| 5 Dampak | 14,1–17,3 | Tiga: bunga dan dendanya nggak jelas. | Kontrak dengan teks buram + tanda tanya; lalu perisai "cek legalitas" ✓ |
+| 6 CTA | 17,6–20,6 | Cek legalnya di OJK, kirim ke keluarga. | Logo, tombol Kirim, "edukasi, cek kanal resmi" |
 
 **Caption:** Cair 5 menit tanpa syarat? Tahan dulu. Cek 3 tanda ini, dan cek legalitasnya di kanal resmi OJK sebelum klik apa pun. Kirim ke grup keluarga 🙏 #bokekanonim #antipinjol
 
@@ -201,13 +213,16 @@ Hashtag dasar semua postingan: `#bokekanonim #keuanganpribadi` + 1–3 hashtag t
 
 ## H5 · Gaji naik, kok tetap pas-pasan? (Psikologi · PM, FJ)
 
-### 07.00 · Video tips 🆕 — "Aturan naik gaji" (±20 dtk)
-| Detik | Narasi |
-|---|---|
-| 0–3 | Gaji naik, tapi tetap pas-pasan? |
-| 3–9 | Itu lifestyle creep: tiap gaji naik, gaya hidup ikut naik, diam-diam. |
-| 9–15 | Aturannya: tiap naik gaji, naikin tabungan dulu. Misal setengah dari kenaikan. |
-| 15–20 | Sisanya baru buat upgrade hidup. Gaji naik, masa depan juga naik. |
+### 07.00 · Video tips 🆕 — "Aturan naik gaji" (21 dtk)
+**Angka:** [ANGKA CONTOH] naik Rp1 jt; aturan "setengah ke tabungan" = aturan praktis, bukan riset. [HITUNGAN] 500.000 × 12 = 6.000.000.
+| # | Waktu | Narasi | Visual |
+|---|---|---|---|
+| 1 Hook | 0,2–3,3 | Gaji naik, tapi tetap pas-pasan? | Slip gaji naik Rp5 jt → Rp6 jt, tapi saldo tetap tipis; kata "pas-pasan" bergetar |
+| 2 Data | 3,6–6,9 | Namanya lifestyle creep: gaya hidup ikut naik diam-diam. | Grafik dua garis (gaji & pengeluaran) naik bersamaan |
+| 3 Inti | 7,1–10,3 | Aturannya: tiap naik gaji, setengahnya ke tabungan dulu. | Kenaikan Rp1 jt dibelah dua, separuh meluncur ke karung hijau |
+| 4 Inti | 10,6–13,8 | Misal naik sejuta: lima ratus ribu ditabung. | Masuk dari kiri; Rp500.000 ke tabungan, Rp500.000 ke "upgrade", chip "otomatis · tanggal gajian" |
+| 5 Dampak | 14,1–17,3 | Setahun, tabungan nambah enam juta. | Kalender 12 bulan terisi, Rp6.000.000 ✓; hidup tetap upgrade |
+| 6 CTA | 17,6–20,6 | Simpan buat pas naik gaji nanti. | Logo, tombol Simpan, "angka = contoh" |
 
 **Caption:** Lifestyle creep = gaya hidup ikut naik tiap gaji naik. Aturan simpel: setengah kenaikan gaji langsung ke tabungan. #bokekanonim #psikologiuang
 
@@ -237,13 +252,15 @@ Narasi mengikuti caption video yang sudah ada (perumpamaan katak di air yang dip
 
 ## H6 · Checkout jam 2 pagi itu bukan lu, itu capek lu (Psikologi · M, FJ)
 
-### 07.00 · Video tips 🆕 — "Aturan 24 jam keranjang" (±18 dtk)
-| Detik | Narasi |
-|---|---|
-| 0–3 | Mau checkout jam dua pagi? |
-| 3–8 | Masukin keranjang aja. Jangan bayar. |
-| 8–14 | Besok siang, buka lagi. Kalau masih pengen dan duitnya ada, silakan. |
-| 14–18 | Kebanyakan, besoknya udah nggak pengen. |
+### 07.00 · Video tips 🆕 — "Aturan 24 jam keranjang" (21 dtk)
+| # | Waktu | Narasi | Visual |
+|---|---|---|---|
+| 1 Hook | 0,2–3,3 | Jam dua pagi, mau checkout? | Jam 02.00 berkedip, jempol di atas tombol Bayar Rp349.000; kata "checkout" bergetar di 2,5 dtk |
+| 2 Data | 3,6–6,9 | Pakai aturan dua puluh empat jam. | Jam pasir 24 jam membalik, jarum berputar |
+| 3 Inti | 7,1–10,3 | Masukin keranjang aja. Jangan bayar dulu. | Barang meluncur ke keranjang, tombol Bayar tergembok, chip "simpan · tutup app · tidur" |
+| 4 Inti | 10,6–13,8 | Besok siang, buka lagi. | Masuk dari kiri; matahari terbit, keranjang dibuka lagi |
+| 5 Dampak | 14,1–17,3 | Masih pengen dan duitnya ada? Silakan. Kalau nggak, hapus. | Dua cabang: ✓ beli dengan tenang / 🗑️ hapus, saldo tetap utuh |
+| 6 CTA | 17,6–20,6 | Simpan, coba malam ini. | Logo, tombol Simpan |
 
 **Caption:** Aturan 24 jam: malam masukin keranjang, besok siang baru putusin. Banyak yang batal sendiri 😆 #bokekanonim #belanjaimpulsif
 
@@ -280,13 +297,15 @@ Narasi mengikuti caption video yang sudah ada (perumpamaan katak di air yang dip
 
 ## H7 · Dari paylater kecil sampai gali lubang tutup lubang (Penipuan/utang · M, FJ)
 
-### 07.00 · Video tips 🆕 — "Tes 1 pertanyaan sebelum paylater" (±18 dtk)
-| Detik | Narasi |
-|---|---|
-| 0–3 | Mau pakai paylater? Tanya satu hal dulu. |
-| 3–8 | Kalau harus bayar lunas hari ini, gua sanggup nggak? |
-| 8–13 | Nggak sanggup? Berarti belum mampu beli. |
-| 13–18 | Rp0 hari ini bukan gratis. Cuma pindah ke bulan depan. |
+### 07.00 · Video tips 🆕 — "Tes 1 pertanyaan sebelum paylater" (21 dtk)
+| # | Waktu | Narasi | Visual |
+|---|---|---|---|
+| 1 Hook | 0,2–3,3 | Mau pakai paylater? Tanya satu hal dulu. | Tombol "Bayar Nanti Rp0" berkilau; tanda tanya besar jatuh di 2,5 dtk |
+| 2 Data | 3,6–6,9 | Kalau harus lunas hari ini, sanggup nggak? | Timbangan: harga barang vs saldo hari ini |
+| 3 Inti | 7,1–10,3 | Sanggup: paylater cuma alat bayar. | Timbangan seimbang ✓, chip "saldo cukup · tetap tercatat" |
+| 4 Inti | 10,6–13,8 | Nggak sanggup: berarti belum mampu beli. | Masuk dari kiri; timbangan jomplang ✗, barang kembali ke rak |
+| 5 Dampak | 14,1–17,3 | Nol hari ini, tagihannya bulan depan. | Rp0 berubah jadi tagihan bulan depan + label "denda kalau telat" |
+| 6 CTA | 17,6–20,6 | Simpan sebelum checkout berikutnya. | Logo, tombol Simpan |
 
 **Caption:** Satu pertanyaan sebelum paylater: sanggup bayar lunas hari ini? Kalau nggak, berarti belum mampu beli. #bokekanonim #paylater
 
