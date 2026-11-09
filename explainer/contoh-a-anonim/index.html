@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contoh A · Si Anonim</title>
+<style>
+  @font-face { font-family: Pop; src: url(fonts/poppins-600.woff2) format('woff2'); font-weight: 600; }
+  @font-face { font-family: Pop; src: url(fonts/poppins-800.woff2) format('woff2'); font-weight: 800; }
+  @font-face { font-family: Pop; src: url(fonts/poppins-900.woff2) format('woff2'); font-weight: 900; }
+  html, body { margin: 0; background: #1d1b26; }
+  body { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+  svg { height: 100vh; width: auto; aspect-ratio: 9 / 16; display: block; font-family: Pop, sans-serif; }
+  body.render { display: block; min-height: 0; }
+  body.render svg { width: 720px; height: 1280px; }
+</style>
+</head>
+<body>
+<svg id="v" viewBox="0 0 720 1280" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+/* Contoh A (jalur short): karakter bertulang "Si Anonim" + latar berlapis + kamera mengikuti + mood cahaya.
+   8 dtk. Semua dihitung dari t (deterministik). */
+const DURATION = 8; window.DURATION = DURATION;
+const INK = '#1d1b26', BAG = '#dcbb8c', BAGD = '#c49d68', HOOD = '#ef6f50', HOODD = '#c9553b', JEANS = '#2f3a5c', SKIN = '#f1c7a1', YEL = '#ffd84d';
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const eout = k => 1 - Math.pow(1 - k, 3);
+const back = k => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+const spr = (dt, z = .4, w = 16) => { if (dt <= 0) return 0; const wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * dt) * (Math.cos(wd * dt) + z / Math.sqrt(1 - z * z) * Math.sin(wd * dt)); };
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const f = n => (+n).toFixed(1);
+const R = d => d * Math.PI / 180;
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const txt = (x, y, s, o = {}) => `<text x="${f(x)}" y="${f(y)}" text-anchor="${o.anchor || 'middle'}" font-size="${o.size || 32}" font-weight="${o.weight || 800}" fill="${o.fill || INK}" letter-spacing="${o.ls || 0}" font-style="${o.italic ? 'italic' : 'normal'}">${esc(s)}</text>`;
+
+/* ---------- dunia & kamera ---------- */
+const WALK_END = 3.1, SPEED = 125, CS = 1.6; // CS = skala karakter
+const groundY = x => 1000 - .12 * x + Math.sin(x * .012) * 6;
+const ROCK_X = 120 + SPEED * WALK_END + 14;
+
+/* ---------- pose ---------- */
+// sudut tungkai dari arah bawah (positif = ke depan/kanan); torso positif = condong ke depan
+function walkPose(t) {
+  const p = t / .8 * Math.PI * 2;
+  const leg = ph => { const th = 26 * Math.sin(ph); const bend = 46 * Math.max(0, Math.sin(ph + 1.9)); return [th, th - bend]; };
+  const arm = ph => { const u = -22 * Math.sin(ph); return [u, u + 18 + 8 * Math.max(0, -Math.sin(ph))]; };
+  return { dx: 0, dy: -6 * Math.abs(Math.cos(p)), torso: 9 + 2 * Math.sin(2 * p), head: -4 + 3 * Math.sin(2 * p - .6),
+    ll: leg(p), rl: leg(p + Math.PI), la: arm(p + Math.PI), ra: arm(p), face: 'smile' };
+}
+const K = {
+  TRIP:  { dx: 34, dy: -10, torso: 50, head: 12, la: [115, 135], ra: [140, 165], ll: [32, 12], rl: [-55, -105], face: 'wow' },
+  AIR:   { dx: 58, dy: -34, torso: -26, head: -14, la: [168, 150], ra: [-165, -140], ll: [72, 40], rl: [96, 64], face: 'wow' },
+  SIT:   { dx: 66, dy: 86, torso: -8, head: -4, la: [-32, -12], ra: [-26, -6], ll: [86, 12], rl: [80, 24], face: 'wow' },
+  SLUMP: { dx: 66, dy: 86, torso: 24, head: 30, la: [48, 96], ra: [40, 102], ll: [86, 22], rl: [76, 32], face: 'sad' },
+  PUSH:  { dx: 66, dy: 56, torso: 42, head: 16, la: [-8, 0], ra: [6, 6], ll: [62, -30], rl: [42, -42], face: 'ok' },
+  STAND: { dx: 66, dy: 0, torso: 4, head: -2, la: [-8, 12], ra: [10, 26], ll: [2, 0], rl: [-4, -2], face: 'ok' },
+  CHEER: { dx: 66, dy: -4, torso: -4, head: -10, la: [-38, -110], ra: [138, 165], ll: [6, 0], rl: [-8, -4], face: 'smile' },
+};
+const mixP = (A, B, k) => { const o = {}; for (const key in A) o[key] = key === 'face' ? (k < .5 ? A.face : B.face) : Array.isArray(A[key]) ? A[key].map((v, i) => lerp(v, B[key][i], k)) : lerp(A[key], B[key], k); return o; };
+const SEQ = [ // [mulai, selesai, pose tujuan, easing]
+  [WALK_END, 3.4, 'TRIP', eout], [3.4, 3.75, 'AIR', eio], [3.75, 3.86, 'SIT', k => k], [3.95, 4.5, 'SLUMP', eio],
+  [5.6, 5.95, 'PUSH', eio], [5.95, 6.4, 'STAND', back], [6.75, 7.1, 'CHEER', back],
+];
+function poseAt(t) {
+  let P = walkPose(Math.min(t, WALK_END));
+  for (const [a, b, name, ez] of SEQ) if (t > a) P = mixP(P, K[name], ez(prog(t, a, b)));
+  // gerak sekunder per fase
+  if (t > 4.5 && t < 5.6) { const br = Math.sin((t - 4.5) * 3.2); P.torso += br * 2.5; P.head += br * 3; if (t > 4.6 && t < 5.1) P.dy -= Math.sin(prog(t, 4.6, 5.1) * Math.PI) * 6; }
+  if (t > 6.4 && t < 6.75) { const w = Math.sin((t - 6.4) * 40); P.ra = [32 + w * 10, 100 + w * 25]; P.face = 'ok'; }
+  if (t > 7.1) { P.ra = [P.ra[0] + Math.sin(t * 9) * 4, P.ra[1] + Math.sin(t * 9 - .5) * 6]; }
+  return P;
+}
+
+/* ---------- gambar karakter (rubber-hose: tungkai melengkung halus) ---------- */
+function limb(ax, ay, a1, l1, a2, l2, w, col) {
+  const bx = ax + Math.sin(R(a1)) * l1, by = ay + Math.cos(R(a1)) * l1;
+  const cx = bx + Math.sin(R(a2)) * l2, cy = by + Math.cos(R(a2)) * l2;
+  const d = `M${f(ax)} ${f(ay)} Q${f(bx)} ${f(by)} ${f(cx)} ${f(cy)}`;
+  return { svg: `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w + 8}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`, end: [cx, cy], a2 };
+}
+function face(kind, t) {
+  const blink = (t % 2.6) > 2.45 ? .15 : 1;
+  let s = `<ellipse cx="-15" cy="6" rx="5" ry="${f(6 * blink)}" fill="${INK}"/><ellipse cx="17" cy="6" rx="5" ry="${f(6 * blink)}" fill="${INK}"/>`;
+  if (kind === 'smile') s += `<path d="M-14 24 q16 14 32 0" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/>`;
+  if (kind === 'ok') s += `<path d="M-10 26 q11 6 22 0" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/>`;
+  if (kind === 'sad') s += `<path d="M-10 30 q11 -8 22 0" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/><path d="M-22 -4 l12 4 M26 -4 l-12 4" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`;
+  if (kind === 'wow') s += `<ellipse cx="2" cy="28" rx="8" ry="10" fill="${INK}"/>`;
+  return s;
+}
+function character(t, P, sx, gy, sq = 0) {
+  const hx = sx, hy = gy - 128 + P.dy;
+  const tA = R(P.torso), up = [Math.sin(tA), -Math.cos(tA)], side = [Math.cos(tA), Math.sin(tA)];
+  const sh = [hx + up[0] * 92, hy + up[1] * 92], neck = [hx + up[0] * 100, hy + up[1] * 100];
+  const leg = (L, off) => limb(hx + side[0] * off, hy + side[1] * off, L[0], 62, L[1], 60, 20, JEANS);
+  const arm = (A, off) => limb(sh[0] + side[0] * off, sh[1] + side[1] * off, A[0] + P.torso * .3, 50, A[1] + P.torso * .3, 46, 17, HOOD);
+  const shoe = (lg, dark) => { const [x, y] = lg.end; const a = lg.a2; return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(-a * .5)})"><path d="M-10 -6 h20 q14 0 16 10 v4 h-38 z" fill="${dark ? '#d9d4ca' : '#fffdf6'}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></g>`; };
+  const hand = (am) => `<circle cx="${f(am.end[0])}" cy="${f(am.end[1])}" r="9" fill="${SKIN}" stroke="${INK}" stroke-width="4"/>`;
+  const lb = leg(P.rl, -6), lf = leg(P.ll, 8), ab = arm(P.la, -20), af = arm(P.ra, 22);
+  let s = `<g transform="translate(${f(hx)} ${f(gy)}) scale(${f(CS * (1 + sq * .12))} ${f(CS * (1 - sq * .12))}) translate(${f(-hx)} ${f(-gy)})">`;
+  s += `<ellipse cx="${f(hx + 6)}" cy="${f(gy + 4)}" rx="${f(70 - Math.max(0, -P.dy) * .5)}" ry="12" fill="${INK}" opacity=".18"/>`;
+  s += ab.svg + hand(ab) + lb.svg + shoe(lb, true);
+  // badan hoodie
+  const tw = 34, bw = 30, p1 = [sh[0] - side[0] * tw, sh[1] - side[1] * tw], p2 = [sh[0] + side[0] * tw, sh[1] + side[1] * tw];
+  const p3 = [hx + side[0] * bw, hy + side[1] * bw], p4 = [hx - side[0] * bw, hy - side[1] * bw];
+  s += `<path d="M${f(p1[0])} ${f(p1[1])} Q${f(neck[0])} ${f(neck[1] - 4)} ${f(p2[0])} ${f(p2[1])} L${f(p3[0])} ${f(p3[1])} Q${f(hx)} ${f(hy + 10)} ${f(p4[0])} ${f(p4[1])} Z" fill="${HOOD}" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>`;
+  const pk = (k, o) => [hx + up[0] * k + side[0] * o, hy + up[1] * k + side[1] * o];
+  const a1 = pk(18, -18), a2 = pk(18, 18), a3 = pk(40, 14), a4 = pk(40, -14);
+  s += `<path d="M${f(a1[0])} ${f(a1[1])} L${f(a2[0])} ${f(a2[1])} L${f(a3[0])} ${f(a3[1])} L${f(a4[0])} ${f(a4[1])} Z" fill="${HOODD}" stroke="${INK}" stroke-width="3" opacity=".9"/>`;
+  s += lf.svg + shoe(lf, false);
+  // kepala kantong kertas (ikut torso, sedikit tertinggal; tepi atas berkerut bergoyang)
+  const hA = P.torso + P.head, wob = Math.sin(t * 11) * 2.2;
+  let zig = 'M-44 -96 '; for (let i = 0; i <= 8; i++) zig += `L${-44 + i * 11} ${f(-96 - (i % 2 ? 9 : 0) + (i % 2 ? wob : -wob * .5))} `;
+  s += `<g transform="translate(${f(neck[0])} ${f(neck[1])}) rotate(${f(hA)})">
+    <path d="${zig} L44 -4 Q0 6 -44 -4 Z" fill="${BAG}" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M26 -92 L30 -6" stroke="${BAGD}" stroke-width="6" opacity=".8"/><path d="M-44 -80 h88" stroke="${BAGD}" stroke-width="4" opacity=".7"/>
+    <g transform="translate(-2 -46)">${face(P.face, t)}</g></g>`;
+  s += af.svg + hand(af);
+  return s + '</g>';
+}
+
+/* ---------- latar berlapis ---------- */
+function cloud(x, y, s) { return `<g transform="translate(${f(x)} ${f(y)}) scale(${s})"><path d="M-80 20 q-10 -40 30 -40 q10 -36 50 -26 q30 -20 56 10 q40 0 34 40 z" fill="#fffaf0" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" opacity=".95"/></g>`; }
+function rock(x, y, s, i, label) {
+  const w = 60 * s, h = 40 * s;
+  return `<g transform="translate(${f(x)} ${f(y)})"><path d="M${-w} 0 Q${-w * .9} ${-h} ${-w * .2} ${-h * 1.1} Q${w * .6} ${-h * 1.2} ${w} ${-h * .2} L${w} 0 Z" fill="${i % 2 ? '#a3a8a6' : '#b4b6ae'}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><path d="M${-w * .4} ${-h * .7} q${w * .3} ${-h * .2} ${w * .5} 0" fill="none" stroke="#ffffff" stroke-width="4" opacity=".5" stroke-linecap="round"/>${label ? txt(0, -h * .32, label, { size: 22, weight: 900, ls: 1 }) : ''}</g>`;
+}
+function scene(t, cam) {
+  let s = `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc6e6"/><stop offset=".55" stop-color="#cfe9ef"/><stop offset="1" stop-color="#fbeed6"/></linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .08  0 0 0 0 .05  0 0 0 .09 0"/></filter></defs>`;
+  s += `<rect x="-40" y="-40" width="800" height="1360" fill="url(#sky)"/>`;
+  s += `<circle cx="${f(560 - cam * .02)}" cy="250" r="64" fill="#fff3c4" opacity=".9"/><circle cx="${f(560 - cam * .02)}" cy="250" r="44" fill="#ffe08a"/>`;
+  [[120, 180, 1.0], [520, 120, .8], [820, 330, .9], [1100, 200, .7]].forEach(([x, y, sc], i) => s += cloud(((x - cam * .1 + t * (6 + i * 2)) % 1100) - 120, y, sc));
+  // gunung jauh
+  let m = 'M-40 760 '; for (let x = -40; x <= 780; x += 40) m += `L${x} ${f(700 - 90 * Math.abs(Math.sin((x + cam * .15) * .006)) - 40 * Math.sin((x + cam * .15) * .017))} `;
+  s += `<path d="${m} L780 1300 L-40 1300 Z" fill="#a9c3b4" stroke="${INK}" stroke-width="3" opacity=".9"/>`;
+  // bukit tengah + jalan berkelok ke bendera
+  const mx = -cam * .4;
+  s += `<path d="M${f(-200 + mx)} 900 Q${f(250 + mx)} 520 ${f(700 + mx)} 640 Q${f(1000 + mx)} 700 ${f(1300 + mx)} 900 L${f(1300 + mx)} 1300 L${f(-200 + mx)} 1300 Z" fill="#8fc27a" stroke="${INK}" stroke-width="3.5"/>`;
+  s += `<path d="M${f(620 + mx)} 660 q-60 40 -10 70 q60 30 -40 70 q-90 40 -20 100" fill="none" stroke="#e3c999" stroke-width="16" stroke-linecap="round" opacity=".9"/>`;
+  s += `<g transform="translate(${f(640 + mx)} 646)"><path d="M0 0 V-62" stroke="${INK}" stroke-width="4"/><path d="M0 -62 l${f(34 + Math.sin(t * 6) * 4)} 10 l${f(-34 - Math.sin(t * 6) * 4)} 12 z" fill="${YEL}" stroke="${INK}" stroke-width="3"/></g>`;
+  // tanah depan mengikuti garis tanah dunia
+  let g = `M-40 1300 `; for (let x = -40; x <= 780; x += 20) g += `L${x} ${f(groundY(x + cam) - 30)} `;
+  s += `<path d="${g} L780 1300 Z" fill="#74b25e" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`;
+  let p = ''; for (let x = -40; x <= 780; x += 20) p += `${x === -40 ? 'M' : 'L'}${x} ${f(groundY(x + cam) - 14)} `;
+  s += `<path d="${p}" fill="none" stroke="#e1c08c" stroke-width="44" stroke-linecap="round"/><path d="${p}" fill="none" stroke="#cfa972" stroke-width="4" stroke-dasharray="3 26" stroke-linecap="round"/>`;
+  // batu & rumput di dunia
+  for (let i = 0; i < 9; i++) { const wx = 60 + i * 170 + rnd(i) * 60, x = wx - cam; if (x < -80 || x > 800 || Math.abs(wx - ROCK_X) < 120) continue; s += rock(x, groundY(wx) + 70 + rnd(i + 3) * 120, .7 + rnd(i + 7) * .5, i); }
+  s += rock(ROCK_X - cam, groundY(ROCK_X) - 4, 1.15, 1, 'TAGIHAN');
+  for (let i = 0; i < 40; i++) { const wx = i * 34 + rnd(i + 11) * 20, x = wx - cam, y = groundY(wx) + 60 + rnd(i + 5) * 160; if (x < -20 || x > 740) continue; const sw = Math.sin(t * 2.2 + i) * 5; s += `<path d="M${f(x)} ${f(y)} q${f(-4 + sw)} -16 ${f(-8 + sw * 1.5)} -26 M${f(x)} ${f(y)} q${f(4 + sw)} -18 ${f(2 + sw * 1.5)} -30 M${f(x)} ${f(y)} q${f(8 + sw)} -12 ${f(14 + sw * 1.5)} -20" fill="none" stroke="#3f7d3a" stroke-width="3.5" stroke-linecap="round"/>`; }
+  return s;
+}
+function foreground(t, cam) { // rumput besar paling depan, parallax lebih cepat
+  let s = '';
+  for (let i = 0; i < 9; i++) { const x = ((i * 130 - cam * 1.35) % 1170 + 1170) % 1170 - 120, sw = Math.sin(t * 1.8 + i) * 8; s += `<path d="M${f(x)} 1300 q${f(10 + sw)} -90 ${f(30 + sw * 2)} -150 q${f(-6)} 70 ${f(10)} 150 z M${f(x + 30)} 1300 q${f(-6 + sw)} -70 ${f(-30 + sw * 2)} -110 q${f(26)} 50 ${f(44)} 110 z" fill="#2f6a33" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`; }
+  return s;
+}
+
+/* ---------- efek: debu, koin, mood, caption ---------- */
+function dust(t, x, y, t0) {
+  const k = prog(t, t0, t0 + .6); if (k <= 0 || k >= 1) return '';
+  let s = ''; for (let i = 0; i < 10; i++) { const a = Math.PI * (1.05 + i * .09), r = eout(k) * (60 + rnd(i) * 70); s += `<circle cx="${f(x + Math.cos(a) * r * 1.3)}" cy="${f(y + Math.sin(a) * r * .35)}" r="${f((1 - k) * (8 + rnd(i + 2) * 8))}" fill="#e7d3ad" stroke="${INK}" stroke-width="2.5" opacity=".9"/>`; }
+  return s;
+}
+function coins(t, x, y) {
+  let s = '';
+  [[-90, 130, 3.8], [40, 170, 3.86], [120, 120, 3.92]].forEach(([dx, h, t0], i) => {
+    const k = prog(t, t0, t0 + .55); if (k <= 0) return;
+    const cx = x + dx * eout(k), cy = y - Math.sin(k * Math.PI) * h + k * 30, sq = k >= 1 ? 1 - Math.max(0, .2 - (t - t0 - .55)) : 1;
+    s += `<g transform="translate(${f(cx)} ${f(cy)}) rotate(${f(k * 360 * (i % 2 ? 1 : -1))}) scale(1 ${f(sq)})"><circle r="15" fill="${YEL}" stroke="${INK}" stroke-width="3.5"/>${txt(0, 5, 'Rp', { size: 11, weight: 900 })}</g>`;
+  });
+  return s;
+}
+function mood(t) { // redup kebiruan saat sedih, hangat keemasan saat bangkit
+  const dim = prog(t, 3.9, 4.5) * (1 - prog(t, 5.5, 6.2)), warm = prog(t, 5.6, 6.4);
+  return `<rect x="-40" y="-40" width="800" height="1360" fill="#1b2a4a" opacity="${f(dim * .42)}"/><rect x="-40" y="-40" width="800" height="1360" fill="#ffb84d" opacity="${f(warm * .16)}" style="mix-blend-mode:multiply"/>`
+    + (warm > 0 ? `<defs><radialGradient id="glow"><stop offset="0" stop-color="#fff1b8" stop-opacity=".7"/><stop offset="1" stop-color="#fff1b8" stop-opacity="0"/></radialGradient></defs><circle cx="560" cy="250" r="420" fill="url(#glow)" opacity="${f(warm)}"/>` : '');
+}
+const CAPS = [[.2, 3.0, 'Udah semangat nabung dari awal bulan...'], [3.1, 3.9, 'eh, kesandung tagihan.'], [3.95, 5.5, 'Rasanya pengen nyerah, ya?'], [5.55, 7.35, 'Nggak apa-apa. Bangkit, mulai lagi.']];
+const _cv = document.createElement('canvas').getContext('2d');
+function caption(t) {
+  const c = CAPS.find(([a, b]) => t >= a && t < b); if (!c) return '';
+  const [a, b, s] = c, k = spr(t - a, .5, 18), out = prog(t, b - .15, b);
+  _cv.font = '800 30px Pop'; const w = _cv.measureText(s).width + 44;
+  return `<g transform="translate(360 ${f(1150 + (1 - k) * 30)})" opacity="${f(clamp(k * 1.5) * (1 - out))}"><rect x="${f(-w / 2)}" y="-30" width="${f(w)}" height="58" rx="14" fill="#fffaf0" stroke="${INK}" stroke-width="4"/>${txt(0, 10, s, { size: 30 })}</g>`;
+}
+function endCard(t) {
+  const k = prog(t, 7.3, 7.55); if (k <= 0) return '';
+  let s = `<rect x="-40" y="-40" width="800" height="1360" fill="${INK}" opacity="${f(k)}"/>`;
+  const a = spr(t - 7.45, .45, 18), b = spr(t - 7.62, .5, 18);
+  s += `<g opacity="${f(clamp(a * 2))}" transform="translate(360 ${f(600 + (1 - a) * 40)})">${txt(0, 0, 'pelan-pelan juga', { size: 44, fill: '#fffaf0', italic: true, weight: 600 })}</g>`;
+  s += `<g transform="translate(360 700) scale(${f(Math.min(b, 1.08))})">${txt(0, 0, 'TETAP JALAN', { size: 80, fill: YEL, weight: 900 })}</g>`;
+  return s;
+}
+
+/* ---------- komposisi ---------- */
+const svg = document.getElementById('v');
+function renderAt(t) {
+  const P = poseAt(t);
+  const wx = 120 + SPEED * Math.min(t, WALK_END) + P.dx;
+  const camWalk = 120 + SPEED * Math.min(t, WALK_END) - 290;
+  const cam = lerp(camWalk, 120 + SPEED * WALK_END + 66 - 360, eio(prog(t, WALK_END, 4.6)));
+  const sx = wx - cam, gy = groundY(wx) - 14;
+  // kamera: push-in saat sedih, lepas saat bangkit, guncangan saat jatuh
+  const zoom = 1 + .1 * eio(prog(t, 3.95, 5.2)) * (1 - eio(prog(t, 5.6, 6.6))) + .02 * prog(t, 0, 3);
+  const fr = (t - 3.82) * 30, shk = fr >= 0 && fr < 14 ? Math.sin(fr * 2.4) * (14 - fr) / 14 * 12 : 0;
+  const land = Math.max(0, 1 - Math.abs(t - 3.84) / .12), hop = t > 6.4 && t < 6.75 ? 0 : 0;
+  const focusY = gy - 190;
+  const camT = `translate(${f(shk)} ${f(shk * .5)}) translate(${f(sx)} ${f(focusY)}) scale(${f(zoom)}) translate(${f(-sx)} ${f(-focusY)})`;
+  let s = `<g transform="${camT}">` + scene(t, cam) + dust(t, sx, gy, 3.82) + character(t, P, sx, gy, land + hop) + coins(t, sx, gy - 90) + foreground(t, cam) + '</g>';
+  s += mood(t) + `<rect x="-40" y="-40" width="800" height="1360" filter="url(#grain)"/>` + caption(t) + endCard(t);
+  svg.innerHTML = s;
+}
+window.renderAt = renderAt;
+
+/* ---------- audio dari timeline ---------- */
+(() => {
+  const E = [], add = (t, type, o = {}) => E.push({ t: +t.toFixed(3), type, ...o });
+  for (let x = .2; x < WALK_END; x += .4) add(x, 'tick', { gain: .5, pan: -.2 });
+  add(3.1, 'swipe', { gain: .6 }); add(3.35, 'whoosh', { d: .45, gain: .7 });
+  add(3.82, 'impact', { gain: .8 }); add(3.82, 'thud', { gain: .8 });
+  [3.8, 3.86, 3.92].forEach(t0 => add(t0 + .55, 'coin', { gain: .45 }));
+  add(4.6, 'rise', { d: .6, f0: 500, f1: 260, gain: .5 });
+  add(5.0, 'riser', { d: .9, gain: .4 });
+  add(5.95, 'pop', { gain: .7 }); add(6.4, 'tick', { gain: .6 }); add(6.5, 'tick', { gain: .6 }); add(6.6, 'tick', { gain: .6 });
+  add(6.85, 'sparkle', { gain: .7 }); add(6.85, 'bell', { f: 1568, gain: .4 });
+  add(7.3, 'whoosh', { d: .4, gain: .6 }); add(7.62, 'impact', { gain: .7 }); add(7.62, 'clap', { gain: .7 });
+  window.AUDIO_EVENTS = E;
+})();
+window.MUSIC = { engine: 'studio', bpm: 110, bars: ['F', 'C', 'Dm', 'Bb'], breaks: [[3.9, 5.6]], build: [5.2, 5.6], final: 7.6, final_chord: 'F', arp_from: 0, hat_from: .5, clap_from: 1, volume: 1, sfxGain: 1, lufs: -14 };
+
+window.READY = Promise.all([600, 800, 900].map(w => document.fonts.load(`${w} 40px Pop`)));
+if (new URLSearchParams(location.search).has('render')) document.body.classList.add('render');
+else window.READY.then(() => { const st = performance.now(); const loop = () => { renderAt(((performance.now() - st) / 1000) % DURATION); requestAnimationFrame(loop); }; requestAnimationFrame(loop); });
+</script>
+</body>
+</html>

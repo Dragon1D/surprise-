@@ -101,7 +101,7 @@ function serve() {
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error',
     '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', '-i', wav,
     '-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p',
-    '-af', `loudnorm=I=${LUFS}:TP=-1.5:LRA=11`, '-c:a', 'aac', '-b:a', '160k', '-ar', '44100',
+    '-af', `loudnorm=I=${LUFS}:TP=-2:LRA=11,alimiter=limit=0.79:level=false,aresample=44100`, '-c:a', 'aac', '-b:a', '160k', '-ar', '44100',
     '-shortest', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
   const t0 = Date.now();
   for (let i = 0; i < frames; i++) {
