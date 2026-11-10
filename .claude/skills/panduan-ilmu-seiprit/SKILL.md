@@ -16,7 +16,7 @@ Akun kedua Deny, terpisah dari Bokek Anonim. **Bukan** konten finansial.
 - Nama: **Ilmu Seiprit** · handle `@ilmuseiprit` · tagline **"Dikit, tapi nempel."**
 - "Seiprit" = sedikit banget. Jangan ditulis "siprit" (terbaca "spirit").
 - Palet: teal `#0f4c5c`, limau `#d7f75b`, krem `#f6f7f2`, tinta `#14232a`, aksen pink `#ff7aa2`. Font Poppins (aset di skill video-motion).
-- Logo/maskot: konsep di `ilmu-seiprit/profil/logo/` (menunggu pilihan Deny; kandidat: Iprit si otak mungil, "i" percik, catatan tempel).
+- Logo/maskot: **Iprit**, otak mungil hijau limau (dipilih Deny 2026-11-10). Ekspresi: senyum, kaget, mikir, ngeh (mata bintang). Sumber vektor: `ilmu-seiprit/profil/logo/paket.html` (fungsi `iprit(expr)`, bisa disalin ke halaman video). Aset jadi: `ilmu-seiprit/profil/logo/final/` + `ilmu-seiprit-logo.zip`. Pola video: Iprit kaget/mikir di hook → ngeh di "pantesan".
 - Bio semua platform: `ilmu-seiprit/profil/bio.md`.
 
 ## Angle
