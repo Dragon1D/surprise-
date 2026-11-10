@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Ilmu Seiprit · konsep logo</title>
+<style>
+  @font-face { font-family: Pop; src: url(../../../explainer/contoh-a-anonim/fonts/poppins-600.woff2) format('woff2'); font-weight: 600; }
+  @font-face { font-family: Pop; src: url(../../../explainer/contoh-a-anonim/fonts/poppins-800.woff2) format('woff2'); font-weight: 800; }
+  @font-face { font-family: Pop; src: url(../../../explainer/contoh-a-anonim/fonts/poppins-900.woff2) format('woff2'); font-weight: 900; }
+  body { margin: 0; background: #f6f7f2; font-family: Pop, sans-serif; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<svg id="v" xmlns="http://www.w3.org/2000/svg" width="1600" height="1180" viewBox="0 0 1600 1180"></svg>
+<script>
+/* Palet Ilmu Seiprit */
+const P = { teal: '#0f4c5c', tealD: '#0a3540', lime: '#d7f75b', limeD: '#b5d93a', cream: '#f6f7f2', ink: '#14232a', pink: '#ff7aa2', white: '#ffffff' };
+const OUT = `stroke="${P.ink}" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"`;
+const star = (r, fill = P.lime, sw = 12) => { let d = ''; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, rr = i % 2 ? r * .42 : r; d += `${i ? 'L' : 'M'}${(Math.cos(a) * rr).toFixed(1)} ${(Math.sin(a) * rr).toFixed(1)} `; } return `<path d="${d}Z" fill="${fill}" stroke="${P.ink}" stroke-width="${sw}" stroke-linejoin="round"/>`; };
+
+// 1. JEPIT: gestur "seiprit" (jempol & telunjuk hampir menempel) menjepit percikan kecil
+const L1 = `<circle cx="256" cy="256" r="256" fill="${P.teal}"/>
+  <path d="M120 360 C110 300 150 250 214 238 L300 222 C326 217 338 248 316 262 L246 300" fill="${P.cream}" ${OUT}/>
+  <path d="M150 392 C190 330 250 300 300 292 L372 282 C398 279 404 312 380 320 L300 344 C280 352 270 372 250 392 Z" fill="${P.cream}" ${OUT}/>
+  <path d="M300 222 C340 214 372 200 384 186" fill="none" ${OUT}/>
+  <g transform="translate(372 236)">${star(34)}</g>
+  <circle cx="420" cy="180" r="9" fill="${P.lime}"/><circle cx="410" cy="300" r="6" fill="${P.lime}"/>`;
+
+// 2. IPRIT: maskot otak mungil yang lagi "ngeh"
+const L2 = `<circle cx="256" cy="256" r="256" fill="${P.teal}"/>
+  <path d="M130 300 C110 220 160 150 240 146 C290 120 360 140 380 196 C420 220 410 300 372 318 C350 370 170 372 130 300 Z" fill="${P.lime}" ${OUT}/>
+  <path d="M200 170 q-10 40 22 54 M268 150 q-16 46 14 70 M330 180 q-28 30 -6 64 M170 236 q30 4 40 -18" fill="none" stroke="${P.limeD}" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="222" cy="276" r="26" fill="${P.white}" stroke="${P.ink}" stroke-width="10"/><circle cx="304" cy="276" r="26" fill="${P.white}" stroke="${P.ink}" stroke-width="10"/>
+  <circle cx="228" cy="280" r="11" fill="${P.ink}"/><circle cx="310" cy="280" r="11" fill="${P.ink}"/>
+  <path d="M244 322 q20 16 40 0" fill="none" stroke="${P.ink}" stroke-width="10" stroke-linecap="round"/>
+  <g transform="translate(398 128) rotate(12)">${star(40, P.white)}</g>`;
+
+// 3. "i" PERCIK: huruf i kecil, titiknya percikan ide
+const L3 = `<circle cx="256" cy="256" r="256" fill="${P.teal}"/>
+  <rect x="210" y="226" width="92" height="196" rx="46" fill="${P.cream}" ${OUT}/>
+  <g transform="translate(256 150) rotate(-8)">${star(78, P.lime, 14)}</g>
+  <circle cx="356" cy="96" r="12" fill="${P.lime}"/><circle cx="150" cy="120" r="9" fill="${P.lime}"/>`;
+
+// 4. NEMPEL: catatan tempel mungil berisi percikan, menempel miring
+const L4 = `<circle cx="256" cy="256" r="256" fill="${P.teal}"/>
+  <g transform="translate(256 270) rotate(-8)"><rect x="-130" y="-130" width="260" height="260" rx="20" fill="${P.lime}" ${OUT}/>
+  <path d="M130 70 L70 130 L130 130 Z" fill="${P.limeD}" stroke="${P.ink}" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="-60" y="-158" width="120" height="48" rx="8" fill="${P.cream}" stroke="${P.ink}" stroke-width="10" opacity=".95"/>
+  <g transform="translate(-6 0)">${star(62, P.white)}</g></g>`;
+
+const opts = [['1 · Jepit', 'gestur "seiprit": jempol & telunjuk menjepit percikan ilmu', L1], ['2 · Iprit', 'maskot otak mungil yang lagi "ngeh"', L2], ['3 · i Percik', 'huruf i, titiknya percikan ide', L3], ['4 · Nempel', 'catatan tempel = ilmu yang nempel', L4]];
+let s = `<rect width="1600" height="1180" fill="${P.cream}"/>`;
+s += `<text x="60" y="80" font-size="46" font-weight="900" fill="${P.ink}">Ilmu Seiprit · konsep logo</text><text x="60" y="122" font-size="24" font-weight="600" fill="#5c6b70">Palet: teal ${P.teal} · limau ${P.lime} · krem ${P.cream} · tinta ${P.ink}</text>`;
+opts.forEach(([name, desc, svg], i) => {
+  const x = 60 + i * 385;
+  s += `<g transform="translate(${x} 170)"><svg width="340" height="340" viewBox="0 0 512 512"><defs><clipPath id="c${i}"><circle cx="256" cy="256" r="256"/></clipPath></defs><g clip-path="url(#c${i})">${svg}</g></svg>`;
+  // uji ukuran avatar kecil
+  [[110, 380], [56, 500], [32, 566]].forEach(([w, y], k) => s += `<svg x="${k === 0 ? 0 : 130}" y="${k === 0 ? 380 : y - 140}" width="${w}" height="${w}" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg>`);
+  s += `<text x="0" y="540" font-size="30" font-weight="900" fill="${P.ink}">${name}</text><foreignObject x="0" y="556" width="340" height="80"><div xmlns="http://www.w3.org/1999/xhtml" style="font:600 20px Pop;color:#5c6b70">${desc}</div></foreignObject>`;
+  s += `</g>`;
+});
+// lockup horizontal (contoh pakai konsep 1)
+s += `<g transform="translate(60 860)"><rect width="1480" height="260" rx="30" fill="${P.teal}"/>`;
+opts.forEach(([n, d, svg], i) => { s += `<svg x="${40 + i * 365}" y="40" width="90" height="90" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg><text x="${145 + i * 365}" y="92" font-size="38" font-weight="900" fill="${P.cream}">Ilmu Seiprit</text><text x="${145 + i * 365}" y="124" font-size="20" font-weight="600" fill="${P.lime}">Dikit, tapi nempel.</text>`; });
+s += `<text x="40" y="210" font-size="22" font-weight="600" fill="${P.cream}" opacity=".8">Contoh lockup (logo + nama + tagline) untuk banner / sampul</text></g>`;
+document.getElementById('v').innerHTML = s;
+window.READY = Promise.all([600, 800, 900].map(w => document.fonts.load(`${w} 40px Pop`)));
+</script>
+</body>
+</html>
