@@ -16,7 +16,7 @@ Akun kedua Deny, terpisah dari Bokek Anonim. **Bukan** konten finansial.
 - Nama: **Ilmu Seiprit** · handle `@ilmuseiprit` · tagline **"Dikit, tapi nempel."**
 - "Seiprit" = sedikit banget. Jangan ditulis "siprit" (terbaca "spirit").
 - Palet: teal `#0f4c5c`, limau `#d7f75b`, krem `#f6f7f2`, tinta `#14232a`, aksen pink `#ff7aa2`. Font Poppins (aset di skill video-motion).
-- Logo/maskot: **Iprit**, otak mungil hijau limau (dipilih Deny 2026-11-10). Ekspresi: senyum, kaget, mikir, ngeh (mata bintang). Sumber vektor: `ilmu-seiprit/profil/logo/paket.html` (fungsi `iprit(expr)`, bisa disalin ke halaman video). Aset jadi: `ilmu-seiprit/profil/logo/final/` + `ilmu-seiprit-logo.zip`. Pola video: Iprit kaget/mikir di hook → ngeh di "pantesan".
+- Logo/maskot: **Kai**, otak mungil hijau limau (dipilih Deny 2026-11-10). Ekspresi: senyum, kaget, mikir, ngeh (mata bintang). Sumber vektor: `ilmu-seiprit/profil/logo/paket.html` (fungsi `kai(expr)`, bisa disalin ke halaman video). Aset jadi: `ilmu-seiprit/profil/logo/final/` + `ilmu-seiprit-logo.zip`. Pola video: Kai kaget/mikir di hook → ngeh di "pantesan".
 - Bio semua platform: `ilmu-seiprit/profil/bio.md`.
 
 ## Angle
@@ -32,6 +32,8 @@ Akun kedua Deny, terpisah dari Bokek Anonim. **Bukan** konten finansial.
 
 ## Seri
 *Pantesan!* (kenapa…) · *Ternyata Hoaks* · *Angka Gila* · *Asal-usul* (kata/benda).
+- **Tanya Kai** (seri tanya-jawab): penonton tanya "kenapa…?" di komentar, Kai jawab di video balasan (fitur balas komentar dengan video di TikTok/IG). CTA standar: "Ada yang bikin kamu penasaran? Tanya Kai di komen." Tulis selalu **"Tanya Kai"** (huruf kecil sesudah K), hashtag `#TanyaKai`, dan jangan pakai huruf kapital semua (KAI) supaya tidak tertukar dengan PT KAI (kereta api).
+- Maskot bernama **Kai** (diganti dari "Iprit" pada 2026-11-12 karena mirip "ifrit"/jin).
 
 ## Format
 | Format | Durasi/isi | Jalur produksi |

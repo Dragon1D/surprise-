@@ -3,7 +3,7 @@ const { chromium } = require('playwright'); const path = require('path'), http =
 const root = path.resolve(__dirname, '../../..'), outDir = path.join(__dirname, 'final');
 fs.mkdirSync(outDir, { recursive: true });
 const srv = http.createServer((q, r) => { const p = path.join(root, decodeURIComponent(q.url.split('?')[0])); fs.readFile(p, (e, b) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'Content-Type': p.endsWith('.html') ? 'text/html' : 'font/woff2' }); r.end(b); }); });
-const JOBS = [['avatar', 'avatar-1080.png', false], ['logo', 'iprit-transparan-1080.png', true], ['ekspresi-senyum', 'iprit-senyum.png', true], ['ekspresi-kaget', 'iprit-kaget.png', true], ['ekspresi-mikir', 'iprit-mikir.png', true], ['ekspresi-ngeh', 'iprit-ngeh.png', true], ['banner-yt', 'banner-youtube-2560x1440.png', false], ['cover-fb', 'sampul-facebook-1640x624.png', false], ['watermark', 'watermark-video.png', true], ['lembar', '../lembar-iprit.png', false]];
+const JOBS = [['avatar', 'avatar-1080.png', false], ['logo', 'kai-transparan-1080.png', true], ['ekspresi-senyum', 'kai-senyum.png', true], ['ekspresi-kaget', 'kai-kaget.png', true], ['ekspresi-mikir', 'kai-mikir.png', true], ['ekspresi-ngeh', 'kai-ngeh.png', true], ['banner-yt', 'banner-youtube-2560x1440.png', false], ['cover-fb', 'sampul-facebook-1640x624.png', false], ['watermark', 'watermark-video.png', true], ['lembar', '../lembar-kai.png', false]];
 srv.listen(0, async () => {
   const b = await chromium.launch(), port = srv.address().port;
   for (const [o, file, transp] of JOBS) {
