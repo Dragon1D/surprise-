@@ -44,7 +44,16 @@ Rasa konten (campur tiap minggu): 🤯 nggak masuk akal · 😂 lucu · 🌀 nye
 - **Sejarah Nyeleneh** — kejadian, aturan, tradisi aneh tapi tercatat.
 - **Kamu Nanya, Kai Jawab** — pertanyaan dari komentar (video balasan komentar di TikTok/IG).
 
-Bank ide: `tanya-kai/bank-ide.csv` (90 ide, semua berstatus perlu cek).
+## Cara mencari ide (keputusan Deny 2026-11-12: "jangan yang itu-itu aja")
+Fakta trivia standar (wombat, gurita 3 jantung, Cleopatra, ikan mas 3 detik, pisang beri, dll.) **tidak dipakai** karena penonton sudah sering melihatnya dan semua AI mengusulkannya. Cari dari **tambang** spesifik:
+1. **Riset Absurd** — pemenang Ig Nobel (improbable.com) & studi aneh yang dipublikasikan.
+2. **Dunia Nyeleneh** — perbatasan/wilayah aneh, aturan & tradisi nyata, insiden sejarah konyol (hati-hati "hukum aneh" palsu).
+3. **Indonesia Nyeleneh / Asal-usul Kata** — hal Indonesia yang orang Indonesia belum tahu, etimologi kata sehari-hari.
+4. **Masa Sih? / Hewan Aneh** — temuan sains baru yang belum jadi trivia standar.
+5. **Ternyata Hoaks** — mitos populer (terutama di Indonesia) yang dibantah sumber kredibel.
+**Uji basi:** kalau topik muncul sebagai contoh standar di artikel "fakta unik" populer, buang — kecuali ada sudut pandang baru. Setiap ide masuk bank hanya jika keberadaannya sudah dicek (minimal 1 URL), lalu tetap dibuka ulang sumbernya sebelum produksi.
+
+Bank ide aktif: `tanya-kai/bank-ide.csv` (dari tambang). Daftar trivia standar lama disimpan di `tanya-kai/arsip/bank-ide-trivia-standar.csv` sebagai daftar "jangan dipakai".
 
 ## Format
 | Format | Durasi/isi | Jalur produksi |
