@@ -71,5 +71,9 @@ Bank ide aktif: `tanya-kai/bank-ide.csv` (dari tambang). Daftar trivia standar l
 5. Hindari topik medis yang bisa dipakai sebagai saran pengobatan, politik, SARA, dan klaim kesehatan produk.
 6. Angka besar sebutkan satuan & tahun datanya.
 
+## Produksi (sejak 2026-11-12)
+- Ikuti plugin **studio-video-deny** (aturan di SKILL.md + PANDUAN-KERJA.md plugin). Paketnya disalin ke `studio/` (lokal, di-.gitignore, tidak diterbitkan): salin ulang dari folder plugin lalu `npm install` di `studio/proj` kalau container baru. Karakter tetap **Kai** dan palet Permen Kapas (plugin: karakter ikut room).
+- **VO**: Deny memakai sumber VO lain (bukan model suara Bokek). Berikan naskah siap tempel; Deny mengirim file suara, lalu disusun sesuai waktu adegan.
+
 ## Distribusi
 IG (+ FB otomatis), TikTok, YT Shorts, Threads. Mulai: 1 short/hari + 3 carousel/minggu, naik setelah ada data.

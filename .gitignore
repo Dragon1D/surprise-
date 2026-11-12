@@ -7,3 +7,6 @@ explainer/kok-bisa/events.json
 **/preview/
 explainer/*/sound*.wav
 explainer/*/events*.json
+
+# paket plugin studio-video-deny (salinan lokal, tidak diterbitkan; pasang ulang dari plugin bila container baru)
+studio/
