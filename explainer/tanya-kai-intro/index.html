@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kai · Intro Ilmu Seiprit</title>
+<title>Kai · Intro Tanya Kai</title>
 <style>
   @font-face { font-family: Pop; src: url(fonts/poppins-600.woff2) format('woff2'); font-weight: 600; }
   @font-face { font-family: Pop; src: url(fonts/poppins-800.woff2) format('woff2'); font-weight: 800; }
@@ -18,7 +18,7 @@
 <body>
 <svg id="v" viewBox="0 0 720 1280" xmlns="http://www.w3.org/2000/svg"></svg>
 <script>
-/* Kai (maskot Ilmu Seiprit), palet "Permen Kapas", pose Tunas Ide. 6 dtk, bisa jadi intro/penutup. */
+/* Kai (maskot & nama akun "Tanya Kai"), palet "Permen Kapas", pose Tunas Ide. 6 dtk, bisa jadi intro/penutup. */
 const DURATION = 6; window.DURATION = DURATION;
 const P = { ink: '#1f1b2e', white: '#ffffff', body: '#ff9ec4', shine: '#ffd3e6', fold: '#f06fa2', cheek: '#ff5a5f', leaf: '#5fe0a8', yel: '#ffd23f', bg1: '#8b7bff', bg2: '#4fc3ff', mint: '#5fe0a8' };
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -108,7 +108,7 @@ function thought(t) { // gelembung pikiran saat mikir
 const _cv = document.createElement('canvas').getContext('2d');
 function title(t) {
   let s = '';
-  const words = ['Ilmu', 'Seiprit'];
+  const words = ['Tanya', 'Kai'];
   _cv.font = '900 96px Pop';
   const ws = words.map(w => _cv.measureText(w).width - 2 * w.length), gap = 26, tot = ws[0] + ws[1] + gap;
   words.forEach((w, i) => {
@@ -143,8 +143,7 @@ function kaiAt(t) {
 }
 const svg = document.getElementById('v');
 function renderAt(t) {
-  svg.innerHTML = bg(t) + burst(t, false) + kaiAt(t) + thought(t) + burst(t, true) + title(t)
-    + `<text x="360" y="1210" text-anchor="middle" font-size="28" font-weight="800" fill="#ffffff" opacity="${f(prog(t, 3.8, 4.2))}">@ilmuseiprit</text>`;
+  svg.innerHTML = bg(t) + burst(t, false) + kaiAt(t) + thought(t) + burst(t, true) + title(t);
 }
 window.renderAt = renderAt;
 

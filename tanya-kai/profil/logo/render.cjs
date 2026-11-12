@@ -1,4 +1,4 @@
-// Render paket logo Ilmu Seiprit: node render.cjs (dari root repo: NODE_PATH=$(npm root -g) node ilmu-seiprit/profil/logo/render.cjs)
+// Render paket logo Tanya Kai: node render.cjs (dari root repo: NODE_PATH=$(npm root -g) node tanya-kai/profil/logo/render.cjs)
 const { chromium } = require('playwright'); const path = require('path'), http = require('http'), fs = require('fs');
 const root = path.resolve(__dirname, '../../..'), outDir = path.join(__dirname, 'final');
 fs.mkdirSync(outDir, { recursive: true });
@@ -8,7 +8,7 @@ srv.listen(0, async () => {
   const b = await chromium.launch(), port = srv.address().port;
   for (const [o, file, transp] of JOBS) {
     const pg = await b.newPage({ viewport: { width: 2560, height: 1440 } });
-    await pg.goto(`http://127.0.0.1:${port}/ilmu-seiprit/profil/logo/paket.html?out=${o}`); await pg.evaluate(() => window.READY);
+    await pg.goto(`http://127.0.0.1:${port}/tanya-kai/profil/logo/paket.html?out=${o}`); await pg.evaluate(() => window.READY);
     const [w, h] = await pg.evaluate(() => window.SIZE);
     await pg.setViewportSize({ width: w, height: h });
     await pg.screenshot({ path: path.join(outDir, file), omitBackground: transp, clip: { x: 0, y: 0, width: w, height: h } });

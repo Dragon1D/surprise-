@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Tanya Kai · paket logo</title>
+<style>
+  @font-face { font-family: Pop; src: url(../../../explainer/contoh-a-anonim/fonts/poppins-600.woff2) format('woff2'); font-weight: 600; }
+  @font-face { font-family: Pop; src: url(../../../explainer/contoh-a-anonim/fonts/poppins-800.woff2) format('woff2'); font-weight: 800; }
+  @font-face { font-family: Pop; src: url(../../../explainer/contoh-a-anonim/fonts/poppins-900.woff2) format('woff2'); font-weight: 900; }
+  html, body { margin: 0; background: transparent; font-family: Pop, sans-serif; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<svg id="v" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+/* Tanya Kai — paket logo, palet "Permen Kapas", pose Tunas Ide.
+   ?out=avatar|logo|ekspresi-<senyum|kaget|mikir|ngeh>|banner-yt|cover-fb|watermark|lembar */
+const P = { ink: '#1f1b2e', white: '#ffffff', body: '#ff9ec4', shine: '#ffd3e6', fold: '#f06fa2', cheek: '#ff5a5f', leaf: '#5fe0a8', yel: '#ffd23f', bg1: '#8b7bff', bg2: '#4fc3ff', mint: '#5fe0a8' };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eout = k => 1 - Math.pow(1 - k, 3);
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const spr = (dt, z = .38, w = 16) => { if (dt <= 0) return 0; const wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * dt) * (Math.cos(wd * dt) + z / Math.sqrt(1 - z * z) * Math.sin(wd * dt)); };
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const f = n => (+n).toFixed(1);
+const O = (w = 12) => `stroke="${P.ink}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
+const star = (r, fill = P.white, sw = 9) => { let d = ''; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, rr = i % 2 ? r * .4 : r; d += `${i ? 'L' : 'M'}${f(Math.cos(a) * rr)} ${f(Math.sin(a) * rr)} `; } return `<path d="${d}Z" fill="${fill}" stroke="${P.ink}" stroke-width="${sw}" stroke-linejoin="round"/>`; };
+
+/* ---------- Kai (kotak 512, kaki di y≈414) ---------- */
+const BODY = 'M112 300 C98 222 142 152 212 152 C232 120 290 118 314 150 C382 148 422 212 406 292 C400 362 332 394 258 394 C178 394 118 362 112 300 Z';
+function kai(o) {
+  // o: wave (derajat ayunan lengan), sprout (derajat), look [x,y], eyes 'open'|'blink'|'star', mouth 'smile'|'o'|'grin'
+  let s = '';
+  s += `<ellipse cx="216" cy="398" rx="28" ry="16" fill="${P.body}" ${O(11)}/><ellipse cx="300" cy="398" rx="28" ry="16" fill="${P.body}" ${O(11)}/>`;
+  // lengan kanan (diam, sedikit berayun)
+  s += `<g transform="rotate(${f(o.rest || 0)} 402 318)"><path d="M402 318 C426 330 432 350 424 366" fill="none" ${O(30)}/><path d="M402 318 C426 330 432 350 424 366" fill="none" stroke="${P.body}" stroke-width="16" stroke-linecap="round"/><circle cx="422" cy="372" r="17" fill="${P.body}" ${O(10)}/></g>`;
+  // tunas
+  s += `<g transform="rotate(${f(o.sprout)} 262 152)"><path d="M262 150 C262 112 254 92 270 70" fill="none" ${O(10)}/><path d="M270 72 C300 40 350 46 356 64 C330 92 292 92 270 72 Z" fill="${P.leaf}" ${O(10)}/><path d="M266 92 C240 70 206 74 200 90 C220 110 252 108 266 92 Z" fill="${P.leaf}" ${O(9)}/></g>`;
+  // badan otak
+  s += `<path d="${BODY}" fill="${P.body}" ${O(13)}/><path d="M140 250 C150 200 190 176 230 176" fill="none" stroke="${P.shine}" stroke-width="16" stroke-linecap="round"/>`;
+  s += `<path d="M262 138 C250 168 270 192 256 222" fill="none" stroke="${P.ink}" stroke-width="9" stroke-linecap="round"/><path d="M190 196 q22 -8 30 12 M320 186 q-18 10 -6 30 q10 12 28 6 M350 250 q-20 0 -26 14" fill="none" stroke="${P.fold}" stroke-width="10" stroke-linecap="round"/>`;
+  // mata
+  [[204, 284], [312, 284]].forEach(([x, y]) => {
+    if (o.eyes === 'blink') s += `<path d="M${x - 26} ${y + 2} q26 16 52 0" fill="none" ${O(9)}/>`;
+    else if (o.eyes === 'star') s += `<ellipse cx="${x}" cy="${y}" rx="32" ry="38" fill="${P.ink}"/><g transform="translate(${x} ${y}) rotate(${f(o.spin || 0)})">${star(24, P.yel, 0)}</g><circle cx="${x - 12}" cy="${y - 18}" r="6" fill="${P.white}"/>`;
+    else { const [lx, ly] = o.look || [0, 0]; s += `<ellipse cx="${x}" cy="${y}" rx="30" ry="38" fill="${P.ink}"/><circle cx="${x - 9 + lx}" cy="${y - 14 + ly}" r="12" fill="${P.white}"/><circle cx="${x + 9 + lx}" cy="${y + 12 + ly}" r="5.5" fill="${P.white}"/>`; }
+  });
+  s += `<ellipse cx="160" cy="330" rx="22" ry="12" fill="${P.cheek}" opacity=".75"/><ellipse cx="356" cy="330" rx="22" ry="12" fill="${P.cheek}" opacity=".75"/>`;
+  if (o.mouth === 'o') s += `<ellipse cx="258" cy="334" rx="13" ry="16" fill="${P.ink}"/>`;
+  else if (o.mouth === 'grin') s += `<path d="M226 320 q32 40 64 0 z" fill="${P.ink}" ${O(6)}/><ellipse cx="258" cy="342" rx="15" ry="8" fill="#ff7aa2"/>`;
+  else s += `<path d="M234 326 q24 30 48 0 z" fill="${P.ink}" ${O(6)}/><ellipse cx="258" cy="342" rx="12" ry="7" fill="#ff7aa2"/>`;
+  // lengan kiri melambai (pivot di bahu)
+  s += `<g transform="rotate(${f(o.wave)} 118 318)"><path d="M118 318 C92 300 80 270 88 244" fill="none" ${O(30)}/><path d="M118 318 C92 300 80 270 88 244" fill="none" stroke="${P.body}" stroke-width="16" stroke-linecap="round"/><circle cx="88" cy="236" r="18" fill="${P.body}" ${O(10)}/></g>`;
+  return s;
+}
+
+
+const EXPR = {
+  senyum: { wave: 0, rest: 0, sprout: 0, look: [0, 0], eyes: 'open', mouth: 'smile' },
+  kaget: { wave: -30, rest: -25, sprout: 18, look: [0, 0], eyes: 'open', mouth: 'o' },
+  mikir: { wave: 0, rest: 0, sprout: -8, look: [8, -10], eyes: 'open', mouth: 'o' },
+  ngeh: { wave: -22, rest: -20, sprout: 12, look: [0, 0], eyes: 'star', mouth: 'grin', spin: 12 },
+};
+function kaiE(e) {
+  let s = kai(EXPR[e]);
+  if (e === 'senyum') s += `<g transform="translate(408 110) rotate(10)">${star(34, P.yel)}</g>`;
+  if (e === 'kaget') s += `<path d="M120 150 l-24 -22 M150 122 l-10 -30 M386 120 l14 -30" stroke="${P.ink}" stroke-width="10" stroke-linecap="round"/>`;
+  if (e === 'mikir') s += `<g fill="#fff" stroke="${P.ink}" stroke-width="7"><circle cx="404" cy="140" r="12"/><circle cx="432" cy="100" r="18"/><circle cx="470" cy="50" r="30"/></g><text x="470" y="64" text-anchor="middle" font-size="40" font-weight="900" fill="${P.bg1}">?</text>`;
+  if (e === 'ngeh') s += `<g transform="translate(410 104) rotate(12)">${star(46, P.yel)}</g><g transform="translate(96 160) rotate(-10)">${star(26, '#fff', 8)}</g>`;
+  return s;
+}
+function bgFill(W, H, cx, cy, R) {
+  let s = `<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${P.bg1}"/><stop offset="1" stop-color="${P.bg2}"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#bg)"/>`;
+  for (let i = 0; i < 16; i++) { const a = i * Math.PI / 8; s += `<path d="M${cx} ${cy} L${f(cx + Math.cos(a - .1) * R)} ${f(cy + Math.sin(a - .1) * R)} L${f(cx + Math.cos(a + .1) * R)} ${f(cy + Math.sin(a + .1) * R)} Z" fill="#fff" opacity=".13"/>`; }
+  const cols = [P.yel, P.mint, '#fff', '#ff7aa2'];
+  for (let i = 0; i < Math.round(W * H / 60000); i++) { const x = rnd(i) * W, y = rnd(i + 50) * H, r = 6 + rnd(i + 9) * 7 * (W / 1080); s += i % 2 ? `<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="${cols[i % 4]}" stroke="${P.ink}" stroke-width="3.5"/>` : `<rect x="${f(x - r)}" y="${f(y - r)}" width="${f(r * 2)}" height="${f(r * 2)}" rx="3" fill="${cols[i % 4]}" stroke="${P.ink}" stroke-width="3.5" transform="rotate(${i * 30} ${f(x)} ${f(y)})"/>`; }
+  return s;
+}
+const word = (x, y, size, anchor = 'start') => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" font-weight="900" fill="#fff" stroke="${P.ink}" stroke-width="${size * .12}" paint-order="stroke" letter-spacing="-2">Tanya Kai</text>`;
+const tag = (x, y, size, anchor = 'start') => { const w = size * 11.2; const x0 = anchor === 'middle' ? x - w / 2 : x; return `<g transform="translate(${x0} ${y})"><rect width="${w}" height="${size * 1.9}" rx="${size * .95}" fill="${P.yel}" stroke="${P.ink}" stroke-width="${size * .16}"/><text x="${w / 2}" y="${size * 1.28}" text-anchor="middle" font-size="${size}" font-weight="900" fill="${P.ink}">Dikit, tapi nempel.</text></g>`; };
+
+const q = new URLSearchParams(location.search), out = q.get('out') || 'avatar';
+let W = 1080, H = 1080, s = '';
+if (out === 'avatar') s = bgFill(1080, 1080, 540, 540, 900) + `<g transform="translate(540 585) scale(2.05) translate(-258 -270)">${kaiE('senyum')}</g>`;
+else if (out === 'logo') s = `<g transform="translate(540 560) scale(1.95) translate(-258 -270)">${kaiE('senyum')}</g>`;
+else if (out.startsWith('ekspresi-')) s = `<g transform="translate(540 560) scale(1.85) translate(-258 -270)">${kaiE(out.slice(9))}</g>`;
+else if (out === 'watermark') { W = 380; H = 120; s = `<g transform="translate(6 6) scale(.21)">${kai(EXPR.senyum)}</g><text x="118" y="74" font-size="40" font-weight="900" fill="#fff" stroke="${P.ink}" stroke-width="7" paint-order="stroke">Tanya Kai</text>`; }
+else if (out === 'banner-yt') { W = 2560; H = 1440; s = bgFill(W, H, 1280, 720, 2000) + `<g transform="translate(760 720) scale(.86) translate(-258 -270)">${kaiE('ngeh')}</g>` + word(1010, 730, 170) + tag(1020, 790, 52); }
+else if (out === 'cover-fb') { W = 1640; H = 624; s = bgFill(W, H, 820, 312, 1300) + `<g transform="translate(480 320) scale(.9) translate(-258 -270)">${kaiE('ngeh')}</g>` + word(700, 320, 108) + tag(706, 356, 34); }
+else if (out === 'lembar') {
+  W = 1600; H = 900;
+  s = `<rect width="1600" height="900" fill="#fbf7ff"/><text x="60" y="80" font-size="44" font-weight="900" fill="${P.ink}">Tanya Kai · 4 ekspresi Kai</text>`;
+  ['senyum', 'kaget', 'mikir', 'ngeh'].forEach((e, i) => { s += `<g transform="translate(${60 + i * 385} 130)"><svg width="340" height="340" viewBox="0 0 1080 1080">${bgFill(1080, 1080, 540, 540, 900)}<g transform="translate(540 560) scale(1.85) translate(-258 -270)">${kaiE(e)}</g></svg><text x="170" y="390" text-anchor="middle" font-size="32" font-weight="900" fill="${P.ink}">${e}</text></g>`; });
+  s += `<defs><clipPath id="cc"><circle cx="540" cy="540" r="540"/></clipPath></defs>`;
+  [[230, 60, 600], [110, 320, 660], [56, 460, 690]].forEach(([w, x, y]) => s += `<svg x="${x}" y="${y}" width="${w}" height="${w}" viewBox="0 0 1080 1080"><g clip-path="url(#cc)">${bgFill(1080, 1080, 540, 540, 900)}<g transform="translate(540 585) scale(2.05) translate(-258 -270)">${kaiE('senyum')}</g></g></svg>`);
+  s += `<text x="580" y="720" font-size="30" font-weight="800" fill="${P.ink}">Avatar (tes ukuran 230 / 110 / 56 px)</text>`;
+}
+const v = document.getElementById('v');
+v.setAttribute('width', W); v.setAttribute('height', H); v.setAttribute('viewBox', `0 0 ${W} ${H}`); v.innerHTML = s;
+window.SIZE = [W, H];
+window.READY = Promise.all([600, 800, 900].map(w => document.fonts.load(`${w} 40px Pop`)));
+</script>
+</body>
+</html>
