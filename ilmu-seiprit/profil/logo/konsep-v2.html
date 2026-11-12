@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Kai · konsep v2</title>
+<style>
+  @font-face { font-family: Pop; src: url(../../../explainer/contoh-a-anonim/fonts/poppins-600.woff2) format('woff2'); font-weight: 600; }
+  @font-face { font-family: Pop; src: url(../../../explainer/contoh-a-anonim/fonts/poppins-900.woff2) format('woff2'); font-weight: 900; }
+  body { margin: 0; background: #f6f7f2; font-family: Pop, sans-serif; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<svg id="v" xmlns="http://www.w3.org/2000/svg" width="1600" height="1060" viewBox="0 0 1600 1060"></svg>
+<script>
+const P = { teal: '#0f4c5c', tealL: '#1a6577', tealLL: '#2a7f92', lime: '#d7f75b', limeL: '#ecff9e', limeD: '#a9cf2c', cream: '#f6f7f2', ink: '#14232a', pink: '#ff7aa2', pinkD: '#e85584', white: '#ffffff', yel: '#ffd84d' };
+const O = (w = 12) => `stroke="${P.ink}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
+const star = (r, fill = P.white, sw = 9) => { let d = ''; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, rr = i % 2 ? r * .4 : r; d += `${i ? 'L' : 'M'}${(Math.cos(a) * rr).toFixed(1)} ${(Math.sin(a) * rr).toFixed(1)} `; } return `<path d="${d}Z" fill="${fill}" stroke="${P.ink}" stroke-width="${sw}" stroke-linejoin="round"/>`; };
+
+// latar: lingkaran teal + sinar lembut
+function bg() {
+  let s = `<circle cx="256" cy="256" r="256" fill="${P.teal}"/>`;
+  for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; s += `<path d="M256 256 L${256 + Math.cos(a - .13) * 400} ${256 + Math.sin(a - .13) * 400} L${256 + Math.cos(a + .13) * 400} ${256 + Math.sin(a + .13) * 400} Z" fill="${P.tealL}" opacity=".55"/>`; }
+  return s + `<circle cx="256" cy="270" r="170" fill="${P.tealLL}" opacity=".45"/>`;
+}
+// badan otak imut
+const BODY = 'M112 300 C98 222 142 152 212 152 C232 120 290 118 314 150 C382 148 422 212 406 292 C400 362 332 394 258 394 C178 394 118 362 112 300 Z';
+function brain(o = {}) {
+  let s = `<path d="${BODY}" fill="${P.lime}" ${O(13)}/>`;
+  s += `<path d="M140 250 C150 200 190 176 230 176" fill="none" stroke="${P.limeL}" stroke-width="16" stroke-linecap="round" opacity=".9"/>`; // kilap
+  s += `<path d="M262 138 C250 168 270 192 256 222" fill="none" stroke="${P.ink}" stroke-width="9" stroke-linecap="round"/>`;
+  s += `<path d="M190 196 q22 -8 30 12 M320 186 q-18 10 -6 30 q10 12 28 6 M350 250 q-20 0 -26 14" fill="none" stroke="${P.limeD}" stroke-width="10" stroke-linecap="round"/>`;
+  return s;
+}
+function eyes(look = [0, 0], big = 1) {
+  let s = '';
+  [[204, 284], [312, 284]].forEach(([x, y]) => {
+    s += `<ellipse cx="${x}" cy="${y}" rx="${30 * big}" ry="${38 * big}" fill="${P.ink}"/>`;
+    s += `<circle cx="${x - 9 + look[0]}" cy="${y - 14 + look[1]}" r="${12 * big}" fill="${P.white}"/><circle cx="${x + 9 + look[0]}" cy="${y + 12 + look[1]}" r="${5.5 * big}" fill="${P.white}"/>`;
+  });
+  return s;
+}
+const cheeks = `<ellipse cx="160" cy="330" rx="22" ry="12" fill="${P.pink}" opacity=".85"/><ellipse cx="356" cy="330" rx="22" ry="12" fill="${P.pink}" opacity=".85"/>`;
+const mouth = `<path d="M234 326 q24 30 48 0 z" fill="${P.ink}" ${O(6)}/><ellipse cx="258" cy="342" rx="12" ry="7" fill="${P.pink}"/>`;
+const feet = `<ellipse cx="216" cy="398" rx="28" ry="16" fill="${P.lime}" ${O(11)}/><ellipse cx="300" cy="398" rx="28" ry="16" fill="${P.lime}" ${O(11)}/>`;
+const armWave = `<path d="M118 318 C92 300 80 270 88 244" fill="none" ${O(30)}/><path d="M118 318 C92 300 80 270 88 244" fill="none" stroke="${P.lime}" stroke-width="16" stroke-linecap="round"/><circle cx="88" cy="236" r="18" fill="${P.lime}" ${O(10)}/>`;
+const armRest = `<path d="M402 318 C426 330 432 350 424 366" fill="none" ${O(30)}/><path d="M402 318 C426 330 432 350 424 366" fill="none" stroke="${P.lime}" stroke-width="16" stroke-linecap="round"/><circle cx="422" cy="372" r="17" fill="${P.lime}" ${O(10)}/>`;
+
+// A · Halo! — melambai, lidah keluar, bintang
+const A = bg() + `<g transform="translate(0 -6)">${feet}${armRest}${brain()}${eyes([0, 0])}${cheeks}${mouth}${armWave}</g><g transform="translate(410 120) rotate(14)">${star(38)}</g><g transform="translate(120 130)">${star(20, P.lime, 7)}</g>`;
+// B · Kepo — kacamata bulat + kaca pembesar
+const glasses = `<g fill="${P.white}" fill-opacity=".18"><circle cx="204" cy="284" r="50" ${O(10)}/><circle cx="312" cy="284" r="50" ${O(10)}/></g><path d="M254 280 q4 -8 8 0" fill="none" ${O(8)}/>`;
+const magnifier = `<path d="M420 360 L456 404" ${O(26)}/><path d="M420 360 L456 404" stroke="${P.yel}" stroke-width="12" stroke-linecap="round"/><circle cx="392" cy="324" r="44" fill="${P.white}" fill-opacity=".35" ${O(11)}/><path d="M374 306 q10 -8 22 -4" fill="none" stroke="${P.white}" stroke-width="7" stroke-linecap="round"/>`;
+const B = bg() + `<g transform="translate(-10 -6)">${feet}${brain()}${eyes([6, -4], .9)}${glasses}${cheeks}<path d="M240 332 q18 16 36 0" fill="none" ${O(8)}/>${magnifier}</g><g transform="translate(110 120)">${star(26, P.lime, 8)}</g>`;
+// C · Cilukba — mengintip dari bawah, tangan berpegangan di tepi
+const C = bg() + `<g transform="translate(0 120)">${brain()}${eyes([10, -10])}${cheeks}<path d="M236 330 q22 22 44 0" fill="none" ${O(8)}/></g>
+  <path d="M-10 440 Q256 400 522 440 L522 520 L-10 520 Z" fill="${P.lime}" ${O(12)}/>
+  <circle cx="150" cy="430" r="26" fill="${P.lime}" ${O(10)}/><circle cx="362" cy="430" r="26" fill="${P.lime}" ${O(10)}/>
+  <path d="M140 420 v14 M152 418 v16 M352 418 v16 M364 420 v14" stroke="${P.ink}" stroke-width="5" stroke-linecap="round"/>
+  <g transform="translate(400 150) rotate(14)">${star(40)}</g><g transform="translate(112 170)">${star(22, P.lime, 7)}</g>`;
+// D · Tunas Ide — tunas daun di kepala + lampu kecil menyala
+const sprout = `<path d="M262 150 C262 112 254 92 270 70" fill="none" ${O(10)}/><path d="M270 72 C300 40 350 46 356 64 C330 92 292 92 270 72 Z" fill="${P.lime}" ${O(10)}/><path d="M266 92 C240 70 206 74 200 90 C220 110 252 108 266 92 Z" fill="${P.limeD}" ${O(9)}/>`;
+const D = bg() + `<g transform="translate(0 16)">${feet}${armRest}${sprout}${brain()}${eyes([0, 0], 1.05)}${cheeks}${mouth}${armWave}</g><g transform="translate(408 110) rotate(10)">${star(34, P.yel)}</g>`;
+
+const opts = [['A · Halo!', 'melambai + lidah melet, paling ramah', A], ['B · Kepo', 'kacamata bulat + kaca pembesar, kesan pintar & penasaran', B], ['C · Cilukba', 'ngintip dari bawah, bikin orang penasaran', C], ['D · Tunas Ide', 'tunas di kepala = ilmu yang tumbuh', D]];
+let s = `<rect width="1600" height="1060" fill="${P.cream}"/><text x="60" y="80" font-size="46" font-weight="900" fill="${P.ink}">Kai · konsep logo v2 (lebih imut)</text>`;
+opts.forEach(([name, desc, svg], i) => {
+  const x = 60 + i * 385;
+  s += `<g transform="translate(${x} 130)"><defs><clipPath id="c${i}"><circle cx="256" cy="256" r="256"/></clipPath></defs>`;
+  s += `<svg width="340" height="340" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg>`;
+  s += `<svg x="0" y="370" width="120" height="120" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg><svg x="140" y="400" width="64" height="64" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg><svg x="224" y="416" width="36" height="36" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg>`;
+  s += `<text x="0" y="550" font-size="32" font-weight="900" fill="${P.ink}">${name}</text><foreignObject x="0" y="566" width="340" height="90"><div xmlns="http://www.w3.org/1999/xhtml" style="font:600 20px Pop;color:#5c6b70">${desc}</div></foreignObject></g>`;
+});
+// simulasi di grid profil (avatar di samping nama)
+s += `<g transform="translate(60 820)"><rect width="1480" height="200" rx="28" fill="#ffffff" stroke="#e3e6dc" stroke-width="3"/>`;
+opts.forEach(([n, d, svg], i) => { s += `<svg x="${30 + i * 365}" y="50" width="100" height="100" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg><text x="${145 + i * 365}" y="92" font-size="30" font-weight="900" fill="${P.ink}">ilmuseiprit</text><text x="${145 + i * 365}" y="124" font-size="20" font-weight="600" fill="#6b7a7f">Dikit, tapi nempel ✨</text>`; });
+s += `</g>`;
+document.getElementById('v').innerHTML = s;
+window.READY = Promise.all([600, 900].map(w => document.fonts.load(`${w} 40px Pop`)));
+</script>
+</body>
+</html>
