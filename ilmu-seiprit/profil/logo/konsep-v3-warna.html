@@ -1,0 +1,62 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Kai · palet colorful</title>
+<style>@font-face{font-family:Pop;src:url(../../../explainer/contoh-a-anonim/fonts/poppins-600.woff2) format('woff2');font-weight:600}@font-face{font-family:Pop;src:url(../../../explainer/contoh-a-anonim/fonts/poppins-900.woff2) format('woff2');font-weight:900}body{margin:0;font-family:Pop,sans-serif}svg{display:block}</style></head><body>
+<svg id="v" xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120"></svg><script>
+const P = { ink: '#1f1b2e', white: '#ffffff', pink: '#ff6f9a', yel: '#ffd23f' };
+const O = (w = 12) => `stroke="${P.ink}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
+const star = (r, fill = P.white, sw = 9) => { let d = ''; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, rr = i % 2 ? r * .4 : r; d += `${i ? 'L' : 'M'}${(Math.cos(a) * rr).toFixed(1)} ${(Math.sin(a) * rr).toFixed(1)} `; } return `<path d="${d}Z" fill="${fill}" stroke="${P.ink}" stroke-width="${sw}" stroke-linejoin="round"/>`; };
+let Q;
+const PAL = [
+ { id: 1, name: 'Permen Kapas', desc: 'Kai pink, latar ungu–biru, konfeti kuning & mint', body: '#ff9ec4', shine: '#ffd3e6', fold: '#f06fa2', bg1: '#8b7bff', bg2: '#4fc3ff', ray: '#ffffff', leaf: '#5fe0a8', star: '#ffd23f', conf: [[90,150,'#ffd23f',1],[430,330,'#5fe0a8',0],[110,380,'#ffd23f',0],[420,430,'#ffffff',1],[70,260,'#5fe0a8',1]] },
+ { id: 2, name: 'Jeruk Ceria', desc: 'Kai pink, latar kuning–oranye, konfeti biru & ungu', body: '#ff9ec4', shine: '#ffd3e6', fold: '#f06fa2', bg1: '#ffd23f', bg2: '#ff8a3d', ray: '#ffffff', leaf: '#3ccf8e', star: '#ffffff', conf: [[90,150,'#4fc3ff',1],[430,330,'#8b7bff',0],[110,380,'#4fc3ff',0],[420,430,'#8b7bff',1],[70,260,'#ffffff',1]] },
+ { id: 3, name: 'Mint Segar', desc: 'Kai mint, latar pink–peach, konfeti kuning & biru', body: '#7ff0c4', shine: '#c9fff0', fold: '#3fcf9a', bg1: '#ff8fb8', bg2: '#ffc38a', ray: '#ffffff', leaf: '#ffd23f', star: '#ffd23f', conf: [[90,150,'#4fc3ff',1],[430,330,'#ffd23f',0],[110,380,'#ffffff',0],[420,430,'#4fc3ff',1],[70,260,'#ffd23f',1]] },
+ { id: 4, name: 'Pelangi Pop', desc: 'Kai limau (lama), latar biru langit–ungu, konfeti warna-warni', body: '#d7f75b', shine: '#ecff9e', fold: '#a9cf2c', bg1: '#4fc3ff', bg2: '#a35bff', ray: '#ffffff', leaf: '#ff6f9a', star: '#ffd23f', conf: [[90,150,'#ff6f9a',1],[430,330,'#ffd23f',0],[110,380,'#ff8a3d',0],[420,430,'#5fe0a8',1],[70,260,'#ffffff',1]] },
+];
+// latar: lingkaran teal + sinar lembut
+function bg() {
+  let s = `<defs><linearGradient id="g${Q.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${Q.bg1}"/><stop offset="1" stop-color="${Q.bg2}"/></linearGradient></defs><circle cx="256" cy="256" r="256" fill="url(#g${Q.id})"/>`;
+  for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; s += `<path d="M256 256 L${256 + Math.cos(a - .13) * 400} ${256 + Math.sin(a - .13) * 400} L${256 + Math.cos(a + .13) * 400} ${256 + Math.sin(a + .13) * 400} Z" fill="${Q.ray}" opacity=".35"/>`; }
+  Q.conf.forEach(([x, y, c, k], i) => s += k ? `<circle cx="${x}" cy="${y}" r="9" fill="${c}" stroke="${P.ink}" stroke-width="4"/>` : `<rect x="${x - 8}" y="${y - 8}" width="16" height="16" rx="4" transform="rotate(${i * 25} ${x} ${y})" fill="${c}" stroke="${P.ink}" stroke-width="4"/>`);
+  return s;
+}
+// badan otak imut
+const BODY = 'M112 300 C98 222 142 152 212 152 C232 120 290 118 314 150 C382 148 422 212 406 292 C400 362 332 394 258 394 C178 394 118 362 112 300 Z';
+function brain(o = {}) {
+  let s = `<path d="${BODY}" fill="${Q.body}" ${O(13)}/>`;
+  s += `<path d="M140 250 C150 200 190 176 230 176" fill="none" stroke="${Q.shine}" stroke-width="16" stroke-linecap="round" opacity=".9"/>`; // kilap
+  s += `<path d="M262 138 C250 168 270 192 256 222" fill="none" stroke="${P.ink}" stroke-width="9" stroke-linecap="round"/>`;
+  s += `<path d="M190 196 q22 -8 30 12 M320 186 q-18 10 -6 30 q10 12 28 6 M350 250 q-20 0 -26 14" fill="none" stroke="${Q.fold}" stroke-width="10" stroke-linecap="round"/>`;
+  return s;
+}
+function eyes(look = [0, 0], big = 1) {
+  let s = '';
+  [[204, 284], [312, 284]].forEach(([x, y]) => {
+    s += `<ellipse cx="${x}" cy="${y}" rx="${30 * big}" ry="${38 * big}" fill="${P.ink}"/>`;
+    s += `<circle cx="${x - 9 + look[0]}" cy="${y - 14 + look[1]}" r="${12 * big}" fill="${P.white}"/><circle cx="${x + 9 + look[0]}" cy="${y + 12 + look[1]}" r="${5.5 * big}" fill="${P.white}"/>`;
+  });
+  return s;
+}
+const cheeks = () => `<ellipse cx="160" cy="330" rx="22" ry="12" fill="${P.pink}" opacity=".85"/><ellipse cx="356" cy="330" rx="22" ry="12" fill="${P.pink}" opacity=".85"/>`;
+const mouth = () => `<path d="M234 326 q24 30 48 0 z" fill="${P.ink}" ${O(6)}/><ellipse cx="258" cy="342" rx="12" ry="7" fill="${P.pink}"/>`;
+const feet = () => `<ellipse cx="216" cy="398" rx="28" ry="16" fill="${Q.body}" ${O(11)}/><ellipse cx="300" cy="398" rx="28" ry="16" fill="${Q.body}" ${O(11)}/>`;
+const armWave = () => `<path d="M118 318 C92 300 80 270 88 244" fill="none" ${O(30)}/><path d="M118 318 C92 300 80 270 88 244" fill="none" stroke="${Q.body}" stroke-width="16" stroke-linecap="round"/><circle cx="88" cy="236" r="18" fill="${Q.body}" ${O(10)}/>`;
+const armRest = () => `<path d="M402 318 C426 330 432 350 424 366" fill="none" ${O(30)}/><path d="M402 318 C426 330 432 350 424 366" fill="none" stroke="${Q.body}" stroke-width="16" stroke-linecap="round"/><circle cx="422" cy="372" r="17" fill="${Q.body}" ${O(10)}/>`;
+
+
+function kaiD() {
+  const sprout = `<path d="M262 150 C262 112 254 92 270 70" fill="none" ${O(10)}/><path d="M270 72 C300 40 350 46 356 64 C330 92 292 92 270 72 Z" fill="${Q.leaf}" ${O(10)}/><path d="M266 92 C240 70 206 74 200 90 C220 110 252 108 266 92 Z" fill="${Q.leaf}" ${O(9)}/>`;
+  return bg() + `<g transform="translate(0 16)">${feet()}${armRest()}${sprout}${brain()}${eyes([0, 0], 1.05)}${cheeks()}${mouth()}${armWave()}</g><g transform="translate(408 110) rotate(10)">${star(34, Q.star)}</g>`;
+}
+let s = `<rect width="1600" height="1120" fill="#fbf7ff"/><text x="60" y="80" font-size="46" font-weight="900" fill="${P.ink}">Kai · 4 palet colorful</text>`;
+PAL.forEach((pal, i) => {
+  Q = pal; const svg = kaiD(), x = 60 + i * 385;
+  s += `<g transform="translate(${x} 130)"><defs><clipPath id="c${i}"><circle cx="256" cy="256" r="256"/></clipPath></defs><svg width="340" height="340" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg>`;
+  s += `<svg x="0" y="370" width="120" height="120" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg><svg x="140" y="400" width="64" height="64" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg><svg x="224" y="416" width="36" height="36" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg>`;
+  s += `<text x="0" y="550" font-size="32" font-weight="900" fill="${P.ink}">${i + 1} · ${pal.name}</text><foreignObject x="0" y="566" width="340" height="90"><div xmlns="http://www.w3.org/1999/xhtml" style="font:600 20px Pop;color:#6b6680">${pal.desc}</div></foreignObject>`;
+  s += [pal.bg1, pal.bg2, pal.body, pal.leaf, pal.star].map((c, k) => `<circle cx="${18 + k * 42}" cy="${680}" r="16" fill="${c}" stroke="${P.ink}" stroke-width="3"/>`).join('') + '</g>';
+});
+s += `<g transform="translate(60 870)"><rect width="1480" height="200" rx="28" fill="#ffffff" stroke="#e8e2f2" stroke-width="3"/>`;
+PAL.forEach((pal, i) => { Q = pal; const svg = kaiD(); s += `<svg x="${30 + i * 365}" y="50" width="100" height="100" viewBox="0 0 512 512"><g clip-path="url(#c${i})">${svg}</g></svg><text x="${145 + i * 365}" y="92" font-size="30" font-weight="900" fill="${P.ink}">ilmuseiprit</text><text x="${145 + i * 365}" y="124" font-size="20" font-weight="600" fill="#6b6680">Dikit, tapi nempel ✨</text>`; });
+s += `</g>`;
+document.getElementById('v').innerHTML = s;
+window.READY = Promise.all([600, 900].map(w => document.fonts.load(`${w} 40px Pop`)));
+</script></body></html>
